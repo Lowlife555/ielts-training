@@ -14,7 +14,7 @@ router.get('/start', (req, res) => {
     SELECT id, word, phonetic, part_of_speech, chinese_definition, topic, level,
            example_sentence, example_translation
     FROM words
-    WHERE level = ? OR level = 'ielts'
+    WHERE level = ?
     ORDER BY RANDOM()
     LIMIT ?
   `).all(level, wordCount);

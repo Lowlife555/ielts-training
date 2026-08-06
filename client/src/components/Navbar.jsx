@@ -60,28 +60,28 @@ export default function Navbar() {
           {/* Nav links */}
           <div className="flex items-center gap-1">
             <Link
-              to="/daily"
+              to="/daily" aria-label="每日训练"
               className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isActive('/daily')}`}
             >
               <CalendarDays className="w-4 h-4" />
               <span className="hidden sm:inline">每日训练</span>
             </Link>
             <Link
-              to="/words"
+              to="/words" aria-label="背单词"
               className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isActive('/words')}`}
             >
               <BookOpen className="w-4 h-4" />
               <span className="hidden sm:inline">背单词</span>
             </Link>
             <Link
-              to="/writing"
+              to="/writing" aria-label="写作"
               className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isActive('/writing')}`}
             >
               <PenLine className="w-4 h-4" />
               <span className="hidden sm:inline">写作</span>
             </Link>
             <Link
-              to="/history"
+              to="/history" aria-label="历史记录"
               className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isActive('/history')}`}
             >
               <BarChart3 className="w-4 h-4" />

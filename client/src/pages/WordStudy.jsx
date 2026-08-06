@@ -94,7 +94,9 @@ export default function WordStudy() {
       </div>
 
       {/* Word card */}
-      <div className="card text-center py-12" onClick={() => setShowDefinition(true)}>
+      <div className="card text-center py-12 cursor-pointer" onClick={() => {
+        if (showDefinition) { next(); } else { setShowDefinition(true); }
+      }}>
         {/* Word */}
         <div className="mb-2">
           <span className="text-4xl font-bold text-gray-900">{currentWord.word}</span>

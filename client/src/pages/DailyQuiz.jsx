@@ -40,7 +40,7 @@ export default function DailyQuiz() {
         setFeedback(null);
         inputRef.current?.focus();
       }
-    }, 600);
+    }, 800);
   }, [userInput, feedback, currentIndex, currentWord, words.length, submitting]);
 
   const finishQuiz = async () => {

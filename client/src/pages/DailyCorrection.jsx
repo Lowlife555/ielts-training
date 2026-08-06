@@ -39,7 +39,7 @@ export default function DailyCorrection() {
         setFeedback(null);
         inputRef.current?.focus();
       }
-    }, 600);
+    }, 800);
   }, [userInput, feedback, currentIndex, currentWrong, wrongWords.length, submitting]);
 
   const finishCorrection = async () => {
