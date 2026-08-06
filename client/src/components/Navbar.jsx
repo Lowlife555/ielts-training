@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { BookOpen, PenLine, BarChart3, Search } from 'lucide-react';
+import { CalendarDays, BookOpen, PenLine, BarChart3, Search } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 
 export default function Navbar() {
@@ -59,6 +59,13 @@ export default function Navbar() {
 
           {/* Nav links */}
           <div className="flex items-center gap-1">
+            <Link
+              to="/daily"
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isActive('/daily')}`}
+            >
+              <CalendarDays className="w-4 h-4" />
+              <span className="hidden sm:inline">每日训练</span>
+            </Link>
             <Link
               to="/words"
               className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isActive('/words')}`}

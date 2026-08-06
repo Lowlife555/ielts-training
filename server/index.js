@@ -31,6 +31,7 @@ app.use('/api/wrong-words', require('./routes/wrongWords'));
 app.use('/api/writing-questions', require('./routes/writingQuestions'));
 app.use('/api/essays', require('./routes/essays'));
 app.use('/api/stats', require('./routes/stats'));
+app.use('/api/daily', require('./routes/daily'));
 
 // Error handling middleware
 app.use((err, req, res, next) => {

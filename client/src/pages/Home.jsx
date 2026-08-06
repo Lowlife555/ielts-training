@@ -66,7 +66,24 @@ export default function Home() {
       </div>
 
       {/* Main modules */}
-      <div className="grid md:grid-cols-2 gap-6 mb-12">
+      <div className="grid md:grid-cols-3 gap-6 mb-12">
+        {/* Daily Study - new primary module */}
+        <Link to="/daily" className="card group hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 border-2 border-green-300 bg-green-50/30">
+          <div className="flex items-start gap-4">
+            <div className="w-14 h-14 bg-green-100 rounded-xl flex items-center justify-center group-hover:bg-green-200 transition-colors">
+              <span className="text-2xl">📅</span>
+            </div>
+            <div className="flex-1">
+              <h2 className="text-xl font-bold text-gray-900 mb-2">每日单词训练</h2>
+              <p className="text-sm text-gray-500 mb-4">
+                单词卡 → 测验 → 订正 → 报告 · 每天50/100词
+              </p>
+              <div className="flex items-center gap-2 text-sm text-green-600 font-medium">
+                开始训练 →
+              </div>
+            </div>
+          </div>
+        </Link>
         {/* Vocabulary module */}
         <Link to="/words" className="card group hover:shadow-md transition-all duration-300 hover:-translate-y-0.5">
           <div className="flex items-start gap-4">
@@ -74,12 +91,12 @@ export default function Home() {
               <BookOpen className="w-7 h-7 text-indigo-600" />
             </div>
             <div className="flex-1">
-              <h2 className="text-xl font-bold text-gray-900 mb-2">单词背诵</h2>
+              <h2 className="text-xl font-bold text-gray-900 mb-2">话题词汇</h2>
               <p className="text-sm text-gray-500 mb-4">
-                8大话题分类 · 280+高频词汇 · 拼写测试 · 间隔复习
+                8大话题分类 · 4200+词汇 · 拼写测试 · 间隔复习
               </p>
               <div className="flex items-center gap-2 text-sm text-indigo-600 font-medium">
-                开始学习 →
+                浏览词汇 →
               </div>
             </div>
           </div>

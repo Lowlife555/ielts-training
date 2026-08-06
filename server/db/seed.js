@@ -329,7 +329,25 @@ function seed() {
   });
 
   insertMany(words);
-  console.log(`Inserted ${words.length} words.`);
+  console.log(`Inserted ${words.length} curated words.`);
+
+  // ======== EXTRACTED WORDS ========
+  const { extractedWords } = require('./seed_extracted.js');
+
+  const insertExtracted = db.prepare(`
+    INSERT INTO words (word, part_of_speech, chinese_definition, topic, level, difficulty_level, source)
+    VALUES (?, ?, ?, ?, ?, 1, 'extracted')
+  `);
+
+  const insertExtractedAll = db.transaction((items) => {
+    for (const w of items) {
+      const cn = (w.chinese_definition || '').trim();
+      insertExtracted.run(w.word, w.part_of_speech || '', cn, w.topic || 'vocabulary', w.level || 'pet');
+    }
+  });
+
+  insertExtractedAll(extractedWords);
+  console.log(`Inserted ${extractedWords.length} extracted words.`);
 
   // ======== WRITING QUESTIONS (30+) ========
   const questions = [

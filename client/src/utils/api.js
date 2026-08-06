@@ -58,4 +58,16 @@ export const api = {
 
   // Stats
   getOverview: () => request('/stats/overview'),
+
+  // Daily Study
+  getDailySession: (count, level) => {
+    const query = new URLSearchParams({ count, level }).toString();
+    return request(`/daily/start?${query}`);
+  },
+  submitDailyQuiz: (data) =>
+    request('/daily/quiz', { method: 'POST', body: JSON.stringify(data) }),
+  submitDailyCorrection: (data) =>
+    request('/daily/correction', { method: 'POST', body: JSON.stringify(data) }),
+  getDailyReport: (sessionId) => request(`/daily/report/${sessionId}`),
+  getDailyHistory: () => request('/daily/history'),
 };
