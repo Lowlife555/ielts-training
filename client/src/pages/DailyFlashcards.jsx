@@ -51,7 +51,7 @@ export default function DailyFlashcards() {
 
   if (!session) return null;
 
-  const progress = words.length > 0 ? ((currentIndex + 1) / words.length) * 100 : 0;
+  const progress = words.length > 0 ? ((studiedCount + (showMeaning ? 1 : 0)) / words.length) * 100 : 0;
 
   // If all cards studied, show transition
   if (currentIndex >= words.length - 1 && showMeaning) {

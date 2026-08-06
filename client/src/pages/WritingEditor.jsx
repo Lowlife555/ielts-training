@@ -43,6 +43,15 @@ export default function WritingEditor() {
     return () => clearInterval(timer);
   }, [startTime]);
 
+  // Auto-save draft every 30 seconds
+  useEffect(() => {
+    if (!essayText.trim()) return;
+    const autoSave = setInterval(() => {
+      localStorage.setItem(`essay_draft_${id}`, essayText);
+    }, 30000);
+    return () => clearInterval(autoSave);
+  }, [essayText, id]);
+
   // Word count
   const wordCount = essayText.trim() ? essayText.trim().split(/\s+/).length : 0;
 

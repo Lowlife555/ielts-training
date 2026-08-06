@@ -9,7 +9,7 @@
 cd client && npm install
 cd ../server && npm install
 
-# 2. 初始化数据库（建表 + 导入 282 个核心词汇 + 30 道写作真题）
+# 2. 初始化数据库（建表 + 导入 4237 个词汇 + 30 道写作真题）
 cd server && npm run setup
 
 # 3. 启动后端 (端口 3001)
@@ -55,7 +55,7 @@ ielts-training/
 │   ├── db/
 │   │   ├── database.js             # 数据库连接
 │   │   ├── migrate.js              # 建表迁移脚本
-│   │   └── seed.js                 # 种子数据（282词 + 30题）
+│   │   └── seed.js                 # 种子数据（4237词 + 30题）
 │   ├── routes/                # API 路由
 │   │   ├── topics.js               # GET /api/topics
 │   │   ├── words.js                # GET /api/words
@@ -126,7 +126,7 @@ DEEPSEEK_API_KEY=sk-your-api-key-here
 
 ## 📊 数据规模
 
-- **词汇库**：282 个核心高频词汇（8 个话题 × 约 35 词）
+- **词汇库**：4,237 个词汇（PET基础 2,014 + IELTS进阶 1,941 + 真题精选 282）
 - **写作题**：30 道剑桥真题（Task 1 × 15, Task 2 × 15）
 - **来源**：Cambridge IELTS 1-21 真题
 
