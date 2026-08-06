@@ -4,6 +4,7 @@ import { api } from '../utils/api';
 import Loading from '../components/Loading';
 import { useKeyboard } from '../hooks/useKeyboard';
 import { ArrowLeft, Play, Volume2, Search } from 'lucide-react';
+import { speak as speakUtil } from '../utils/speech';
 
 const topicNames = {
   education: '教育', environment: '环境', technology: '科技', society: '社会',
@@ -37,11 +38,8 @@ export default function WordList() {
       .finally(() => setLoading(false));
   }, [topic, page, searchQuery]);
 
-  const speak = (word) => {
-    const utterance = new SpeechSynthesisUtterance(word);
-    utterance.lang = 'en-US';
-    utterance.rate = 0.8;
-    speechSynthesis.speak(utterance);
+  const speakWord = (word) => {
+    speakUtil(word, { rate: 0.8 });
   };
 
   const title = topic ? `${topicNames[topic] || topic} · 词汇列表` : searchQuery ? `搜索: ${searchQuery}` : '词汇列表';
@@ -86,7 +84,7 @@ export default function WordList() {
                 </div>
                 <div className="flex items-center gap-2 ml-4">
                   <button
-                    onClick={() => speak(word.word)}
+                    onClick={() => speakWord(word.word)}
                     className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
                     title="朗读 (Space)"
                   >

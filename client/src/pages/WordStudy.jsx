@@ -63,12 +63,8 @@ export default function WordStudy() {
     'Escape': () => navigate(-1),
   }, true, [showDefinition, currentIndex, next, prev, speakWord, navigate, words]);
 
-  // Auto-speak on word change
-  useEffect(() => {
-    if (words[currentIndex]) {
-      speakWord(words[currentIndex].word);
-    }
-  }, [currentIndex, words]);
+  // Note: Chrome blocks auto-speak (not a user gesture).
+  // User must press Space or click the speaker button to hear pronunciation.
 
   if (loading) return <Loading text="加载单词..." />;
   if (words.length === 0) return <div className="text-center py-20 text-gray-500">暂无单词数据</div>;

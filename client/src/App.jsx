@@ -23,6 +23,7 @@ import DailyFlashcards from './pages/DailyFlashcards';
 import DailyQuiz from './pages/DailyQuiz';
 import DailyCorrection from './pages/DailyCorrection';
 import DailyReport from './pages/DailyReport';
+import SpeechDiagnostic from './pages/SpeechDiagnostic';
 
 export default function App() {
   return (
@@ -52,6 +53,7 @@ export default function App() {
                 <Route path="/daily/quiz" element={<DailyQuiz />} />
                 <Route path="/daily/correction" element={<DailyCorrection />} />
                 <Route path="/daily/report" element={<DailyReport />} />
+                <Route path="/speech-test" element={<SpeechDiagnostic />} />
               </Routes>
             </main>
           </div>
