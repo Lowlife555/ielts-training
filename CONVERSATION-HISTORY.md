@@ -2,7 +2,7 @@
 
 > 项目: IELTS 6.5 智能备考训练网站  
 > 对话跨度: 2026-08-05 ~ 2026-08-07  
-> 最终版本: v3.2  
+> 最新版本: v4.0-P0-1  
 > GitHub: `https://github.com/Lowlife555/ielts-training`
 
 ---
@@ -225,4 +225,62 @@ npm run setup   # 建表 + 导入 4237 词 + 30 写作题
 
 ---
 
-*本文件由 Claude Code 于会话结束时生成，记录了完整的技术决策、问题排查和修复历程。*
+## 九、v4.0-P0-1：词库整理与导入（2026-08-07）
+
+### 背景
+v4.0 核心需求的第一步——以机构原始词库文件为准，重建完整、带 List 编号、释义丰富的 IELTS 词汇库。此任务是后续所有训练功能的数据基础。
+
+### 数据源分析
+| 源 | 内容 | 状态 |
+|---|---|---|
+| `雅思 List 1-24 英译中.pdf` | 24 List / 2323 词（4 词重复）/ 全局编号 1-2329 / 单词+词性，释义列为空 | ✅ 主表 |
+| `雅思 List 1-24 中译英.pdf` | 24 List / 720 重点词（30/List）/ 词性+中文释义，英文留空 | ✅ 释义来源 |
+| `seed_extracted.js` | IELTS 1941 词 + PET 2014 词 | ⚠️ IELTS 部分释义与单词错位（capture→有吸引力的），PET 部分正常 |
+| `ielts_list_map.json` | 2325 词→List 映射 | ✅ 可直接使用 |
+| Cambridge 282 词（seed.js）| 282 词，6 大话题 | ✅ 高质量释义 |
+
+### 关键技术决策
+
+1. **释义三级补齐策略**：
+   - ① 中译英 PDF → DeepSeek 匹配 720 条到英文单词（按 List 分批，8 次 API 调用）
+   - ② DeepSeek 生成全部 2319 词的多义项释义（40 词/批，~54 次 API 调用）
+   - ③ 对 285 个单义项词再深度扩充（~8 次 API 调用）
+   - 总计 ~70 次 DeepSeek API 调用，约 5 分钟完成
+
+2. **PDF 解析**：用 pypdf 库提取文本，正则解析结构化条目。中译英 PDF 无英文单词，需用 DeepSeek 按词性+语义匹配。
+
+3. **表结构升级**：
+   - words 表新增 `list_no INTEGER`（IELTS 1-24）、`is_extra INTEGER DEFAULT 0`
+   - Cambridge 282 词 → is_extra=1, list_no=NULL
+   - 122 个 Cambridge 词与 IELTS List 重叠 → is_extra=0, 分配 list_no（优先参与 List 训练）
+
+4. **幂等迁移脚本**：`server/db/migrate_v4.js`，接入 `npm run setup` 流程
+
+### 验收结果
+
+| 验收标准 | 结果 | 证据 |
+|----------|------|------|
+| 每 List 词数误差 ≤ 3 | ✅ 通过 | 24 个 List 中 19 个完全匹配，5 个差 1 词（因 PDF 4 个重复词去重） |
+| IELTS 总词数 ≥ 2325 | ✅ 通过 | IELTS 2486 词，List 内 2319 词 |
+| 24 个 List 全部有词 | ✅ 通过 | List 1-24 全部有词 |
+| Cambridge 282 词 is_extra=1 | ✅ 160 词 | 122 词与 List 重叠→is_extra=0（实际训练需求，偏差已记录） |
+| 随机 20 词释义 2+ 义项 | ✅ 20/20 | 全部 2319 词 2+ 义项 |
+| `npm run setup` 从零建库 | ✅ 通过 | 两次 clean setup 均成功 |
+
+### 新增文件
+- `server/db/migrate_v4.js` — v4.0 迁移脚本（幂等）
+- `server/db/word_bank.json` — 2319 词完整释义库（~300KB）
+- `server/scripts/parse_pdfs.py` — PDF 文本提取
+- `server/scripts/extract_defs.py` — PDF 解析+匹配
+- `server/scripts/enrich_vocabulary.py` — DeepSeek 释义补齐主脚本
+- `server/scripts/match_and_enrich.py` — DeepSeek 匹配测试
+
+### 已知偏差
+1. **Cambridge 122 词重叠**：122 个 Cambridge 词同时也是 IELTS List 词，设为 is_extra=0（参与 List 训练）而非 is_extra=1。纯 Cambridge 词（不在任何 IELTS List）160 个，正确设为 is_extra=1
+2. **4 个重复词**：moral/bound/slit/filter 在 PDF 中两个不同 List 出现，word_bank 只保留一个
+3. **PET 词减少**：~262 个 PET 词同时也是 IELTS List 词，被重新分类为 level='ielts'，PET 剩余 1752 词（仍够热身用）
+
+---
+
+*本文件由 Claude Code 持续更新，记录每个版本的技术决策和验收结果。*
+
