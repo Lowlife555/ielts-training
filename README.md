@@ -61,9 +61,17 @@ ielts-training/
 │   │   │   ├── WritingQuestions.jsx # 写作选题（Task1/2筛选）
 │   │   │   ├── WritingEditor.jsx   # 写作编辑器
 │   │   │   ├── WritingResult.jsx   # 批改结果（雷达图）
-│   │   │   └── History.jsx         # 历史记录（趋势图）
+│   │   │   ├── History.jsx         # 历史记录（趋势图）
+│   │   │   ├── TodayBriefing.jsx   # 今日简报（目标时长/欠债/今日内容）
+│   │   │   ├── PetWarmup.jsx       # PET 热身（10词，不计时不计分）
+│   │   │   ├── MainStudy.jsx       # 英译中主任务（会/不会 + 错词死磕）
+│   │   │   ├── SpotCheck.jsx       # 抽查（≥80%通过，不达标标记待重背）
+│   │   │   ├── SpellingPractice.jsx# 中译英拼写（20%权重）
+│   │   │   ├── AcceptanceTest.jsx  # 验收（漏网之鱼全对才算完成）
+│   │   │   └── DailyReport.jsx     # 训练报告（三项正确率）
 │   │   ├── context/AppContext.jsx   # 全局状态
 │   │   ├── hooks/useKeyboard.js    # 键盘快捷键 Hook
+│   │   ├── hooks/useTimer.js       # 训练计时 Hook
 │   │   └── utils/api.js            # API 调用封装
 │   └── vite.config.js         # Vite 配置（含代理）
 │
@@ -71,6 +79,8 @@ ielts-training/
 │   ├── db/
 │   │   ├── database.js             # 数据库连接
 │   │   ├── migrate.js              # 建表迁移脚本
+│   │   ├── migrate_v4.js           # v4.0 词库迁移（list_no/is_extra）
+│   │   ├── migrate_v5.js           # v4.0 训练流程迁移（计时/完成/抽查表）
 │   │   └── seed.js                 # 种子数据（4237词 + 30题）
 │   ├── routes/                # API 路由
 │   │   ├── topics.js               # GET /api/topics
@@ -81,7 +91,12 @@ ielts-training/
 │   │   ├── wrongWords.js           # GET /api/wrong-words
 │   │   ├── writingQuestions.js     # GET /api/writing-questions
 │   │   ├── essays.js               # POST /api/essays/submit
-│   │   └── stats.js                # GET /api/stats/overview
+│   │   ├── stats.js                # GET /api/stats/overview
+│   │   ├── daily.js                # 旧版每日训练（保留兼容）
+│   │   ├── dailyPlan.js            # 今日简报/欠债/抽查 (v4.0)
+│   │   └── training.js             # 训练会话 开始/完成/收工 (v4.0)
+│   ├── scripts/
+│   │   └── enrichDefinitions.js    # 释义深度扩充脚本（DeepSeek 批量）
 │   ├── .env                   # 环境变量（DeepSeek API Key）
 │   └── index.js               # 入口
 │
@@ -140,6 +155,21 @@ DEEPSEEK_API_KEY=sk-your-api-key-here
 
 > 💡 未配置 API Key 时，系统会使用本地启发式评分作为备选方案，确保功能可用。
 
+## 📅 v4.0 每日训练流程
+
+```
+今日简报 (目标时长=60+欠债min, 上限120min)
+  └─ PET 热身 (10词, 不计时不计分)
+  └─ 英译中主任务 (List 未完成词 + 待重背词, 错词死磕)
+  └─ 抽查 (完成List ≥3天未抽查 → 随机抽30词, ≥80%通过)
+  └─ 中译英拼写 (随机15词, 20%权重)
+  └─ 验收 (漏网之鱼全对才完成今日, 完成则欠债清零)
+```
+
+- 欠债规则：目标时长未达标 → 记入欠债，次日目标增加；连续欠债最多累计 120min
+- 待重背：抽查/拼写/验收不达标的词次日优先复习，重背完成后自动清除
+- 时间盒：所有训练受计时器约束，超时自动收工，避免刷时长
+
 ## 📊 数据规模
 
 - **词汇库**：4,237 个词汇（PET基础 2,014 + IELTS进阶 1,941 + 真题精选 282）
@@ -174,3 +204,8 @@ DEEPSEEK_API_KEY=sk-your-api-key-here
 | GET | `/api/essays/:id/result` | 批改结果 |
 | GET | `/api/essays/history` | 历史记录 |
 | GET | `/api/stats/overview` | 学习概览 |
+| GET | `/api/daily-plan` | 今日简报（目标时长/欠债/今日内容/待重背/抽查任务） |
+| POST | `/api/daily-plan/spot-check` | 提交抽查结果（≥80% 通过，否则标记待重背） |
+| POST | `/api/training/start` | 开始训练会话（PET热身/英译中/拼写/验收） |
+| POST | `/api/training/complete` | 完成训练会话（记录时长+正确率） |
+| POST | `/api/training/abandon` | 中止训练会话 |
