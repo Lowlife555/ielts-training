@@ -54,6 +54,12 @@ export default function PetWarmup() {
     }
   }, [currentIndex]);
 
+  // 主按钮：未翻面时 = 显示释义；已翻面时 = 下一个/开始主任务（文案与行为必须一致）
+  const mainAction = useCallback(() => {
+    if (!showMeaning) { setShowMeaning(true); return; }
+    next();
+  }, [showMeaning, next]);
+
   // 触屏手势：左右滑动切换；点卡片只翻面（已显示时点击无操作，避免误触跳题）
   const swipe = useSwipe({
     enabled: isTouch,
@@ -130,7 +136,7 @@ export default function PetWarmup() {
         <button onClick={prev} disabled={currentIndex === 0} className="btn-secondary disabled:opacity-30">
           <ChevronLeft className="w-4 h-4 inline" /> 上一个
         </button>
-        <button onClick={next} disabled={starting} className="btn-primary">
+        <button onClick={mainAction} disabled={starting} className="btn-primary">
           {isLast && showMeaning ? (starting ? '准备中...' : '开始主任务 →') : showMeaning ? '下一个' : '显示释义'}
           <ChevronRight className={`w-4 h-4 inline ${showMeaning ? '' : 'hidden'}`} />
         </button>

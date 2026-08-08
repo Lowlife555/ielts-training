@@ -93,7 +93,7 @@ export default function Home() {
             <div className="flex-1">
               <h2 className="text-xl font-bold text-gray-900 mb-2">话题词汇</h2>
               <p className="text-sm text-gray-500 mb-4">
-                8大话题分类 · 4200+词汇 · 拼写测试 · 间隔复习
+                8大话题分类 · 4200+词汇 · 拼写测试 · 词义判定 · 间隔复习
               </p>
               <div className="flex items-center gap-2 text-sm text-indigo-600 font-medium">
                 浏览词汇 →
@@ -125,6 +125,7 @@ export default function Home() {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <Link to="/words" className="btn-secondary text-center text-sm">📖 话题浏览</Link>
         <Link to="/spelling-test" className="btn-secondary text-center text-sm">✍️ 拼写测试</Link>
+        <Link to="/meaning-test" className="btn-secondary text-center text-sm">🎯 词义判定</Link>
         <Link to="/wrong-words" className="btn-secondary text-center text-sm">📝 错词复习</Link>
         <Link to="/history" className="btn-secondary text-center text-sm flex items-center justify-center gap-1">
           <BarChart3 className="w-4 h-4" />

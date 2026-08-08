@@ -15,9 +15,10 @@
 - 服务器: 腾讯云轻量应用服务器 `43.135.22.140` (Ubuntu 24.04 LTS, root, SSH 密钥免密)
 - 部署目录: `/var/www/ielts-training` (git clone 自 GitHub origin/master)
 - 进程: pm2 `ielts-server` (server/index.js) + nginx (root=/var/www/ielts-training/client/dist, proxy → 127.0.0.1:3001)
-- 部署流程由 `deploy.ps1` 完成: 本地 push → 服务器 pull → npm install → client build → pm2 restart → 健康检查(API /api/health + 前端 HTTP 200)
+- 部署流程由 `deploy.ps1` 完成: 本地 push → 服务器 pull → npm install → **数据库迁移 (`npm run migrate:all`)** → client build → pm2 restart → 健康检查(API /api/health + 前端 HTTP 200)
 - ⚠️ 服务器配置(密码/密钥)不入库;公开信息仅限上面这些
 - ⚠️ 服务器数据库 SQLite 在服务器本地生成/增长,`git pull` 不影响用户数据(数据文件不入库);server 代码改动照常 pull 覆盖
+- **发新版本时**: 新增 `server/db/migrate_vN.js` 并在其中 `INSERT OR IGNORE` 一条公告(版本号/标题/特性列表 JSON),再把它加进 `server/package.json` 的 `migrate:all` 链;用户首次进入自动弹窗(v5.4 起,公告表 announcements + user_announcements)
 
 ## 3. 架构约定 (2026-08 重组后)
 
@@ -70,6 +71,8 @@ client/src/
 ## 4. 交互红线 (不可违反)
 
 1. **按钮/卡片行为必须与显示文案一致**。文案写"显示释义"就只能显示释义。
+   - **动态文案按钮(同一按钮随状态换文案)必须让 handler 同步切换**,禁止固定 handler。
+   - 曾发生:PET 热身底部按钮文案"显示释义"时 onClick 却执行 next() 跳下一个(v5.4.1 修复)。
 2. **点卡片 = 只翻面**:未显示 → 显示;已显示 → 点击无操作。
    跳下一个/上一个必须用明确的「下一个」按钮或左右滑动,禁止"点卡片翻面后再点跳题"。
 3. 触屏设备上禁止依赖:键盘、hover、右键、拖拽、双击。
