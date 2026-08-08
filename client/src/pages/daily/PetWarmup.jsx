@@ -14,6 +14,7 @@ export default function PetWarmup() {
   const { showToast } = useApp();
   const { isTouch } = useTouch();
   const plan = location.state?.plan;
+  const batchSize = location.state?.batchSize || 30;
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showMeaning, setShowMeaning] = useState(false);
@@ -28,10 +29,11 @@ export default function PetWarmup() {
     try {
       const session = await api.startTraining({
         listNo: plan.todayList.listNo,
+        batchSize,
         targetMinutes: plan.targetMinutes,
         debtMinutes: plan.debtMinutes,
       });
-      navigate('/daily/study', { state: { session, plan } });
+      navigate('/daily/study', { state: { session, plan, batchSize } });
     } catch (err) {
       showToast('启动训练失败: ' + err.message, 'error');
       setStarting(false);

@@ -32,6 +32,7 @@ import PetWarmup from './pages/daily/PetWarmup';
 import MainStudy from './pages/daily/MainStudy';
 import SpellingPractice from './pages/daily/SpellingPractice';
 import AcceptanceTest from './pages/daily/AcceptanceTest';
+import SpellCheck from './pages/daily/SpellCheck';
 import SpotCheck from './pages/daily/SpotCheck';
 import DailyReport from './pages/daily/DailyReport';
 import SpeechDiagnostic from './pages/misc/SpeechDiagnostic';
@@ -104,6 +105,7 @@ function Layout() {
           <Route path="/daily/study" element={<RequireAuth><MainStudy /></RequireAuth>} />
           <Route path="/daily/spotcheck" element={<RequireAuth><SpotCheck /></RequireAuth>} />
           <Route path="/daily/spelling" element={<RequireAuth><SpellingPractice /></RequireAuth>} />
+          <Route path="/daily/spellcheck" element={<RequireAuth><SpellCheck /></RequireAuth>} />
           <Route path="/daily/acceptance" element={<RequireAuth><AcceptanceTest /></RequireAuth>} />
           <Route path="/daily/report" element={<RequireAuth><DailyReport /></RequireAuth>} />
           <Route path="/admin" element={<RequireAdmin><Admin /></RequireAdmin>} />

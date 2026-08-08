@@ -122,4 +122,8 @@ export const api = {
     request('/training/complete', { method: 'POST', body: JSON.stringify(data) }),
   abandonTraining: (data) =>
     request('/training/abandon', { method: 'POST', body: JSON.stringify(data) }),
+
+  // v7.1 Spell check (daily flow final stage)
+  submitSpellCheck: (data) =>
+    request('/training/spell-check', { method: 'POST', body: JSON.stringify(data) }),
 };
