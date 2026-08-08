@@ -47,7 +47,7 @@ export default function KeyboardHelp() {
       { gesture: '我的 → 设置', desc: '深色模式 / 界面模式（自动·触屏·桌面）' },
     ]},
     { section: '单词学习', items: [
-      { gesture: '点卡片', desc: '显示释义 / 下一个' },
+      { gesture: '点卡片', desc: '显示释义（已显示时点击无操作，不会跳题）' },
       { gesture: '左右滑动', desc: '会（右滑）/ 不会（左滑）' },
       { gesture: '点🔊', desc: '朗读单词' },
       { gesture: '点绿色/红色按钮', desc: '认识 / 不认识' },
