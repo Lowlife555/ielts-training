@@ -2,6 +2,20 @@
 
 基于 React + Express + SQLite 的雅思（IELTS）6.5 分目标备考平台，包含**单词背诵**和**写作训练**两大核心模块。
 
+## 📅 版本记录
+
+> 每个版本的 README 均在此记录发布日期与开发 Agent。历史提交对应 git tag，可随时回滚。
+
+| 版本 | 日期 | 开发 Agent | 核心内容 |
+|------|------|-----------|---------|
+| v1.0 | 2026-08-05 | Claude Code + DeepSeek V4 | 初始版本：脚手架 + 数据库 + 14 API + 282 真题词 + 30 写作题 |
+| v2.0 | 2026-08-06 | Claude Code + DeepSeek V4 | 验收后修复：user_id 动态化、语音、空 catch 吞错、评分按钮颜色 |
+| v3.0 | 2026-08-06 | Claude Code + DeepSeek V4 | 每日单词训练系统（设置→单词卡→测验→订正→报告）+ 4237 词词库 |
+| v3.1 | 2026-08-06 | Claude Code + DeepSeek V4 | 修复语音发音：改用本地 Microsoft 离线语音（Google 远程被墙） |
+| v3.2 | 2026-08-06 | Claude Code + DeepSeek V4 | 交付前修复：PET/IELTS 词汇隔离、端口统一、反馈延时、自动保存等 |
+| v4.0-P0-1 | 2026-08-07 | Claude Code + DeepSeek V4 | 词库整理与导入：List 1-24 编号、释义三级补齐、list_no/is_extra 字段 |
+| v4.0-P0-2/3 | 2026-08-08 | opencode (deepseek-v4-flash-free) | 今日简报 + 每日训练流程重构（热身→英译中→错词死磕→中译英→验收）+ 时间盒与欠债系统 |
+
 ## 🚀 快速启动
 
 ```bash

@@ -284,3 +284,40 @@ v4.0 核心需求的第一步——以机构原始词库文件为准，重建完
 
 *本文件由 Claude Code 持续更新，记录每个版本的技术决策和验收结果。*
 
+
+## 十、v4.0-P0-2/3：今日简报 + 每日流程重构 + 时间盒与欠债（2026-08-08）
+
+> 开发 Agent: opencode (deepseek-v4-flash-free)。P0-2 与 P0-3 合并为一次提交：欠债规则是简报页面展示目标时长的前置依赖，无法干净拆分。
+
+### 新架构
+`
+/daily              → TodayBriefing（今日简报：目标时长/原因/今日内容/现在开始）
+/daily/warmup       → PetWarmup（PET 热身 10 词，不计时不计分）
+/daily/study        → MainStudy（英译中主任务 → 错词死磕循环，1/2 键标记会/不会）
+/daily/spelling     → SpellingPractice（中译英 20%，约 20 词）
+/daily/acceptance   → AcceptanceTest（验收：漏网之鱼全部拼对，错词自动重测直到通过）
+/daily/report       → DailyReport（时长 + 三项正确率 + 目标对比）
+`
+旧流程 4 个页面（DailySetup/Flashcards/Quiz/Correction）已删除，路由文件 daily.js 保留（向后兼容）。
+
+### 后端
+- migrate_v5.js：daily_sessions 增加 list_no/start_time/duration_seconds/completed/main_accuracy 等 11 列；daily_session_words 增加 6 列；新增 list_completion 表
+- outes/dailyPlan.js：GET /api/daily-plan（简报）、GET /status、POST /complete
+- outes/training.js：POST /start、/complete、/abandon
+- 欠债递推规则：目标=60+欠债（上限 120）；惩罚触发（未训练/训练<目标-15 且未验收通过）+30；验收通过不加罚但旧债保留；练满 2h 全部结清；首次训练记录前的日期不计债
+- 时长权威性：服务端以 start_time 为准取 min(客户端上报, 服务端实际)
+
+### 前端
+- 5 个新页面 + TrainingTimer 组件（计时/目标/2h 上限提示）+ useTimer hook
+- 键盘：Enter 翻卡/提交、1/2 会不会、Space 发音、←→ 翻卡、Esc 收工（确认后保存进度）
+
+### 验收结果
+- 全流程 E2E 通过：简报→开训（100 主词+20 拼写词）→验收→List 标记完成→明日跳下一 List
+- 欠债 6 场景全过（未训练/不足45min/连续3天/练满2h/验收通过/全新用户）
+- 前端 build + lint 无错误；验收正确率用 firstTry 首试成绩统计
+
+### 已知偏差
+- 规格中"连续欠债 3 天 → target=150min"与"单日上限 2 小时"矛盾，按显式规则实现上限 120min（S3 场景即验证此行为）
+- 旧 /api/daily 路由保留但前端不再使用
+
+---
