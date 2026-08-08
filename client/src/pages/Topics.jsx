@@ -28,7 +28,7 @@ export default function Topics() {
     <div className="max-w-6xl mx-auto px-4 py-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">📖 单词背诵</h1>
-        <p className="text-gray-500">按话题分类学习 IELTS 6.5 核心词汇</p>
+        <p className="text-gray-500">按话题分类学习 IELTS 核心词汇</p>
       </div>
 
       <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">

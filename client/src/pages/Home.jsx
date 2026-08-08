@@ -45,7 +45,7 @@ export default function Home() {
       {/* Header */}
       <div className="text-center mb-12">
         <h1 className="text-4xl font-bold text-gray-900 mb-3">
-          📚 IELTS 6.5 智能备考
+          📚 lowlife's IELTS Training
         </h1>
         <p className="text-lg text-gray-500">
           基于艾宾浩斯遗忘曲线 · 雅思真题词汇 · AI写作批改
