@@ -107,7 +107,8 @@ export default function ReviewWords() {
           <Link to="/wrong-words" className="btn-secondary">查看错词本</Link>
         </div>
         <p className="text-xs text-gray-400 mt-4">
-          按 <kbd className="px-1.5 py-0.5 bg-gray-100 border border-gray-300 rounded">Enter</kbd> 或 <kbd className="px-1.5 py-0.5 bg-gray-100 border border-gray-300 rounded">Esc</kbd> 返回
+          <span className="kbd-hint">按 <kbd className="px-1.5 py-0.5 bg-gray-100 border border-gray-300 rounded">Enter</kbd> 或 <kbd className="px-1.5 py-0.5 bg-gray-100 border border-gray-300 rounded">Esc</kbd> 返回</span>
+          <span className="touch-hint hidden">复习完成！今天也辛苦了</span>
         </p>
       </div>
     );
@@ -144,7 +145,7 @@ export default function ReviewWords() {
             <p className="text-3xl font-bold text-gray-900 mb-2">{currentWord.word}</p>
             <p className="text-gray-400 mb-4">{currentWord.phonetic}</p>
             <p className="text-sm text-gray-500">
-              你还记得这个词的意思吗？按 <kbd className="px-1.5 py-0.5 bg-gray-100 border border-gray-300 rounded text-xs">Enter</kbd> 查看答案
+               你还记得这个词的意思吗？<span className="kbd-hint">按 <kbd className="px-1.5 py-0.5 bg-gray-100 border border-gray-300 rounded text-xs">Enter</kbd> 查看答案</span><span className="touch-hint hidden">点卡片 查看答案</span>
             </p>
           </div>
         ) : (
@@ -174,7 +175,9 @@ export default function ReviewWords() {
               ))}
             </div>
             <p className="text-xs text-gray-400 mt-3">
-              按 <kbd className="px-1.5 py-0.5 bg-gray-100 border border-gray-300 rounded">1-6</kbd> 快速选择
+               <span className="kbd-hint">按 <kbd className="px-1.5 py-0.5 bg-gray-100 border border-gray-300 rounded">1-6</kbd> 快速选择</span>
+               <span className="touch-hint hidden">点数字评分</span>
+               <span className="touch-hint hidden">点数字评分</span>
             </p>
           </div>
         )}

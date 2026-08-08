@@ -1,8 +1,10 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AppProvider } from './context/AppContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { useTouch } from './context/TouchContext';
 import ErrorBoundary from './components/ErrorBoundary';
 import Navbar from './components/Navbar';
+import MobileTabBar from './components/MobileTabBar';
 import Toast from './components/Toast';
 import KeyboardHelp from './components/KeyboardHelp';
 import FirstVisitHint from './components/FirstVisitHint';
@@ -30,6 +32,7 @@ import SpeechDiagnostic from './pages/SpeechDiagnostic';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Admin from './pages/Admin';
+import Me from './pages/Me';
 
 function RequireAuth({ children }) {
   const { user, loading } = useAuth();
@@ -52,41 +55,51 @@ export default function App() {
       <BrowserRouter>
         <AuthProvider>
           <AppProvider>
-            <div className="min-h-screen bg-gray-50">
-              <Navbar />
-              <Toast />
-              <KeyboardHelp />
-              <FirstVisitHint />
-              <main className="pb-16">
-                <Routes>
-                  <Route path="/login" element={<Login />} />
-                  <Route path="/register" element={<Register />} />
-                  <Route path="/" element={<RequireAuth><Home /></RequireAuth>} />
-                  <Route path="/words" element={<RequireAuth><Topics /></RequireAuth>} />
-                  <Route path="/words/:topic" element={<RequireAuth><WordList /></RequireAuth>} />
-                  <Route path="/words/:topic/study" element={<RequireAuth><WordStudy /></RequireAuth>} />
-                  <Route path="/spelling-test" element={<RequireAuth><SpellingTest /></RequireAuth>} />
-                  <Route path="/review-words" element={<RequireAuth><ReviewWords /></RequireAuth>} />
-                  <Route path="/wrong-words" element={<RequireAuth><WrongWords /></RequireAuth>} />
-                  <Route path="/writing" element={<RequireAuth><WritingQuestions /></RequireAuth>} />
-                  <Route path="/writing/:id" element={<RequireAuth><WritingEditor /></RequireAuth>} />
-                  <Route path="/writing/result/:id" element={<RequireAuth><WritingResult /></RequireAuth>} />
-                  <Route path="/history" element={<RequireAuth><History /></RequireAuth>} />
-                  <Route path="/daily" element={<RequireAuth><TodayBriefing /></RequireAuth>} />
-                  <Route path="/daily/warmup" element={<RequireAuth><PetWarmup /></RequireAuth>} />
-                  <Route path="/daily/study" element={<RequireAuth><MainStudy /></RequireAuth>} />
-                  <Route path="/daily/spotcheck" element={<RequireAuth><SpotCheck /></RequireAuth>} />
-                  <Route path="/daily/spelling" element={<RequireAuth><SpellingPractice /></RequireAuth>} />
-                  <Route path="/daily/acceptance" element={<RequireAuth><AcceptanceTest /></RequireAuth>} />
-                  <Route path="/daily/report" element={<RequireAuth><DailyReport /></RequireAuth>} />
-                  <Route path="/admin" element={<RequireAdmin><Admin /></RequireAdmin>} />
-                  <Route path="/speech-test" element={<RequireAuth><SpeechDiagnostic /></RequireAuth>} />
-                </Routes>
-              </main>
-            </div>
+            <Layout />
           </AppProvider>
         </AuthProvider>
       </BrowserRouter>
     </ErrorBoundary>
+  );
+}
+
+function Layout() {
+  const { isTouch } = useTouch();
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {!isTouch && <Navbar />}
+      <Toast />
+      <KeyboardHelp />
+      <FirstVisitHint />
+      <main className={isTouch ? 'pb-24 pt-2' : 'pb-16'}>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/" element={<RequireAuth><Home /></RequireAuth>} />
+          <Route path="/words" element={<RequireAuth><Topics /></RequireAuth>} />
+          <Route path="/words/:topic" element={<RequireAuth><WordList /></RequireAuth>} />
+          <Route path="/words/:topic/study" element={<RequireAuth><WordStudy /></RequireAuth>} />
+          <Route path="/spelling-test" element={<RequireAuth><SpellingTest /></RequireAuth>} />
+          <Route path="/review-words" element={<RequireAuth><ReviewWords /></RequireAuth>} />
+          <Route path="/wrong-words" element={<RequireAuth><WrongWords /></RequireAuth>} />
+          <Route path="/writing" element={<RequireAuth><WritingQuestions /></RequireAuth>} />
+          <Route path="/writing/:id" element={<RequireAuth><WritingEditor /></RequireAuth>} />
+          <Route path="/writing/result/:id" element={<RequireAuth><WritingResult /></RequireAuth>} />
+          <Route path="/history" element={<RequireAuth><History /></RequireAuth>} />
+          <Route path="/daily" element={<RequireAuth><TodayBriefing /></RequireAuth>} />
+          <Route path="/daily/warmup" element={<RequireAuth><PetWarmup /></RequireAuth>} />
+          <Route path="/daily/study" element={<RequireAuth><MainStudy /></RequireAuth>} />
+          <Route path="/daily/spotcheck" element={<RequireAuth><SpotCheck /></RequireAuth>} />
+          <Route path="/daily/spelling" element={<RequireAuth><SpellingPractice /></RequireAuth>} />
+          <Route path="/daily/acceptance" element={<RequireAuth><AcceptanceTest /></RequireAuth>} />
+          <Route path="/daily/report" element={<RequireAuth><DailyReport /></RequireAuth>} />
+          <Route path="/admin" element={<RequireAdmin><Admin /></RequireAdmin>} />
+          <Route path="/me" element={<RequireAuth><Me /></RequireAuth>} />
+          <Route path="/speech-test" element={<RequireAuth><SpeechDiagnostic /></RequireAuth>} />
+        </Routes>
+      </main>
+      {isTouch && <MobileTabBar />}
+    </div>
   );
 }

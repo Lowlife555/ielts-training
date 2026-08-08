@@ -3,6 +3,8 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { api } from '../utils/api';
 import { useApp } from '../context/AppContext';
 import { useKeyboard } from '../hooks/useKeyboard';
+import { useSwipe } from '../hooks/useSwipe';
+import { useTouch } from '../context/TouchContext';
 import { speak } from '../utils/speech';
 import { Volume2, ChevronLeft, ChevronRight, Eye, EyeOff } from 'lucide-react';
 
@@ -10,6 +12,7 @@ export default function PetWarmup() {
   const navigate = useNavigate();
   const location = useLocation();
   const { showToast } = useApp();
+  const { isTouch } = useTouch();
   const plan = location.state?.plan;
 
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -51,6 +54,14 @@ export default function PetWarmup() {
     }
   }, [currentIndex]);
 
+  // 触屏手势：左右滑动切换；点卡片显示/隐藏释义
+  const swipe = useSwipe({
+    enabled: isTouch,
+    onLeft: () => { if (showMeaning) next(); else setShowMeaning(true); },
+    onRight: () => { if (showMeaning) prev(); else setShowMeaning(true); },
+    onTap: () => setShowMeaning(v => !v),
+  });
+
   useKeyboard({
     'Enter': () => { if (!showMeaning) setShowMeaning(true); else next(); },
     'ArrowRight': next,
@@ -83,7 +94,10 @@ export default function PetWarmup() {
 
       {/* Flashcard */}
       {currentWord && (
-        <div className="card text-center py-12 min-h-[300px] flex flex-col justify-center">
+        <div
+          className={`card text-center py-12 min-h-[300px] flex flex-col justify-center ${isTouch ? 'no-select' : ''}`}
+          {...swipe}
+        >
           <span className="text-xs text-gray-400 uppercase tracking-wide mb-2">PET 热身</span>
           <div className="text-4xl font-bold text-gray-900 mb-3">{currentWord.word}</div>
           <div className="flex items-center justify-center gap-2 mb-4">
@@ -94,7 +108,7 @@ export default function PetWarmup() {
           </div>
 
           <button onClick={() => speak(currentWord.word)}
-            className="mx-auto mb-6 w-12 h-12 bg-green-50 hover:bg-green-100 rounded-full flex items-center justify-center transition-colors">
+            className={`mx-auto mb-6 w-12 h-12 ${isTouch ? 'w-14 h-14' : ''} bg-green-50 hover:bg-green-100 rounded-full flex items-center justify-center transition-colors`}>
             <Volume2 className="w-6 h-6 text-green-600" />
           </button>
 
@@ -103,7 +117,10 @@ export default function PetWarmup() {
           </div>
 
           {!showMeaning && (
-            <p className="text-sm text-gray-400">按 <kbd className="px-1.5 py-0.5 bg-gray-100 border rounded text-xs">Enter</kbd> 显示释义</p>
+            <p className="text-sm text-gray-400">
+              <span className="kbd-hint">按 <kbd className="px-1.5 py-0.5 bg-gray-100 border rounded text-xs">Enter</kbd> 显示释义</span>
+              <span className="touch-hint hidden">点卡片 显示释义</span>
+            </p>
           )}
         </div>
       )}
@@ -120,9 +137,10 @@ export default function PetWarmup() {
       </div>
 
       <p className="text-center text-xs text-gray-400 mt-4 space-x-3">
-        <span><kbd className="px-1.5 py-0.5 bg-gray-100 border rounded">Space</kbd> 发音</span>
-        <span><kbd className="px-1.5 py-0.5 bg-gray-100 border rounded">← →</kbd> 切换</span>
-        <span><kbd className="px-1.5 py-0.5 bg-gray-100 border rounded">Enter</kbd> {showMeaning ? (isLast ? '开始' : '下一个') : '显示释义'}</span>
+        <span className="kbd-hint"><kbd className="px-1.5 py-0.5 bg-gray-100 border rounded">Space</kbd> 发音</span>
+        <span className="kbd-hint"><kbd className="px-1.5 py-0.5 bg-gray-100 border rounded">← →</kbd> 切换</span>
+        <span className="kbd-hint"><kbd className="px-1.5 py-0.5 bg-gray-100 border rounded">Enter</kbd> {showMeaning ? (isLast ? '开始' : '下一个') : '显示释义'}</span>
+        <span className="touch-hint hidden">← 上一个 · 点卡片翻面 · 下一个 →</span>
       </p>
     </div>
   );
