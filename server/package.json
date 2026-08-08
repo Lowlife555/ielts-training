@@ -8,7 +8,7 @@
     "dev": "nodemon index.js",
     "migrate": "node db/migrate.js",
     "seed": "node db/seed.js",
-    "setup": "node db/migrate.js && node db/seed.js && node db/migrate_v4.js && node db/migrate_v5.js"
+    "setup": "node db/migrate.js && node db/seed.js && node db/migrate_v4.js && node db/migrate_v5.js && node db/migrate_v9.js"
   },
   "keywords": [],
   "author": "",

@@ -104,12 +104,12 @@ export default function Me() {
 
         <Row icon={<Check className="w-4 h-4 text-green-600" />} label="触屏交互说明">
           <span className="text-xs text-gray-400">
-            左右滑动词卡 · 点卡片翻面
+            左右滑动词卡 · 右上角可切回桌面模式
           </span>
         </Row>
 
         <Row icon={<Monitor className="w-4 h-4 text-indigo-600" />} label="版本">
-          <span className="text-xs text-gray-400">v5.3 触屏适配</span>
+          <span className="text-xs text-gray-400">v5.4</span>
         </Row>
       </div>
 

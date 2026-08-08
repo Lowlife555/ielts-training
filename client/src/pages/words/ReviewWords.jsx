@@ -20,6 +20,7 @@ const qualityLabels = [
 export default function ReviewWords() {
   const navigate = useNavigate();
   const { showToast } = useApp();
+  const { isTouch } = useTouch();
   const [words, setWords] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(true);
