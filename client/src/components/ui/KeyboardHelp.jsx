@@ -42,7 +42,9 @@ export default function KeyboardHelp() {
     { section: '全局操作', items: [
       { gesture: '点返回箭头', desc: '返回上一页' },
       { gesture: '底部标签栏', desc: '首页 / 单词 / 写作 / 我的' },
-      { gesture: '顶部 ☰ 图标', desc: '打开本帮助 / 切换模式 / 深色' },
+      { gesture: '右上角 ⓘ 按钮', desc: '打开本帮助' },
+      { gesture: '右上角 电脑 按钮', desc: '随时切回桌面模式' },
+      { gesture: '我的 → 设置', desc: '深色模式 / 界面模式（自动·触屏·桌面）' },
     ]},
     { section: '单词学习', items: [
       { gesture: '点卡片', desc: '显示释义 / 下一个' },

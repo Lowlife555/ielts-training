@@ -36,6 +36,7 @@ app.use('/api/stats', require('./routes/stats'));
 app.use('/api/daily', require('./routes/daily'));
 app.use('/api/daily-plan', require('./routes/dailyPlan'));
 app.use('/api/training', require('./routes/training'));
+app.use('/api/announcements', require('./routes/announcements'));
 
 // Error handling middleware
 app.use((err, req, res, next) => {

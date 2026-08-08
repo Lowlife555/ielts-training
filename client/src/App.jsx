@@ -5,8 +5,10 @@ import { useTouch } from './context/TouchContext';
 import ErrorBoundary from './components/ui/ErrorBoundary';
 import Navbar from './components/layout/Navbar';
 import MobileTabBar from './components/layout/MobileTabBar';
+import FloatingActions from './components/layout/FloatingActions';
 import Toast from './components/ui/Toast';
 import KeyboardHelp from './components/ui/KeyboardHelp';
+import VersionNotice from './components/ui/VersionNotice';
 import FirstVisitHint from './components/training/FirstVisitHint';
 
 // Pages
@@ -69,9 +71,11 @@ function Layout() {
   return (
     <div className="min-h-screen bg-gray-50">
       {!isTouch && <Navbar />}
+      {isTouch && <FloatingActions />}
       <Toast />
       <KeyboardHelp />
       <FirstVisitHint />
+      <VersionNotice />
       <main className={isTouch ? 'pb-24 pt-2' : 'pb-16'}>
         <Routes>
           <Route path="/login" element={<Login />} />
