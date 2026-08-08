@@ -2,7 +2,7 @@
 
 > 项目: IELTS 6.5 智能备考训练网站  
 > 对话跨度: 2026-08-05 ~ 2026-08-08  
-> 最新版本: v6.0-P1  
+> 最新版本: v7.0-P1  
 > GitHub: `https://github.com/Lowlife555/ielts-training`
 
 ---
@@ -316,6 +316,37 @@ v4.0 核心需求的第一步——以机构原始词库文件为准，重建完
 ### 技术备注
 - 抓取初期 Node fetch 连 dict.youdao.com "连接被拒绝"，而 PowerShell Invoke-RestMethod 正常 → 瞬时网络故障（非代理问题，系统代理未启用），重试后恢复
 - 长驻服务器启动不要用 `-RedirectStandardOutput` 重定向（会挂起 bash 工具），直接用 `Start-Process -WindowStyle Hidden`；旧实例占用 3001 端口会导致新路由 404
+
+---
+
+## 十五、v7.0-P1：List 背诵 + 中文默写测试（2026-08-08）
+
+> 开发 Agent: opencode (deepseek-v4-flash-free)
+
+### 需求(用户确认)
+1. 取消旧"看英文→Enter 显示释义→翻下一张"的单词卡流程(WordStudy)
+2. 背诵:一页展示整个 IELTS List(24 个 List,每 List ~100 词)的完整多义项释义,用户可选择显示/隐藏释义(全局开关 + 每词独立展开)
+3. 背诵完毕自行点"开始测试" → 中文默写测试:显示英文,默写中文词义
+4. 判分:关键词自动判分(输入包含任一核心义项词即算对,宽松判),答错自动重测直到默写正确
+5. 测试词数可选手数:全部/50/100
+6. 旧流程替换,每日训练(MainStudy 英译中)与 v6.0 选择题测试保留
+
+### 实现
+- **后端** `server/routes/lists.js`:
+  - GET `/api/lists`:24 个 List 元数据 + 每 List 已掌握进度(按 user_word_progress.mastered)
+  - GET `/api/lists/:listNo/words`:该 List 全部词 + word_meanings 完整释义 + 判词关键词 + 已掌握标记
+  - POST `/api/lists/:listNo/dictation`:默写判分提交,写入 user_word_progress(与拼写测试同规则)
+- **前端** 3 个新页面:
+  - `/lists` Lists.jsx:24 个 List 卡片(词数 + 掌握进度)
+  - `/lists/:listNo` ListStudy.jsx:整 List 平铺展示,全局"显示/隐藏全部释义"开关 + 每词独立展开,已掌握标记,顶部+底部"开始测试"按钮
+  - `/lists/:listNo/test` ListDictation.jsx:选词数 → 显示英文输入中文 → 关键词自动判分(答错显示完整参考答案) → 错词自动重测循环(参考 AcceptanceTest 模式) → 结果页(首试正确率 + 错词完整释义复习)
+- 判分规则:输入清洗(去空格标点)后包含任一清洗后关键词(长度≥2)即算对;关键词空时回退用 chinese_definition 拆义项
+- 入口:Home 快速链接"话题浏览"→"List 背诵";Topics 页"List 背诵"主按钮;WordList 移除"学习"按钮(旧 WordStudy 流程入口删除)
+
+### 验收结果
+- 接口:24 List、List 1 = 100 词、完整释义 + 关键词正常返回 ✅
+- 判分逻辑单测 8/8 通过(多义项/空格/词性前缀/空输入) ✅
+- 前端 build 通过 ✅
 
 ---
 

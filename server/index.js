@@ -28,6 +28,7 @@ app.use('/api/topics', require('./routes/topics'));
 app.use('/api/words', require('./routes/words'));
 app.use('/api/spelling-test', require('./routes/spellingTest'));
 app.use('/api/meaning-test', require('./routes/meaningTest'));
+app.use('/api/lists', require('./routes/lists'));
 app.use('/api/review-words', require('./routes/reviewWords'));
 app.use('/api/review-result', require('./routes/reviewResult'));
 app.use('/api/wrong-words', require('./routes/wrongWords'));
