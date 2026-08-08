@@ -156,7 +156,7 @@ export default function AcceptanceTest() {
   return (
     <div className="max-w-2xl mx-auto px-4 py-8">
       <div className="flex items-center justify-between mb-4">
-        <span className="text-sm font-medium text-amber-600">✅ 验收测验 · {round > 1 ? `第 ${round} 轮` : '漏网之鱼'} · 剩余 {words.length} 词</span>
+        <span className="text-sm font-medium text-amber-600">✅ 验收测验 · List {session.listNo} · {round > 1 ? `第 ${round} 轮` : '漏网之鱼'} · 剩余 {words.length} 词</span>
         <span className="flex items-center gap-3">
           <span className="text-sm text-gray-400">{currentIndex + 1} / {words.length}</span>
           <TrainingTimer

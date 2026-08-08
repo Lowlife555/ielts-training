@@ -22,6 +22,8 @@ app.get('/api/health', (req, res) => {
 });
 
 // API routes
+app.use('/api/auth', require('./routes/auth'));
+app.use('/api/admin', require('./routes/admin'));
 app.use('/api/topics', require('./routes/topics'));
 app.use('/api/words', require('./routes/words'));
 app.use('/api/spelling-test', require('./routes/spellingTest'));

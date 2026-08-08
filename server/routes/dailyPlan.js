@@ -1,6 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const { getDb, getUserId } = require('../db/database');
+const { getDb } = require('../db/database');
+const { requireAuth } = require('../auth');
+
+router.use(requireAuth);
 
 const BASE_TARGET_MINUTES = 60;
 const MAX_TARGET_MINUTES = 120; // 单日上限 2 小时
@@ -97,7 +100,7 @@ function buildReason(yesterday) {
 // GET /api/daily-plan — 今日简报
 router.get('/', (req, res) => {
   const db = getDb();
-  const userId = getUserId();
+  const userId = req.user.id;
   const today = dateString();
 
   // 欠债计算
@@ -107,8 +110,8 @@ router.get('/', (req, res) => {
 
   // 今日 List：优先待重背 List，否则下一个未完成 List
   const pendingReview = db.prepare(
-    'SELECT list_no FROM list_completion WHERE pending_review = 1 ORDER BY list_no LIMIT 1'
-  ).get();
+    'SELECT list_no FROM list_completion WHERE user_id = ? AND pending_review = 1 ORDER BY list_no LIMIT 1'
+  ).get(userId);
 
   let todayList = null;
   if (pendingReview) {
@@ -121,11 +124,11 @@ router.get('/', (req, res) => {
       SELECT w.list_no, COUNT(*) as cnt
       FROM words w
       WHERE w.is_extra = 0 AND w.list_no IS NOT NULL
-        AND w.list_no NOT IN (SELECT list_no FROM list_completion)
+        AND w.list_no NOT IN (SELECT list_no FROM list_completion WHERE user_id = ?)
       GROUP BY w.list_no
       ORDER BY w.list_no
       LIMIT 1
-    `).get();
+    `).get(userId);
     if (nextList) todayList = { listNo: nextList.list_no, wordCount: nextList.cnt, isReback: false };
   }
 
@@ -134,11 +137,12 @@ router.get('/', (req, res) => {
   const dueList = db.prepare(`
     SELECT list_no, first_completed_date
     FROM list_completion
-    WHERE spot_check_date IS NULL AND pending_review = 0
+    WHERE user_id = ?
+      AND spot_check_date IS NULL AND pending_review = 0
       AND julianday(date('now')) - julianday(first_completed_date) >= 3
     ORDER BY RANDOM()
     LIMIT 1
-  `).get();
+  `).get(userId);
   if (dueList) {
     const cnt = db.prepare('SELECT COUNT(*) as cnt FROM words WHERE is_extra=0 AND list_no = ?').get(dueList.list_no);
     const spotCount = Math.min(30, cnt.cnt);
@@ -197,7 +201,7 @@ router.get('/', (req, res) => {
 // GET /api/daily-plan/status — 今日训练状态
 router.get('/status', (req, res) => {
   const db = getDb();
-  const userId = getUserId();
+  const userId = req.user.id;
   const today = dateString();
 
   const { debt } = computeDebtChain(db, userId);
@@ -222,7 +226,7 @@ router.get('/status', (req, res) => {
 // POST /api/daily-plan/complete — 标记当日训练完成（验收通过时调用）
 router.post('/complete', (req, res) => {
   const db = getDb();
-  const userId = getUserId();
+  const userId = req.user.id;
   const { sessionId } = req.body || {};
 
   let session;
@@ -245,10 +249,10 @@ router.post('/complete', (req, res) => {
 
   if (session.list_no) {
     db.prepare(`
-      INSERT INTO list_completion (list_no, first_completed_date)
-      VALUES (?, ?)
-      ON CONFLICT(list_no) DO NOTHING
-    `).run(session.list_no, dateString());
+      INSERT INTO list_completion (user_id, list_no, first_completed_date)
+      VALUES (?, ?, ?)
+      ON CONFLICT(user_id, list_no) DO NOTHING
+    `).run(userId, session.list_no, dateString());
   }
 
   res.json({ ok: true, sessionId: session.id });
@@ -259,13 +263,14 @@ router.post('/complete', (req, res) => {
 // 正确率 ≥80% 通过并记录抽查日期；否则标记待重背（次日简报优先重背）
 router.post('/spot-check', (req, res) => {
   const db = getDb();
+  const userId = req.user.id;
   const { listNo, results } = req.body || {};
 
   if (!listNo || !results || !Array.isArray(results) || results.length === 0) {
     return res.status(400).json({ error: 'listNo and results array required' });
   }
 
-  const row = db.prepare('SELECT * FROM list_completion WHERE list_no = ?').get(listNo);
+  const row = db.prepare('SELECT * FROM list_completion WHERE user_id = ? AND list_no = ?').get(userId, listNo);
   if (!row) {
     return res.status(404).json({ error: `List ${listNo} 未完成背诵，无需抽查` });
   }
@@ -279,10 +284,12 @@ router.post('/spot-check', (req, res) => {
     UPDATE list_completion SET
       spot_check_date = ?,
       pending_review = ?
-    WHERE list_no = ?
-  `).run(dateString(), passed ? 0 : 1, listNo);
+    WHERE user_id = ? AND list_no = ?
+  `).run(dateString(), passed ? 0 : 1, userId, listNo);
 
   res.json({ ok: true, listNo, total, correct, accuracy, passed });
 });
 
 module.exports = router;
+module.exports.computeDebtChain = computeDebtChain;
+module.exports.dateString = dateString;

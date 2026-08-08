@@ -1,11 +1,14 @@
 const express = require('express');
 const router = express.Router();
-const { getDb, getUserId } = require('../db/database');
+const { getDb } = require('../db/database');
+const { requireAuth } = require('../auth');
+
+router.use(requireAuth);
 
 // Get words by topic with pagination
 router.get('/', (req, res) => {
   const db = getDb();
-  const userId = getUserId();
+  const userId = req.user.id;
   const { topic, page = 1, limit = 20, search } = req.query;
   const offset = (parseInt(page) - 1) * parseInt(limit);
 
@@ -48,7 +51,7 @@ router.get('/', (req, res) => {
 // Get single word by ID
 router.get('/:id', (req, res) => {
   const db = getDb();
-  const userId = getUserId();
+  const userId = req.user.id;
   const word = db.prepare(`
     SELECT w.*, uwp.mastered, uwp.correct_count, uwp.incorrect_count,
            uwp.ease_factor, uwp.interval_days, uwp.repetitions

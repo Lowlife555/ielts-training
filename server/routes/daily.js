@@ -1,11 +1,14 @@
 const express = require('express');
 const router = express.Router();
-const { getDb, getUserId } = require('../db/database');
+const { getDb } = require('../db/database');
+const { requireAuth } = require('../auth');
+
+router.use(requireAuth);
 
 // Start a new daily study session
 router.get('/start', (req, res) => {
   const db = getDb();
-  const userId = getUserId();
+  const userId = req.user.id;
   const { count = 50, level = 'pet' } = req.query;
   const wordCount = Math.min(parseInt(count), 200);
 
@@ -276,7 +279,7 @@ router.get('/report/:sessionId', (req, res) => {
 // Get recent sessions list
 router.get('/history', (req, res) => {
   const db = getDb();
-  const userId = getUserId();
+  const userId = req.user.id;
 
   const sessions = db.prepare(`
     SELECT * FROM daily_sessions

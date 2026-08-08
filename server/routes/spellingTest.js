@@ -1,6 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const { getDb, getUserId } = require('../db/database');
+const { getDb } = require('../db/database');
+const { requireAuth } = require('../auth');
+
+router.use(requireAuth);
 
 // Get words for spelling test
 router.get('/', (req, res) => {
@@ -46,7 +49,7 @@ router.post('/', (req, res) => {
     return res.status(404).json({ error: 'Word not found' });
   }
 
-  const userId = getUserId();
+  const userId = req.user.id;
 
   // Update or insert progress
   const existing = db.prepare(

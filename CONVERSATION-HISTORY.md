@@ -361,3 +361,27 @@ v4.0 核心需求的第一步——以机构原始词库文件为准，重建完
 - 中译英训练界面（SpellingPractice/AcceptanceTest）直接读取 chinese_definition，扩充即刻生效 ✅
 
 ---
+
+## 十三、v5.0-P1：用户系统 + Admin 管理（2026-08-08）
+
+> 开发 Agent: opencode (deepseek-v4-flash-free)
+
+### 需求背景
+用户 4 个核心需求：1) 背诵时显示当前 List；2) 开放注册/登录（账号+密码即可）；3) Admin 面板查看各账号状态；4) 首个注册者继承原有学习数据；5) 标题徽标区分 server(浅灰)/laptop(浅黄)
+
+### 实现
+- 迁移 migrate_v6.js：users 加 password_hash/is_admin/status/last_login_at；新表 sessions（token 30天）；list_completion 重建为 (user_id, list_no) 复合主键
+- 认证 server/auth.js：bcryptjs 哈希（纯 JS 无编译依赖）、Bearer token 会话、requireAuth/requireAdmin 中间件
+- routes/auth.js：注册（首个注册者接管 id=1 的 default 用户，数据原地不动自动成为管理员）/登录/登出/me
+- routes/admin.js：用户列表+每用户统计（今日训练/累计时长/List完成/掌握词数/欠债）、重置密码（踢出全部会话）、禁用/启用
+- 全路由 user_id 隔离改造：getUserId() 全局函数废弃，改为 req.user.id；daily.js/dailyPlan.js/training.js/essays.js/stats.js/words.js/topics.js/spellingTest.js/reviewWords.js/reviewResult.js/wrongWords.js 全部加 requireAuth
+- 前端：Login/Register 页面 + RequireAuth/RequireAdmin 路由守卫 + AuthContext（token 存 localStorage）+ Navbar 用户名/退出/管理入口 + Admin.jsx 表格 + api.js 自动带 token/401 跳登录
+- 标题徽标：Navbar 与 document.title 显示 server（浅灰 bg-gray-200）/laptop（浅黄 bg-yellow-100），按 hostname 判断
+- List 显示增强：验收测验头部加 List N；主任务/拼写/抽查原有显示保留
+
+### 验收结果
+- 认证 18 项场景全过：无 token 401、首个注册成 admin+继承、重复用户名 409、错误密码 401、禁用 403、重置密码踢会话、登出后 401 等
+- E2E 双用户隔离：两人各自完成 List 1 后各自推进到 List 2，admin 面板统计正确
+- 前端 npm run build 通过
+
+---

@@ -1,11 +1,14 @@
 const express = require('express');
 const router = express.Router();
-const { getDb, getUserId } = require('../db/database');
+const { getDb } = require('../db/database');
+const { requireAuth } = require('../auth');
+
+router.use(requireAuth);
 
 // Get essay history
 router.get('/history', (req, res) => {
   const db = getDb();
-  const userId = getUserId();
+  const userId = req.user.id;
 
   const submissions = db.prepare(`
     SELECT es.*, wq.question_text, wq.task_type, wq.source
@@ -21,7 +24,7 @@ router.get('/history', (req, res) => {
 // Get essay result by ID
 router.get('/:id/result', (req, res) => {
   const db = getDb();
-  const userId = getUserId();
+  const userId = req.user.id;
 
   const submission = db.prepare(`
     SELECT es.*, wq.question_text, wq.task_type, wq.model_essay
@@ -51,7 +54,7 @@ router.get('/:id/result', (req, res) => {
 // Submit essay for grading
 router.post('/submit', async (req, res) => {
   const db = getDb();
-  const userId = getUserId();
+  const userId = req.user.id;
   const { questionId, essayText } = req.body;
 
   if (!questionId || !essayText) {

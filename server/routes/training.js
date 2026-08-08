@@ -1,6 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const { getDb, getUserId } = require('../db/database');
+const { getDb } = require('../db/database');
+const { requireAuth } = require('../auth');
+
+router.use(requireAuth);
 
 const SPELLING_MIN_COUNT = 20;
 
@@ -12,7 +15,7 @@ function dateString() {
 // body: { listNo }
 router.post('/start', (req, res) => {
   const db = getDb();
-  const userId = getUserId();
+  const userId = req.user.id;
   const { listNo } = req.body || {};
 
   if (!listNo) return res.status(400).json({ error: 'listNo required' });
@@ -74,7 +77,7 @@ router.post('/start', (req, res) => {
 //         acceptanceResults: [{wordId, correct, answer}] }
 router.post('/complete', (req, res) => {
   const db = getDb();
-  const userId = getUserId();
+  const userId = req.user.id;
   const { sessionId, durationSeconds, mainResults = [], spellingResults = [], acceptanceResults = [] } = req.body || {};
 
   const session = db.prepare('SELECT * FROM daily_sessions WHERE id = ? AND user_id = ?')
@@ -158,13 +161,13 @@ router.post('/complete', (req, res) => {
 
     // List 完成标记（验收通过时）
     if (acceptancePassed && session.list_no) {
-      const existing = db.prepare('SELECT * FROM list_completion WHERE list_no = ?').get(session.list_no);
+      const existing = db.prepare('SELECT * FROM list_completion WHERE user_id = ? AND list_no = ?').get(userId, session.list_no);
       if (!existing) {
         db.prepare(`
-          INSERT INTO list_completion (list_no, first_completed_date)
-          VALUES (?, ?)
-          ON CONFLICT(list_no) DO NOTHING
-        `).run(session.list_no, dateString());
+          INSERT INTO list_completion (user_id, list_no, first_completed_date)
+          VALUES (?, ?, ?)
+          ON CONFLICT(user_id, list_no) DO NOTHING
+        `).run(userId, session.list_no, dateString());
       } else if (existing.pending_review === 1) {
         // 重背完成：清除待重背标记，重置抽查状态
         db.prepare(`
@@ -172,8 +175,8 @@ router.post('/complete', (req, res) => {
             pending_review = 0,
             reback_completed_date = ?,
             spot_check_date = NULL
-          WHERE list_no = ?
-        `).run(dateString(), session.list_no);
+          WHERE user_id = ? AND list_no = ?
+        `).run(dateString(), userId, session.list_no);
       }
     }
   });
@@ -195,7 +198,7 @@ router.post('/complete', (req, res) => {
 // body: { sessionId, durationSeconds, mainResults?, spellingResults? }
 router.post('/abandon', (req, res) => {
   const db = getDb();
-  const userId = getUserId();
+  const userId = req.user.id;
   const { sessionId, durationSeconds, mainResults = [] } = req.body || {};
 
   const session = db.prepare('SELECT * FROM daily_sessions WHERE id = ? AND user_id = ?')

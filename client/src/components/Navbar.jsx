@@ -1,9 +1,17 @@
-import { Link, useLocation } from 'react-router-dom';
-import { CalendarDays, BookOpen, PenLine, BarChart3, Search } from 'lucide-react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { CalendarDays, BookOpen, PenLine, BarChart3, Search, LogOut, Shield } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
+import { useAuth } from '../context/AuthContext';
+import { useApp } from '../context/AppContext';
+
+// 环境徽标：本地(laptop)=浅黄，服务器(server)=浅灰
+const IS_SERVER = !['localhost', '127.0.0.1'].includes(window.location.hostname);
 
 export default function Navbar() {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
+  const { showToast } = useApp();
   const [searchQuery, setSearchQuery] = useState('');
   const searchRef = useRef(null);
 
@@ -11,6 +19,10 @@ export default function Navbar() {
     location.pathname === path || location.pathname.startsWith(path + '/')
       ? 'bg-indigo-100 text-indigo-700'
       : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100';
+
+  useEffect(() => {
+    document.title = `IELTS Prep · ${IS_SERVER ? 'server' : 'laptop'}`;
+  }, []);
 
   // Listen for '/' key to focus search
   useEffect(() => {
@@ -31,14 +43,30 @@ export default function Navbar() {
     }
   };
 
+  const handleLogout = async () => {
+    await logout();
+    showToast('已退出登录', 'info');
+    navigate('/login', { replace: true });
+  };
+
   return (
     <nav className="bg-white border-b border-gray-200 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2 text-xl font-bold text-indigo-600 shrink-0">
-            <BookOpen className="w-6 h-6" />
-            <span className="hidden sm:inline">IELTS Prep</span>
+          <Link to="/" className="flex items-center gap-2 shrink-0">
+            <span className="text-xl font-bold text-indigo-600 flex items-center gap-1">
+              <BookOpen className="w-6 h-6" />
+              IELTS Prep
+            </span>
+            {/* 环境徽标：server=浅灰，laptop=浅黄 */}
+            <span
+              className={`text-[10px] px-1.5 py-0.5 rounded uppercase tracking-wider ${
+                IS_SERVER ? 'bg-gray-200 text-gray-500' : 'bg-yellow-100 text-yellow-600'
+              }`}
+            >
+              {IS_SERVER ? 'server' : 'laptop'}
+            </span>
           </Link>
 
           {/* Search */}
@@ -87,6 +115,30 @@ export default function Navbar() {
               <BarChart3 className="w-4 h-4" />
               <span className="hidden sm:inline">历史</span>
             </Link>
+
+            {/* 用户区 */}
+            <div className="ml-2 pl-3 border-l border-gray-200 flex items-center gap-1">
+              {user?.isAdmin && (
+                <Link
+                  to="/admin" aria-label="管理"
+                  className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isActive('/admin')}`}
+                >
+                  <Shield className="w-4 h-4" />
+                  <span className="hidden lg:inline">管理</span>
+                </Link>
+              )}
+              <span className="hidden md:inline text-sm font-medium text-gray-700 max-w-[100px] truncate">
+                {user?.username}
+              </span>
+              <button
+                onClick={handleLogout}
+                aria-label="退出登录"
+                title="退出登录"
+                className="flex items-center gap-1 px-2 py-2 rounded-lg text-sm text-gray-500 hover:text-red-600 hover:bg-red-50 transition-colors"
+              >
+                <LogOut className="w-4 h-4" />
+              </button>
+            </div>
           </div>
         </div>
       </div>
