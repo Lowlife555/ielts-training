@@ -3,37 +3,45 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { api } from '../utils/api';
 import { useApp } from '../context/AppContext';
 import { useKeyboard } from '../hooks/useKeyboard';
+import { useElapsed, formatDuration } from '../hooks/useTimer';
+import TrainingTimer from '../components/TrainingTimer';
 import { CheckCircle, XCircle, Volume2 } from 'lucide-react';
 import { speak } from '../utils/speech';
 
-export default function DailyQuiz() {
+export default function SpellingPractice() {
   const navigate = useNavigate();
   const location = useLocation();
   const { showToast } = useApp();
   const session = location.state?.session;
+  const plan = location.state?.plan;
+  const wrongPool = location.state?.wrongPool || [];
+  const mainResults = location.state?.mainResults || [];
 
+  const words = session?.spellingWords || [];
   const [currentIndex, setCurrentIndex] = useState(0);
   const [userInput, setUserInput] = useState('');
-  const [answers, setAnswers] = useState([]);
+  const [spellingResults, setSpellingResults] = useState([]);
   const [feedback, setFeedback] = useState(null);
-  const [submitting, setSubmitting] = useState(false);
+  const [abandoning, setAbandoning] = useState(false);
   const inputRef = useRef(null);
+
+  const elapsed = useElapsed(session?.startTime);
 
   useEffect(() => { if (!session) navigate('/daily', { replace: true }); }, [session, navigate]);
   useEffect(() => { if (inputRef.current) inputRef.current.focus(); }, [currentIndex]);
 
-  const words = session?.words || [];
   const currentWord = words[currentIndex];
 
   const submitAnswer = useCallback(() => {
-    if (feedback || !userInput.trim() || submitting) return;
+    if (feedback || !userInput.trim()) return;
     const isCorrect = userInput.trim().toLowerCase() === currentWord.word.toLowerCase();
     setFeedback(isCorrect ? 'correct' : 'incorrect');
-    setAnswers(prev => [...prev, { wordId: currentWord.wordId, userAnswer: userInput.trim() }]);
+    const newResults = [...spellingResults, { wordId: currentWord.wordId, correct: isCorrect, answer: userInput.trim() }];
+    setSpellingResults(newResults);
 
     setTimeout(() => {
       if (currentIndex + 1 >= words.length) {
-        finishQuiz();
+        navigate('/daily/acceptance', { state: { session, plan, wrongPool, mainResults, spellingResults: newResults } });
       } else {
         setCurrentIndex(i => i + 1);
         setUserInput('');
@@ -41,39 +49,49 @@ export default function DailyQuiz() {
         inputRef.current?.focus();
       }
     }, 800);
-  }, [userInput, feedback, currentIndex, currentWord, words.length, submitting]);
+  }, [userInput, feedback, currentIndex, currentWord, words.length, spellingResults, navigate, session, plan, wrongPool, mainResults]);
 
-  const finishQuiz = async () => {
-    setSubmitting(true);
+  const abandon = useCallback(async () => {
+    if (abandoning) return;
+    const ok = window.confirm('确定要收工吗？本次进度将保存，欠债规则照常计算。');
+    if (!ok) return;
+    setAbandoning(true);
     try {
-      const updatedAnswers = [...answers, { wordId: currentWord.wordId, userAnswer: userInput.trim() }];
-      const result = await api.submitDailyQuiz({ sessionId: session.sessionId, answers: updatedAnswers });
-      showToast(`测验完成! 正确率: ${result.accuracy}%`, 'success');
-      if (result.wrongCount > 0) {
-        navigate('/daily/correction', { state: { session, quizResult: result } });
-      } else {
-        navigate('/daily/report', { state: { sessionId: session.sessionId } });
-      }
+      await api.abandonTraining({ sessionId: session.sessionId, durationSeconds: elapsed, mainResults });
+      showToast('已收工，进度已保存', 'info');
+      navigate('/');
     } catch (err) {
-      showToast('提交失败: ' + err.message, 'error');
+      showToast('收工失败: ' + err.message, 'error');
     } finally {
-      setSubmitting(false);
+      setAbandoning(false);
     }
-  };
+  }, [abandoning, session, elapsed, mainResults, showToast, navigate]);
 
   useKeyboard({
     'Enter': () => submitAnswer(),
-    'Escape': () => {},
-  }, true, [submitAnswer]);
+    'Escape': abandon,
+    ' ': (e) => {
+      if (feedback && currentWord) { e.preventDefault(); speak(currentWord.word); }
+    },
+  }, true, [submitAnswer, abandon, feedback, currentWord]);
 
   if (!session) return null;
-  const progress = ((currentIndex) / words.length) * 100;
+
+  const progress = (currentIndex / words.length) * 100;
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-8">
       <div className="flex items-center justify-between mb-4">
-        <span className="text-sm font-medium text-gray-500">✍️ 拼写测验</span>
-        <span className="text-sm text-gray-400">{currentIndex + 1} / {words.length}</span>
+        <span className="text-sm font-medium text-indigo-600">✍️ 中译英拼写 · List {session.listNo}</span>
+        <span className="flex items-center gap-3">
+          <span className="text-sm text-gray-400">{currentIndex + 1} / {words.length}</span>
+          <TrainingTimer
+            elapsed={elapsed}
+            targetMinutes={plan?.targetMinutes || 60}
+            onAbandon={abandon}
+            onReachedCap={() => showToast('已达今日上限 2 小时，欠债已结清，可以收工', 'success')}
+          />
+        </span>
       </div>
 
       <div className="w-full bg-gray-100 rounded-full h-1.5 mb-8">
@@ -86,7 +104,7 @@ export default function DailyQuiz() {
           feedback === 'incorrect' ? 'border-red-500 animate-shake-red' : 'border-gray-200'
         }`}>
           <div className="mb-4">
-            <p className="text-sm text-gray-500 mb-1">请根据中文释义拼写单词</p>
+            <p className="text-sm text-gray-500 mb-1">请根据中文释义拼写英文单词</p>
             <p className="text-3xl font-bold text-gray-900">{currentWord.chineseDefinition}</p>
             <span className="text-sm text-gray-400 mt-1">{currentWord.partOfSpeech}</span>
           </div>
@@ -113,6 +131,9 @@ export default function DailyQuiz() {
                   <div>
                     <span className="flex items-center justify-center gap-1"><XCircle className="w-5 h-5" /> 错误</span>
                     <p className="text-sm mt-1">正确答案: <span className="font-semibold text-green-600">{currentWord.word}</span></p>
+                    <button onClick={() => speak(currentWord.word)} className="mt-1 text-xs text-indigo-500 hover:underline flex items-center gap-1 mx-auto">
+                      <Volume2 className="w-3 h-3" /> 听发音
+                    </button>
                   </div>
                 )}
               </div>
@@ -128,7 +149,7 @@ export default function DailyQuiz() {
       </div>
 
       <p className="text-center text-xs text-gray-400 mt-4">
-        <kbd className="px-1.5 py-0.5 bg-gray-100 border rounded">Enter</kbd> 提交 · 答完后自动进入下一题
+        <kbd className="px-1.5 py-0.5 bg-gray-100 border rounded">Enter</kbd> 提交 · 答完后自动进入下一题 · <kbd className="px-1.5 py-0.5 bg-gray-100 border rounded">Esc</kbd> 收工
       </p>
     </div>
   );

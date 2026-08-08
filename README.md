@@ -14,6 +14,7 @@
 | v3.1 | 2026-08-06 | Claude Code + DeepSeek V4 | 修复语音发音：改用本地 Microsoft 离线语音（Google 远程被墙） |
 | v3.2 | 2026-08-06 | Claude Code + DeepSeek V4 | 交付前修复：PET/IELTS 词汇隔离、端口统一、反馈延时、自动保存等 |
 | v4.0-P0-1 | 2026-08-07 | Claude Code + DeepSeek V4 | 词库整理与导入：List 1-24 编号、释义三级补齐、list_no/is_extra 字段 |
+| v4.0-P0-2/3 | 2026-08-08 | opencode (deepseek-v4-flash-free) | 今日简报 + 每日训练流程重构（热身→英译中→错词死磕→中译英→验收）+ 时间盒与欠债系统 |
 
 ## 🚀 快速启动
 

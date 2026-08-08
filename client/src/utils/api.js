@@ -59,15 +59,17 @@ export const api = {
   // Stats
   getOverview: () => request('/stats/overview'),
 
-  // Daily Study
-  getDailySession: (count, level) => {
-    const query = new URLSearchParams({ count, level }).toString();
-    return request(`/daily/start?${query}`);
-  },
-  submitDailyQuiz: (data) =>
-    request('/daily/quiz', { method: 'POST', body: JSON.stringify(data) }),
-  submitDailyCorrection: (data) =>
-    request('/daily/correction', { method: 'POST', body: JSON.stringify(data) }),
-  getDailyReport: (sessionId) => request(`/daily/report/${sessionId}`),
-  getDailyHistory: () => request('/daily/history'),
+  // v4.0 Daily Plan
+  getDailyPlan: () => request('/daily-plan'),
+  getDailyPlanStatus: () => request('/daily-plan/status'),
+  completeDailyPlan: (sessionId) =>
+    request('/daily-plan/complete', { method: 'POST', body: JSON.stringify({ sessionId }) }),
+
+  // v4.0 Training
+  startTraining: (data) =>
+    request('/training/start', { method: 'POST', body: JSON.stringify(data) }),
+  completeTraining: (data) =>
+    request('/training/complete', { method: 'POST', body: JSON.stringify(data) }),
+  abandonTraining: (data) =>
+    request('/training/abandon', { method: 'POST', body: JSON.stringify(data) }),
 };

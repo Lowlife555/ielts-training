@@ -18,10 +18,11 @@ import WritingQuestions from './pages/WritingQuestions';
 import WritingEditor from './pages/WritingEditor';
 import WritingResult from './pages/WritingResult';
 import History from './pages/History';
-import DailySetup from './pages/DailySetup';
-import DailyFlashcards from './pages/DailyFlashcards';
-import DailyQuiz from './pages/DailyQuiz';
-import DailyCorrection from './pages/DailyCorrection';
+import TodayBriefing from './pages/TodayBriefing';
+import PetWarmup from './pages/PetWarmup';
+import MainStudy from './pages/MainStudy';
+import SpellingPractice from './pages/SpellingPractice';
+import AcceptanceTest from './pages/AcceptanceTest';
 import DailyReport from './pages/DailyReport';
 import SpeechDiagnostic from './pages/SpeechDiagnostic';
 
@@ -48,10 +49,11 @@ export default function App() {
                 <Route path="/writing/:id" element={<WritingEditor />} />
                 <Route path="/writing/result/:id" element={<WritingResult />} />
                 <Route path="/history" element={<History />} />
-                <Route path="/daily" element={<DailySetup />} />
-                <Route path="/daily/flashcards" element={<DailyFlashcards />} />
-                <Route path="/daily/quiz" element={<DailyQuiz />} />
-                <Route path="/daily/correction" element={<DailyCorrection />} />
+                <Route path="/daily" element={<TodayBriefing />} />
+                <Route path="/daily/warmup" element={<PetWarmup />} />
+                <Route path="/daily/study" element={<MainStudy />} />
+                <Route path="/daily/spelling" element={<SpellingPractice />} />
+                <Route path="/daily/acceptance" element={<AcceptanceTest />} />
                 <Route path="/daily/report" element={<DailyReport />} />
                 <Route path="/speech-test" element={<SpeechDiagnostic />} />
               </Routes>
