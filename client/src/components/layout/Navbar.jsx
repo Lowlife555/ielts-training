@@ -15,7 +15,7 @@ export default function Navbar() {
   const { user, logout } = useAuth();
   const { showToast, dispatch } = useApp();
   const { theme, toggle } = useTheme();
-  const { mode, setMode } = useTouch();
+  const { mode, setMode, isTouch } = useTouch();
   const [searchQuery, setSearchQuery] = useState('');
   const searchRef = useRef(null);
 
