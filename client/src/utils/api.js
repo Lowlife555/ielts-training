@@ -64,6 +64,8 @@ export const api = {
   getDailyPlanStatus: () => request('/daily-plan/status'),
   completeDailyPlan: (sessionId) =>
     request('/daily-plan/complete', { method: 'POST', body: JSON.stringify({ sessionId }) }),
+  submitSpotCheck: (data) =>
+    request('/daily-plan/spot-check', { method: 'POST', body: JSON.stringify(data) }),
 
   // v4.0 Training
   startTraining: (data) =>

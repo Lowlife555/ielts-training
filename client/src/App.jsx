@@ -23,6 +23,7 @@ import PetWarmup from './pages/PetWarmup';
 import MainStudy from './pages/MainStudy';
 import SpellingPractice from './pages/SpellingPractice';
 import AcceptanceTest from './pages/AcceptanceTest';
+import SpotCheck from './pages/SpotCheck';
 import DailyReport from './pages/DailyReport';
 import SpeechDiagnostic from './pages/SpeechDiagnostic';
 
@@ -52,6 +53,7 @@ export default function App() {
                 <Route path="/daily" element={<TodayBriefing />} />
                 <Route path="/daily/warmup" element={<PetWarmup />} />
                 <Route path="/daily/study" element={<MainStudy />} />
+                <Route path="/daily/spotcheck" element={<SpotCheck />} />
                 <Route path="/daily/spelling" element={<SpellingPractice />} />
                 <Route path="/daily/acceptance" element={<AcceptanceTest />} />
                 <Route path="/daily/report" element={<DailyReport />} />

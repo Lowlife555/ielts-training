@@ -34,11 +34,20 @@ export default function MainStudy() {
   const total = words.length;
   const poolSize = wrongPool.length;
 
+  const goNext = useCallback((passWrongPool, passResults) => {
+    const hasSpotCheck = plan?.spotCheckList && plan.spotCheckList.words?.length > 0;
+    if (hasSpotCheck) {
+      navigate('/daily/spotcheck', { state: { session, plan, wrongPool: passWrongPool, mainResults: passResults } });
+    } else {
+      navigate('/daily/spelling', { state: { session, plan, wrongPool: passWrongPool, mainResults: passResults } });
+    }
+  }, [navigate, session, plan]);
+
   // 进入错词死磕
   const startGrind = useCallback((wrongWords) => {
     if (wrongWords.length === 0) {
-      // 第一遍全对，直接进入拼写
-      navigate('/daily/spelling', { state: { session, plan, wrongPool: [], mainResults: results } });
+      // 第一遍全对，直接进入下一阶段
+      goNext([], results);
       return;
     }
     setWrongPool(wrongWords);
@@ -46,7 +55,7 @@ export default function MainStudy() {
     setGrindIndex(0);
     setGrindRound(1);
     setShowMeaning(false);
-  }, [navigate, session, plan, results]);
+  }, [goNext, results]);
 
   // 第一遍标记会/不会
   const markFirst = useCallback((correct) => {
@@ -70,7 +79,7 @@ export default function MainStudy() {
     if (correct) {
       // 会的移出错词池
       if (remaining.length === 0) {
-        navigate('/daily/spelling', { state: { session, plan, wrongPool, mainResults: results } });
+        goNext(wrongPool, results);
         return;
       }
       setWrongPool(remaining);
@@ -83,7 +92,7 @@ export default function MainStudy() {
       setGrindRound(r => r + 1);
     }
     setShowMeaning(false);
-  }, [phase, wrongPool, grindIndex, navigate, session, plan, results]);
+  }, [phase, wrongPool, grindIndex, goNext, results]);
 
   // 第一遍完成后的过渡 UI 由 startGrind 直接跳转或进入死磕
 
