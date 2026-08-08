@@ -12,31 +12,34 @@ function dateString() {
 }
 
 // POST /api/training/start — 开启当日主训练会话（开始计时）
-// body: { listNo }
+// body: { listNo, batchSize? (30/40/50/100), targetMinutes?, debtMinutes? }
 router.post('/start', (req, res) => {
   const db = getDb();
   const userId = req.user.id;
-  const { listNo } = req.body || {};
+  const { listNo, batchSize } = req.body || {};
 
   if (!listNo) return res.status(400).json({ error: 'listNo required' });
 
   const listWords = db.prepare(`
-    SELECT id, word, phonetic, part_of_speech, chinese_definition
-    FROM words
-    WHERE is_extra = 0 AND list_no = ?
-    ORDER BY word ASC
+    SELECT w.id, w.word, w.phonetic, w.part_of_speech, w.chinese_definition,
+           wm.meanings, wm.keywords
+    FROM words w
+    LEFT JOIN word_meanings wm ON wm.word_id = w.id
+    WHERE w.is_extra = 0 AND w.list_no = ?
+    ORDER BY w.id ASC
   `).all(listNo);
 
   if (listWords.length === 0) {
     return res.status(404).json({ error: `List ${listNo} 没有单词` });
   }
 
+  const batch = Math.min(Math.max(parseInt(batchSize) || 30, 10), 100);
   const now = new Date();
   const result = db.prepare(`
-    INSERT INTO daily_sessions (user_id, session_date, level, word_count, status, list_no, start_time, target_minutes, debt_minutes)
-    VALUES (?, ?, 'ielts', ?, 'studying', ?, ?, ?, ?)
+    INSERT INTO daily_sessions (user_id, session_date, level, word_count, status, list_no, start_time, target_minutes, debt_minutes, batch_size)
+    VALUES (?, ?, 'ielts', ?, 'studying', ?, ?, ?, ?, ?)
   `).run(userId, dateString(), listWords.length, listNo,
-    now.toISOString(), req.body.targetMinutes || 60, req.body.debtMinutes || 0);
+    now.toISOString(), req.body.targetMinutes || 60, req.body.debtMinutes || 0, batch);
 
   const sessionId = result.lastInsertRowid;
 
@@ -59,17 +62,130 @@ router.post('/start', (req, res) => {
     phonetic: w.phonetic,
     partOfSpeech: w.part_of_speech,
     chineseDefinition: w.chinese_definition,
+    meanings: parseJson(w.meanings) || [w.chinese_definition],
+    keywords: parseJson(w.keywords) || [],
   });
 
   res.json({
     sessionId,
     listNo,
+    batchSize: batch,
     total: listWords.length,
     words: listWords.map(toView),
     spellingWords: spellingWords.map(toView),
     startTime: now.toISOString(),
   });
 });
+
+// POST /api/training/spell-check — 今日背过词的拼写抽查（最终环节）
+// body: { sessionId, durationSeconds, results: [{wordId, correct, answer}] }
+// 正确率 ≥80%: 当日训练完成, List 标记完成; <80%: 当日不算完成(欠债+30), List 标记待重背
+router.post('/spell-check', (req, res) => {
+  const db = getDb();
+  const userId = req.user.id;
+  const { sessionId, durationSeconds, results = [] } = req.body || {};
+
+  const session = db.prepare('SELECT * FROM daily_sessions WHERE id = ? AND user_id = ?')
+    .get(sessionId, userId);
+  if (!session) return res.status(404).json({ error: 'Session not found' });
+  if (!Array.isArray(results) || results.length === 0) {
+    return res.status(400).json({ error: 'results array required' });
+  }
+
+  const total = results.length;
+  const correct = results.filter(r => r.correct).length;
+  const accuracy = Math.round((correct / total) * 100);
+  const passed = accuracy >= 80;
+
+  // 权威时长：服务端 start_time 为准，取较小值
+  const serverElapsed = session.start_time
+    ? Math.max(0, Math.floor((Date.now() - new Date(session.start_time).getTime()) / 1000))
+    : 0;
+  const finalDuration = Math.min(durationSeconds || 0, serverElapsed || Infinity);
+
+  const update = db.transaction(() => {
+    db.prepare(`
+      UPDATE daily_sessions SET
+        status = ?, completed = ?, duration_seconds = ?, end_time = ?,
+        spelling_accuracy = ?
+      WHERE id = ?
+    `).run(
+      passed ? 'completed' : 'finished',
+      passed ? 1 : 0,
+      finalDuration,
+      new Date().toISOString(),
+      accuracy,
+      sessionId
+    );
+
+    // 逐词记录
+    db.prepare('DELETE FROM daily_session_words WHERE session_id = ?').run(sessionId);
+    const insertWord = db.prepare(`
+      INSERT INTO daily_session_words (session_id, word_id, study_order, spelling_correct, spelling_answer)
+      VALUES (?, ?, ?, ?, ?)
+    `);
+    let order = 0;
+    for (const r of results) {
+      order++;
+      insertWord.run(sessionId, r.wordId, order, r.correct ? 1 : 0, r.answer || '');
+    }
+
+    // List 状态
+    if (session.list_no) {
+      const existing = db.prepare('SELECT * FROM list_completion WHERE user_id = ? AND list_no = ?')
+        .get(userId, session.list_no);
+      if (passed) {
+        if (!existing) {
+          db.prepare(`
+            INSERT INTO list_completion (user_id, list_no, first_completed_date)
+            VALUES (?, ?, ?)
+            ON CONFLICT(user_id, list_no) DO NOTHING
+          `).run(userId, session.list_no, dateString());
+        } else if (existing.pending_review === 1) {
+          // 重背完成：清除待重背标记，重置抽查状态
+          db.prepare(`
+            UPDATE list_completion SET
+              pending_review = 0,
+              reback_completed_date = ?,
+              spot_check_date = NULL
+            WHERE user_id = ? AND list_no = ?
+          `).run(dateString(), userId, session.list_no);
+        }
+      } else {
+        // 未达标：标记待重背（次日简报优先重背）
+        if (!existing) {
+          db.prepare(`
+            INSERT INTO list_completion (user_id, list_no, first_completed_date, pending_review)
+            VALUES (?, ?, ?, 1)
+            ON CONFLICT(user_id, list_no) DO NOTHING
+          `).run(userId, session.list_no, dateString());
+        } else {
+          db.prepare(`
+            UPDATE list_completion SET pending_review = 1, spot_check_date = NULL
+            WHERE user_id = ? AND list_no = ?
+          `).run(userId, session.list_no);
+        }
+      }
+    }
+  });
+  update();
+
+  res.json({
+    ok: true,
+    sessionId,
+    passed,
+    total,
+    correct,
+    accuracy,
+    durationSeconds: finalDuration,
+    completed: passed ? 1 : 0,
+  });
+});
+
+function parseJson(str) {
+  if (!str) return null;
+  try { return JSON.parse(str); } catch { return null; }
+}
 
 // POST /api/training/complete — 训练完成（验收通过）
 // body: { sessionId, durationSeconds, mainResults: [{wordId, correct, wrongPool}],

@@ -88,8 +88,15 @@ export default function SpotCheck() {
 
   if (!session || !plan?.spotCheckList) return null;
 
-  const continueToSpelling = () => {
-    navigate('/daily/spelling', { state: { session, plan, wrongPool, mainResults } });
+  const continueToSpellCheck = () => {
+    navigate('/daily/spellcheck', {
+      state: {
+        session, plan, wrongPool, mainResults,
+        dictationStats: location.state?.dictationStats,
+        spotCheckAccuracy: outcome ? outcome.accuracy : null,
+        restedSeconds: location.state?.restedSeconds || 0,
+      },
+    });
   };
 
   // 结果页
@@ -109,8 +116,8 @@ export default function SpotCheck() {
           {!passed && (
             <p className="text-sm text-amber-600 mb-6">该 List 已标记待重背，明日简报将优先安排重背</p>
           )}
-          <button onClick={continueToSpelling} className="btn-primary px-8">
-            继续今日训练 <ChevronRight className="w-4 h-4 inline" />
+          <button onClick={continueToSpellCheck} className="btn-primary px-8">
+            继续拼写抽查 <ChevronRight className="w-4 h-4 inline" />
           </button>
         </div>
       </div>

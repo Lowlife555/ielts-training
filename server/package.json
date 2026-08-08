@@ -7,9 +7,9 @@
     "start": "node index.js",
     "dev": "nodemon index.js",
     "migrate": "node db/migrate.js",
-    "migrate:all": "node db/migrate.js && node db/migrate_v4.js && node db/migrate_v5.js && node db/migrate_v9.js && node db/migrate_v10.js",
+    "migrate:all": "node db/migrate.js && node db/migrate_v4.js && node db/migrate_v5.js && node db/migrate_v9.js && node db/migrate_v10.js && node db/migrate_v11.js",
     "seed": "node db/seed.js",
-    "setup": "node db/migrate.js && node db/seed.js && node db/migrate_v4.js && node db/migrate_v5.js && node db/migrate_v9.js && node db/migrate_v10.js"
+    "setup": "node db/migrate.js && node db/seed.js && node db/migrate_v4.js && node db/migrate_v5.js && node db/migrate_v9.js && node db/migrate_v10.js && node db/migrate_v11.js"
   },
   "keywords": [],
   "author": "",

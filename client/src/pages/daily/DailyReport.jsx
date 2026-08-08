@@ -1,28 +1,47 @@
 import { useNavigate, useLocation } from 'react-router-dom';
 import { formatDuration } from '../../hooks/useTimer';
-import { Home, Clock, Target, Sparkles } from 'lucide-react';
+import { Home, Clock, Target, Sparkles, RefreshCw } from 'lucide-react';
 
 export default function DailyReport() {
   const navigate = useNavigate();
   const location = useLocation();
   const report = location.state?.report;
   const plan = location.state?.plan;
+  const passed = location.state?.passed;
 
   if (!report) return null;
 
   const stats = [
-    { label: '英译中主任务', value: report.mainAccuracy !== null ? `${report.mainAccuracy}%` : '—', desc: `错词 ${report.wrongPoolCount} 个（已死磕清零）` },
-    { label: '中译英拼写', value: report.spellingAccuracy !== null ? `${report.spellingAccuracy}%` : '—', desc: '20% 随机抽查拼写' },
-    { label: '验收测验', value: report.acceptanceAccuracy !== null ? `${report.acceptanceAccuracy}%` : '—', desc: '漏网之鱼全部拼对才算过' },
+    {
+      label: '中文默写',
+      value: report.dictationAccuracy !== null && report.dictationAccuracy !== undefined ? `${report.dictationAccuracy}%` : '—',
+      desc: '番茄钟批次关键词判分',
+    },
+    {
+      label: '拼写抽查',
+      value: report.spellingAccuracy !== null ? `${report.spellingAccuracy}%` : '—',
+      desc: report.completed ? '今天背过的词随机30 ≥80% 通过' : '未达标，待重背',
+    },
+    {
+      label: '间隔抽查',
+      value: report.spotCheckAccuracy !== null && report.spotCheckAccuracy !== undefined ? `${report.spotCheckAccuracy}%` : '—',
+      desc: report.spotCheckAccuracy !== null && report.spotCheckAccuracy !== undefined ? '背完3天后抽查' : '今日无',
+    },
   ];
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-8 text-center">
       <div className="card animate-fade-in">
-        <div className="text-6xl mb-4">🎉</div>
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">今日任务完成!</h1>
+        <div className="text-6xl mb-4">{passed === false ? '📌' : '🎉'}</div>
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          {passed === false ? '今日训练未达标' : '今日任务完成!'}
+        </h1>
         <p className="text-gray-500 mb-8">
-          List {plan?.todayList?.listNo} 已通过验收，明天见！
+          {passed === false ? (
+            <span className="text-amber-600">List {plan?.todayList?.listNo} 拼写抽查未达 80%，已标记待重背</span>
+          ) : (
+            <>List {plan?.todayList?.listNo} 已完成，明天见！</>
+          )}
         </p>
 
         {/* 时长与目标 */}
@@ -53,6 +72,14 @@ export default function DailyReport() {
             </div>
           ))}
         </div>
+
+        {/* 待重背提示 */}
+        {passed === false && (
+          <div className="flex items-center justify-center gap-2 bg-amber-50 border border-amber-200 rounded-xl p-3 text-amber-700 text-sm mb-8">
+            <RefreshCw className="w-4 h-4" />
+            次日简报将优先安排重背该 List
+          </div>
+        )}
 
         {/* 结清提示 */}
         {plan?.targetMinutes >= 120 && (

@@ -4,9 +4,10 @@ import { api } from '../../utils/api';
 import { useKeyboard } from '../../hooks/useKeyboard';
 import { useApp } from '../../context/AppContext';
 import { useAuth } from '../../context/AuthContext';
-import { ArrowLeft, Play, Clock, Flame, BookOpen, RefreshCw, Target, FlaskConical, ListOrdered } from 'lucide-react';
+import { ArrowLeft, Play, Clock, Flame, BookOpen, RefreshCw, Target, FlaskConical, ListOrdered, Layers } from 'lucide-react';
 
 const TEST_LIST_COUNT = 24;
+const BATCH_OPTIONS = [30, 40, 50, 100];
 
 // 学习模式切换器：顺序模式（自动 List 1→24）/ 自定义模式（固定选某个 List，插队不丢顺序）
 function ModeSwitcher({ plan, onSaved }) {
@@ -108,6 +109,7 @@ export default function TodayBriefing() {
   const [error, setError] = useState(null);
   const [testList, setTestList] = useState(1);
   const [testBusy, setTestBusy] = useState(false);
+  const [batchSize, setBatchSize] = useState(30);
 
   useEffect(() => {
     api.getDailyPlan()
@@ -118,7 +120,7 @@ export default function TodayBriefing() {
 
   const reload = () => api.getDailyPlan().then(setPlan);
 
-  const startNow = () => navigate('/daily/warmup', { state: { plan } });
+  const startNow = () => navigate('/daily/warmup', { state: { plan, batchSize } });
 
   // ===== 测试面板（admin_test 专属）：任意 List 任意环节直接进入 =====
   const testSession = async (listNo) => {
@@ -129,7 +131,7 @@ export default function TodayBriefing() {
     setTestBusy(true);
     try {
       if (stage === 'warmup') {
-        navigate('/daily/warmup', { state: { plan } });
+        navigate('/daily/warmup', { state: { plan, batchSize } });
         return;
       }
       const session = await testSession(testList);
@@ -277,6 +279,34 @@ export default function TodayBriefing() {
               <div className="font-medium text-gray-900">PET 热身 {plan.petWarmupCount} 词</div>
               <div className="text-xs text-gray-500">热身不计时不计分，快速进入状态</div>
             </div>
+          </div>
+
+          {/* 背诵词数（番茄钟批次） */}
+          <div className="p-3 rounded-lg border border-indigo-200 bg-indigo-50/50">
+            <div className="flex items-center gap-2 mb-2">
+              <Layers className="w-5 h-5 text-indigo-600 shrink-0" />
+              <span className="font-medium text-gray-900">一口气背诵词数（番茄钟批次）</span>
+            </div>
+            <div className="grid grid-cols-4 gap-2">
+              {BATCH_OPTIONS.map(n => (
+                <button
+                  key={n}
+                  onClick={() => setBatchSize(n)}
+                  className={`p-2.5 rounded-lg border-2 text-sm font-medium transition-colors ${
+                    batchSize === n
+                      ? 'border-indigo-500 bg-indigo-600 text-white'
+                      : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300'
+                  }`}
+                >
+                  {n} 词
+                </button>
+              ))}
+            </div>
+            <p className="text-xs text-gray-500 mt-2">
+              {todayList && batchSize < todayList.wordCount
+                ? `共 ${todayList.wordCount} 词，按 ${batchSize} 词一批分 ${Math.ceil(todayList.wordCount / batchSize)} 批背诵，批间休息 5 分钟（可跳过，不计时）`
+                : '每批背完后休息 5 分钟（可跳过），不足一批的剩余词作为最后一批'}
+            </p>
           </div>
         </div>
 

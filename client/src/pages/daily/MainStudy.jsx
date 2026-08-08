@@ -1,113 +1,224 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { api } from '../../utils/api';
 import { useApp } from '../../context/AppContext';
 import { useKeyboard } from '../../hooks/useKeyboard';
 import { useElapsed } from '../../hooks/useTimer';
-import { useSwipe } from '../../hooks/useSwipe';
-import { useTouch } from '../../context/TouchContext';
 import { speak } from '../../utils/speech';
 import TrainingTimer from '../../components/training/TrainingTimer';
-import { Volume2, Check, X } from 'lucide-react';
+import { Volume2, Check, X, Play, Coffee, Timer } from 'lucide-react';
+
+const REST_SECONDS = 5 * 60;
+const TIME_UP_BUFFER = 10 * 60; // 剩余不足 10 分钟不再开始新批次
+
+function cleanKw(k) {
+  return k.replace(/^[a-z]+\.\s*/i, '')
+    .replace(/[，,。;；、()（）<>《》「」"'“”]/g, '')
+    .trim();
+}
+
+function fallbackKeywords(def) {
+  return def.split(/[;；,，、]/)
+    .map(cleanKw)
+    .filter(k => k.length >= 2);
+}
+
+// 关键词自动判分:输入包含任一核心义项词即算对(宽松判,多义词不误判)
+function checkAnswer(input, keywords, chineseDefinition) {
+  const clean = input.replace(/\s+/g, '').replace(/[，,。;；、()（）<>《》「」"'“”]/g, '');
+  if (!clean) return false;
+  const kws = (keywords && keywords.length > 0) ? keywords : fallbackKeywords(chineseDefinition || '');
+  for (const k of kws) {
+    const ck = cleanKw(k);
+    if (ck.length >= 2 && clean.includes(ck)) return true;
+  }
+  return false;
+}
 
 export default function MainStudy() {
   const navigate = useNavigate();
   const location = useLocation();
   const { showToast } = useApp();
-  const { isTouch } = useTouch();
   const session = location.state?.session;
   const plan = location.state?.plan;
+  const batchSize = session?.batchSize || location.state?.batchSize || 30;
 
-  const words = session?.words || [];
-  const [phase, setPhase] = useState('first'); // first | grind
+  const allWords = session?.words || [];
+
+  // 批次划分:List 内顺序,最后不足一批的剩余词作为最后一批
+  const batches = useMemo(() => {
+    const out = [];
+    for (let i = 0; i < allWords.length; i += batchSize) {
+      out.push(allWords.slice(i, i + batchSize));
+    }
+    return out;
+  }, [allWords, batchSize]);
+
+  const [phase, setPhase] = useState('wordtable'); // wordtable | dictation | rest
+  const [batchIndex, setBatchIndex] = useState(0);
+  const currentBatch = batches[batchIndex] || [];
+
+  // 单词表状态
+  const [expanded, setExpanded] = useState(new Set());
+  const [marked, setMarked] = useState({});
+
+  // 默写状态
+  const [dictWords, setDictWords] = useState([]);
+  const [round, setRound] = useState(1);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [showMeaning, setShowMeaning] = useState(false);
-  const [results, setResults] = useState([]); // 第一遍: [{wordId, correct}]
-  const [wrongPool, setWrongPool] = useState([]); // 错词: [{wordId, ...}]
-  const [grindIndex, setGrindIndex] = useState(0);
-  const [grindRound, setGrindRound] = useState(1);
+  const [userInput, setUserInput] = useState('');
+  const [feedback, setFeedback] = useState(null);
+  const [roundWrongIds, setRoundWrongIds] = useState([]);
+
+  // 休息状态
+  const [restLeft, setRestLeft] = useState(REST_SECONDS);
+  const [restRunning, setRestRunning] = useState(false);
+
   const [abandoning, setAbandoning] = useState(false);
+  const inputRef = useRef(null);
 
   const elapsed = useElapsed(session?.startTime);
+
+  // 统计:默写首试正确率、休息累计时长(休息不计入训练时长)
+  const dictStatsRef = useRef({ total: 0, correct: 0 });
+  const restedSecondsRef = useRef(0);
 
   useEffect(() => {
     if (!session) navigate('/daily', { replace: true });
   }, [session, navigate]);
 
-  const total = words.length;
-  const poolSize = wrongPool.length;
+  useEffect(() => {
+    if (phase === 'dictation') inputRef.current?.focus();
+  }, [phase, currentIndex, dictWords.length]);
 
-  const goNext = useCallback((passWrongPool, passResults) => {
-    const hasSpotCheck = plan?.spotCheckList && plan.spotCheckList.words?.length > 0;
+  // 休息倒计时
+  useEffect(() => {
+    if (!restRunning || phase !== 'rest') return;
+    const timer = setInterval(() => {
+      setRestLeft(prev => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          setRestRunning(false);
+          nextAfterRest();
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [restRunning, phase]);
+
+  const remainingSeconds = (plan?.targetMinutes || 60) * 60 - elapsed;
+  const timeUp = remainingSeconds < TIME_UP_BUFFER;
+
+  // 进入抽查环节(整个 List 完成或剩余不足 10 分钟)
+  const goCheck = useCallback(() => {
+    const stats = dictStatsRef.current;
+    const dictationStats = { total: stats.total, correct: stats.correct };
+    const hasSpotCheck = plan?.spotCheckList?.words?.length > 0;
     if (hasSpotCheck) {
-      navigate('/daily/spotcheck', { state: { session, plan, wrongPool: passWrongPool, mainResults: passResults } });
+      navigate('/daily/spotcheck', {
+        state: { session, plan, wrongPool: [], mainResults: [], dictationStats },
+      });
     } else {
-      navigate('/daily/spelling', { state: { session, plan, wrongPool: passWrongPool, mainResults: passResults } });
+      navigate('/daily/spellcheck', {
+        state: { session, plan, dictationStats, restedSeconds: restedSecondsRef.current },
+      });
     }
   }, [navigate, session, plan]);
 
-  // 进入错词死磕
-  const startGrind = useCallback((wrongWords) => {
-    if (wrongWords.length === 0) {
-      // 第一遍全对，直接进入下一阶段
-      goNext([], results);
+  // 默写一批完成
+  const batchDictationDone = useCallback(() => {
+    if (batchIndex + 1 >= batches.length || timeUp) {
+      goCheck();
+    } else {
+      setPhase('rest');
+      setRestLeft(REST_SECONDS);
+      setRestRunning(true);
+    }
+  }, [batchIndex, batches.length, timeUp, goCheck]);
+
+  const nextAfterRest = useCallback(() => {
+    const rem = (plan?.targetMinutes || 60) * 60 - elapsed;
+    if (rem < TIME_UP_BUFFER) {
+      goCheck();
       return;
     }
-    setWrongPool(wrongWords);
-    setPhase('grind');
-    setGrindIndex(0);
-    setGrindRound(1);
-    setShowMeaning(false);
-  }, [goNext, results]);
+    setBatchIndex(i => i + 1);
+    setPhase('wordtable');
+    setExpanded(new Set());
+    setMarked({});
+  }, [plan, elapsed, goCheck]);
 
-  // 第一遍标记会/不会
-  const markFirst = useCallback((correct) => {
-    if (phase !== 'first') return;
-    const word = words[currentIndex];
-    if (!word) return;
-    const newResults = [...results, { wordId: word.wordId, correct, wrongPool: !correct }];
-    setResults(newResults);
-    setShowMeaning(false);
-    if (currentIndex + 1 >= total) {
-      startGrind(newResults.filter(r => !r.correct).map(r => r.wordId));
-    } else {
-      setCurrentIndex(i => i + 1);
+  const skipRest = () => {
+    setRestRunning(false);
+    nextAfterRest();
+  };
+
+  // ===== 默写答题(关键词判分 + 错词重测) =====
+  const currentDictWord = dictWords[currentIndex];
+
+  const submitDictation = useCallback(() => {
+    if (feedback || !userInput.trim() || !currentDictWord) return;
+
+    const isCorrect = checkAnswer(userInput, currentDictWord.keywords, currentDictWord.chineseDefinition);
+    setFeedback(isCorrect ? 'correct' : 'incorrect');
+
+    let newWrongIds = roundWrongIds;
+    if (!isCorrect && !newWrongIds.includes(currentDictWord.id)) {
+      newWrongIds = [...newWrongIds, currentDictWord.id];
+      setRoundWrongIds(newWrongIds);
     }
-  }, [phase, words, currentIndex, results, total, startGrind]);
 
-  // 错词死磕标记
-  const markGrind = useCallback((correct) => {
-    if (phase !== 'grind') return;
-    const remaining = wrongPool.filter((_, i) => i !== grindIndex);
-    if (correct) {
-      // 会的移出错词池
-      if (remaining.length === 0) {
-        goNext(wrongPool, results);
-        return;
+    // 首试统计
+    if (isCorrect) {
+      dictStatsRef.current.total += 1;
+      dictStatsRef.current.correct += 1;
+    } else {
+      dictStatsRef.current.total += 1;
+    }
+
+    api.submitDictation(session?.listNo, {
+      wordId: currentDictWord.id,
+      isCorrect,
+      userAnswer: userInput.trim(),
+    }).catch((err) => {
+      console.warn('Failed to save dictation result:', err.message);
+    });
+
+    setTimeout(() => {
+      if (currentIndex + 1 >= dictWords.length) {
+        if (newWrongIds.length > 0) {
+          const retryWords = dictWords.filter(w => newWrongIds.includes(w.id));
+          setDictWords(retryWords);
+          setRoundWrongIds([]);
+          setRound(r => r + 1);
+          setCurrentIndex(0);
+          setUserInput('');
+          setFeedback(null);
+          inputRef.current?.focus();
+        } else {
+          batchDictationDone();
+        }
+      } else {
+        setCurrentIndex(i => i + 1);
+        setUserInput('');
+        setFeedback(null);
+        inputRef.current?.focus();
       }
-      setWrongPool(remaining);
-      setGrindIndex(prev => Math.min(prev, remaining.length - 1));
-    } else {
-      // 不会的继续留在池中，标记后回池底
-      const last = remaining.length;
-      setWrongPool([...remaining, wrongPool[grindIndex]]);
-      setGrindIndex(last);
-      setGrindRound(r => r + 1);
-    }
-    setShowMeaning(false);
-  }, [phase, wrongPool, grindIndex, goNext, results]);
+    }, 800);
+  }, [userInput, feedback, currentDictWord, dictWords, roundWrongIds, currentIndex, batchDictationDone, session]);
 
-  // 第一遍完成后的过渡 UI 由 startGrind 直接跳转或进入死磕
-
-  const currentWord = phase === 'first' ? words[currentIndex] : wrongPool[grindIndex];
-
-  const enterKey = useCallback(() => {
-    if (!currentWord) return;
-    if (!showMeaning) { setShowMeaning(true); return; }
-    if (phase === 'first' && currentIndex + 1 >= total) {
-      markFirst(true); // 最后一张卡显示释义后，提示用户标记
-    }
-  }, [currentWord, showMeaning, phase, currentIndex, total, markFirst]);
+  // 开始默写本批
+  const startDictation = () => {
+    setDictWords(currentBatch);
+    setRound(1);
+    setCurrentIndex(0);
+    setRoundWrongIds([]);
+    setUserInput('');
+    setFeedback(null);
+    setPhase('dictation');
+  };
 
   const abandon = useCallback(async () => {
     if (abandoning) return;
@@ -115,7 +226,11 @@ export default function MainStudy() {
     if (!ok) return;
     setAbandoning(true);
     try {
-      await api.abandonTraining({ sessionId: session.sessionId, durationSeconds: elapsed, mainResults: results });
+      await api.abandonTraining({
+        sessionId: session.sessionId,
+        durationSeconds: Math.max(0, elapsed - restedSecondsRef.current),
+        mainResults: [],
+      });
       showToast('已收工，进度已保存', 'info');
       navigate('/');
     } catch (err) {
@@ -123,108 +238,311 @@ export default function MainStudy() {
     } finally {
       setAbandoning(false);
     }
-  }, [abandoning, session, elapsed, results, showToast, navigate]);
-
-  // 触屏手势：点卡片翻面；左右滑动 = 会/不会（未翻面时视为翻面）
-  const swipe = useSwipe({
-    enabled: isTouch,
-    onLeft: () => { if (showMeaning) { if (phase === 'first') markFirst(false); else markGrind(false); } else setShowMeaning(true); },
-    onRight: () => { if (showMeaning) { if (phase === 'first') markFirst(true); else markGrind(true); } else setShowMeaning(true); },
-    onTap: () => { if (!showMeaning) setShowMeaning(true); },
-  });
+  }, [abandoning, session, elapsed, showToast, navigate]);
 
   useKeyboard({
-    'Enter': enterKey,
-    '1': () => { if (showMeaning) { if (phase === 'first') markFirst(true); else markGrind(true); } },
-    '2': () => { if (showMeaning) { if (phase === 'first') markFirst(false); else markGrind(false); } },
-    'ArrowRight': () => { if (showMeaning) { if (phase === 'first') markFirst(true); else markGrind(true); } },
-    ' ': (e) => { e.preventDefault(); if (currentWord) speak(currentWord.word); },
+    'Enter': () => {
+      if (phase === 'dictation') submitDictation();
+      if (phase === 'rest') skipRest();
+    },
+    ' ': (e) => {
+      e.preventDefault();
+      if (phase === 'dictation' && currentDictWord) speak(currentDictWord.word);
+    },
     'Escape': abandon,
-  }, true, [enterKey, markFirst, markGrind, showMeaning, phase, currentWord, abandon]);
+  }, true, [phase, submitDictation, abandon, currentDictWord, skipRest]);
 
   if (!session) return null;
 
-  const isGrind = phase === 'grind';
-  const progress = isGrind
-    ? ((poolSize - wrongPool.length) / poolSize) * 100
-    : ((currentIndex + (showMeaning ? 1 : 0)) / total) * 100;
+  // ===== 单词表阶段 =====
+  if (phase === 'wordtable') {
+    const showAllMeaning = expanded.size >= currentBatch.length && currentBatch.length > 0;
+    const startIndex = batchIndex * batchSize;
+    return (
+      <div className="max-w-2xl mx-auto px-4 py-8">
+        <div className="flex items-center justify-between mb-4">
+          <span className="text-sm font-medium text-indigo-600">
+            📖 单词表 · List {session.listNo} · 第 {batchIndex + 1} 批（{currentBatch.length} 词）
+            {batches.length > 1 && <span className="text-gray-400 font-normal"> / 共 {batches.length} 批</span>}
+          </span>
+          <span className="flex items-center gap-3">
+            <TrainingTimer
+              elapsed={elapsed}
+              targetMinutes={plan?.targetMinutes || 60}
+              onAbandon={abandon}
+              onReachedCap={() => showToast('已达今日上限 2 小时，欠债已结清，可以收工', 'success')}
+            />
+          </span>
+        </div>
 
-  return (
-    <div className="max-w-2xl mx-auto px-4 py-8">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-        <span className={`text-sm font-medium flex items-center gap-2 ${isGrind ? 'text-amber-600' : 'text-indigo-600'}`}>
-          {isGrind ? `🔄 错词死磕 · 第 ${grindRound} 轮` : `📖 英译中 · List ${session.listNo}`}
-          {!isGrind && <span className="text-gray-400 font-normal">{currentIndex + 1} / {total}</span>}
-          {isGrind && <span className="text-gray-400 font-normal">剩余 {wrongPool.length} / {poolSize}</span>}
-        </span>
-        <TrainingTimer
-          elapsed={elapsed}
-          targetMinutes={plan?.targetMinutes || 60}
-          onAbandon={abandon}
-          onReachedCap={() => showToast('已达今日上限 2 小时，欠债已结清，可以收工', 'success')}
-        />
-      </div>
+        <div className="w-full bg-gray-100 rounded-full h-1.5 mb-6">
+          <div className="bg-indigo-500 h-1.5 rounded-full transition-all" style={{ width: `${((batchIndex + (currentIndex / Math.max(currentBatch.length, 1))) / batches.length) * 100}%` }} />
+        </div>
 
-      {/* Progress */}
-      <div className="w-full bg-gray-100 rounded-full h-1.5 mb-8">
-        <div className={`h-1.5 rounded-full transition-all duration-300 ${isGrind ? 'bg-amber-500' : 'bg-indigo-500'}`} style={{ width: `${Math.min(progress, 100)}%` }} />
-      </div>
-
-      {/* Card */}
-      {currentWord && (
-        <div
-          className={`card text-center py-12 min-h-[320px] flex flex-col justify-center ${isTouch ? 'no-select' : ''}`}
-          {...swipe}
-        >
-          <span className="text-xs text-gray-400 uppercase tracking-wide mb-2">List {session.listNo}</span>
-          <div className="text-4xl font-bold text-gray-900 mb-3">{currentWord.word}</div>
-          <div className="flex items-center justify-center gap-2 mb-4">
-            {currentWord.phonetic && <span className="text-lg text-gray-400">{currentWord.phonetic}</span>}
-            {currentWord.partOfSpeech && (
-              <span className="px-2 py-0.5 bg-indigo-50 text-indigo-600 text-sm rounded">{currentWord.partOfSpeech}</span>
-            )}
-          </div>
-
-          <button onClick={() => speak(currentWord.word)}
-            className={`mx-auto mb-6 w-12 h-12 ${isTouch ? 'w-14 h-14' : ''} bg-indigo-50 hover:bg-indigo-100 rounded-full flex items-center justify-center transition-colors`}>
-            <Volume2 className="w-6 h-6 text-indigo-600" />
+        <div className="text-center mb-6">
+          <h1 className="text-2xl font-bold text-gray-900 mb-1">本批背诵单词</h1>
+          <p className="text-sm text-gray-500">
+            <span className="kbd-hint">点击卡片查看释义 · 1/2 键标记会/不会（仅记录）· 标记后点「开始背诵」</span>
+            <span className="touch-hint hidden">点击卡片查看释义 · 标记会/不会后点「开始背诵」</span>
+          </p>
+          <button
+            onClick={() => {
+              if (showAllMeaning) setExpanded(new Set());
+              else setExpanded(new Set(currentBatch.map(w => w.id)));
+            }}
+            className="mt-3 text-sm font-medium px-3 py-2 rounded-lg border-2 border-gray-200 text-gray-600 hover:border-gray-300"
+          >
+            {showAllMeaning ? '隐藏全部释义' : '显示全部释义'}
           </button>
+        </div>
 
-          <div className={`transition-all duration-300 ${showMeaning ? 'opacity-100' : 'opacity-0 max-h-0 overflow-hidden'}`}>
-            <p className="text-2xl text-gray-700 mb-6">{currentWord.chineseDefinition}</p>
-            <div className="grid grid-cols-2 gap-3 max-w-xs mx-auto">
-              <button
-                onClick={() => isGrind ? markGrind(true) : markFirst(true)}
-                className={`flex items-center justify-center gap-1 px-4 py-3 rounded-lg bg-green-500 text-white font-medium hover:bg-green-600 transition-colors ${isTouch ? 'min-h-[52px] text-base' : ''}`}
+        <div className="space-y-2 mb-6">
+          {currentBatch.map((word, idx) => {
+            const isExpanded = expanded.has(word.id);
+            const isMarked = marked[word.id] === true;
+            const isNotMarked = marked[word.id] === false;
+            const meaningText = Array.isArray(word.meanings) && word.meanings.length > 0
+              ? word.meanings.join('；')
+              : word.chineseDefinition;
+            return (
+              <div
+                key={word.id}
+                className={`card cursor-pointer transition-colors ${isMarked ? 'border-green-300 bg-green-50/50' : isNotMarked ? 'border-red-200 bg-red-50/40' : ''}`}
+                onClick={() => {
+                  setExpanded(prev => {
+                    const next = new Set(prev);
+                    if (next.has(word.id)) next.delete(word.id);
+                    else next.add(word.id);
+                    return next;
+                  });
+                }}
               >
-                <Check className="w-5 h-5" /> {isTouch ? '会' : '会 (1)'}
-              </button>
-              <button
-                onClick={() => isGrind ? markGrind(false) : markFirst(false)}
-                className={`flex items-center justify-center gap-1 px-4 py-3 rounded-lg bg-red-400 text-white font-medium hover:bg-red-500 transition-colors ${isTouch ? 'min-h-[52px] text-base' : ''}`}
-              >
-                <X className="w-5 h-5" /> {isTouch ? '不会' : '不会 (2)'}
-              </button>
+                <div className="flex items-center justify-between py-1">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-sm text-gray-400 w-8">{startIndex + idx + 1}.</span>
+                      <span className="text-lg font-semibold text-gray-900">{word.word}</span>
+                      <span className="text-sm text-gray-400">{word.phonetic}</span>
+                      {word.partOfSpeech && (
+                        <span className="text-xs px-1.5 py-0.5 bg-indigo-50 text-indigo-600 rounded">{word.partOfSpeech}</span>
+                      )}
+                      {isMarked && <span className="text-xs px-1.5 py-0.5 bg-green-100 text-green-700 rounded">会</span>}
+                      {isNotMarked && <span className="text-xs px-1.5 py-0.5 bg-red-100 text-red-500 rounded">不会</span>}
+                    </div>
+                    {isExpanded ? (
+                      <p className="text-sm text-gray-700 ml-8 mt-1">{meaningText}</p>
+                    ) : (
+                      <p className="text-sm text-gray-400 ml-8">
+                        <span className="kbd-hint">点击查看释义</span>
+                        <span className="touch-hint hidden">点按展开释义</span>
+                      </p>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-1 ml-3">
+                    <button
+                      onClick={(e) => { e.stopPropagation(); speak(word.word); }}
+                      className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+                      title="朗读 (Space)"
+                    >
+                      <Volume2 className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); setMarked(m => ({ ...m, [word.id]: true })); }}
+                      className={`p-2 rounded-lg transition-colors ${isMarked ? 'bg-green-100 text-green-600' : 'text-gray-400 hover:bg-green-50'}`}
+                      title="会 (1)"
+                    >
+                      <Check className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); setMarked(m => ({ ...m, [word.id]: false })); }}
+                      className={`p-2 rounded-lg transition-colors ${isNotMarked ? 'bg-red-100 text-red-500' : 'text-gray-400 hover:bg-red-50'}`}
+                      title="不会 (2)"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        <button
+          onClick={startDictation}
+          className="btn-primary w-full text-lg py-3 flex items-center justify-center gap-2"
+        >
+          <Play className="w-5 h-5" />
+          开始背诵（默写本批 {currentBatch.length} 词）
+        </button>
+
+        <p className="text-center text-xs text-gray-400 mt-4">
+          <span className="kbd-hint">
+            <kbd className="px-1.5 py-0.5 bg-gray-100 border rounded">1 / 2</kbd> 会 / 不会
+            · <kbd className="px-1.5 py-0.5 bg-gray-100 border rounded">Space</kbd> 朗读
+            · <kbd className="px-1.5 py-0.5 bg-gray-100 border rounded">Esc</kbd> 收工
+          </span>
+          <span className="touch-hint hidden">点卡片看释义 · 标记会/不会 · 开始背诵</span>
+        </p>
+      </div>
+    );
+  }
+
+  // ===== 休息阶段 =====
+  if (phase === 'rest') {
+    const mm = Math.floor(restLeft / 60);
+    const ss = String(restLeft % 60).padStart(2, '0');
+    return (
+      <div className="max-w-2xl mx-auto px-4 py-8 text-center">
+        <div className="flex items-center justify-between mb-6">
+          <span className="text-sm font-medium text-amber-600 flex items-center gap-2">
+            <Timer className="w-4 h-4" /> 休息时间
+          </span>
+          <TrainingTimer
+            elapsed={elapsed}
+            targetMinutes={plan?.targetMinutes || 60}
+            onAbandon={abandon}
+          />
+        </div>
+
+        <div className="card py-16">
+          <div className="text-6xl mb-4"><Coffee /></div>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">休息一下</h1>
+          <p className="text-gray-500 mb-6">
+            第 {batchIndex + 1} 批完成，休息 5 分钟（不计入训练时长）
+          </p>
+          <div className="text-6xl font-mono font-bold text-amber-600 mb-8">
+            {mm}:{ss}
+          </div>
+          <div className="flex gap-3 justify-center">
+            <button onClick={skipRest} className="btn-primary px-8">
+              跳过休息，开始下一批
+            </button>
+          </div>
+        </div>
+
+        <p className="text-center text-xs text-gray-400 mt-4">
+          <span className="kbd-hint">
+            <kbd className="px-1.5 py-0.5 bg-gray-100 border rounded">Enter</kbd> 跳过休息
+            · <kbd className="px-1.5 py-0.5 bg-gray-100 border rounded">Esc</kbd> 收工
+          </span>
+          <span className="touch-hint hidden">休息 5 分钟或点按钮继续</span>
+        </p>
+      </div>
+    );
+  }
+
+  // ===== 默写阶段 =====
+  if (phase === 'dictation') {
+    const progress = (currentIndex / dictWords.length) * 100;
+    const borderClass = feedback === 'correct'
+      ? 'border-green-500 animate-pulse-green'
+      : feedback === 'incorrect'
+      ? 'border-red-500 animate-shake-red'
+      : 'border-gray-200';
+
+    return (
+      <div className="max-w-2xl mx-auto px-4 py-8">
+        <div className="flex items-center justify-between mb-4">
+          <span className="text-sm font-medium text-amber-600">
+            ✏️ 默写 · List {session.listNo} · 第 {batchIndex + 1} 批
+            {round > 1 ? ` · 第 ${round} 轮重测` : ''} · {currentIndex + 1} / {dictWords.length}
+          </span>
+          <TrainingTimer
+            elapsed={elapsed}
+            targetMinutes={plan?.targetMinutes || 60}
+            onAbandon={abandon}
+            onReachedCap={() => showToast('已达今日上限 2 小时，欠债已结清，可以收工', 'success')}
+          />
+        </div>
+
+        <div className="w-full bg-gray-100 rounded-full h-1.5 mb-8">
+          <div className="bg-amber-500 h-1.5 rounded-full transition-all" style={{ width: `${progress}%` }} />
+        </div>
+
+        {currentDictWord && (
+          <div className={`card text-center border-2 transition-all duration-300 ${borderClass}`}>
+            <div className="mb-4">
+              <p className="text-sm text-gray-500 mb-1">请默写该单词的中文词义</p>
+              <div className="flex items-center justify-center gap-3">
+                <button
+                  onClick={() => speak(currentDictWord.word)}
+                  className="w-10 h-10 bg-indigo-50 hover:bg-indigo-100 rounded-full flex items-center justify-center transition-colors"
+                  title="朗读 (Space)"
+                >
+                  <Volume2 className="w-5 h-5 text-indigo-600" />
+                </button>
+                <p className="text-4xl font-bold text-gray-900">{currentDictWord.word}</p>
+              </div>
+              <span className="text-sm text-gray-400 mt-1 inline-block">
+                {currentDictWord.phonetic}
+                {currentDictWord.partOfSpeech ? ` · ${currentDictWord.partOfSpeech}` : ''}
+              </span>
+            </div>
+
+            <div className="max-w-sm mx-auto">
+              <input
+                ref={inputRef}
+                type="text"
+                value={userInput}
+                onChange={(e) => setUserInput(e.target.value)}
+                placeholder="输入中文词义..."
+                className={`input-field text-center text-xl ${
+                  feedback === 'correct' ? 'border-green-500 bg-green-50' :
+                  feedback === 'incorrect' ? 'border-red-500 bg-red-50' : ''
+                }`}
+                autoComplete="off"
+                autoCorrect="off"
+                spellCheck="false"
+                disabled={!!feedback}
+              />
+              {feedback && (
+                <div className={`text-center mt-3 ${feedback === 'correct' ? 'text-green-600' : 'text-red-500'}`}>
+                  {feedback === 'correct' ? (
+                    <span className="flex items-center justify-center gap-1">
+                      <Check className="w-5 h-5" /> 正确!
+                    </span>
+                  ) : (
+                    <div>
+                      <span className="flex items-center justify-center gap-1">
+                        <X className="w-5 h-5" /> 错误 · 将重测
+                      </span>
+                      <p className="text-sm mt-1">
+                        参考答案: <span className="font-semibold text-green-600">
+                          {Array.isArray(currentDictWord.meanings) && currentDictWord.meanings.length > 0
+                            ? currentDictWord.meanings.join('；')
+                            : currentDictWord.chineseDefinition}
+                        </span>
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
+        )}
 
-          {!showMeaning && (
-            <p className="text-sm text-gray-400">
-              <span className="kbd-hint">按 <kbd className="px-1.5 py-0.5 bg-gray-100 border rounded text-xs">Enter</kbd> 显示释义</span>
-              <span className="touch-hint hidden">点卡片 显示释义</span>
-            </p>
-          )}
+        <div className="text-center mt-6">
+          <button
+            onClick={submitDictation}
+            disabled={!userInput.trim() || !!feedback}
+            className="btn-primary px-8"
+          >
+            <span className="kbd-hint">提交 (Enter)</span>
+            <span className="touch-hint hidden">提交</span>
+          </button>
         </div>
-      )}
 
-      <p className="text-center text-xs text-gray-400 mt-4 space-x-3">
-        <span className="kbd-hint"><kbd className="px-1.5 py-0.5 bg-gray-100 border rounded">Space</kbd> 发音</span>
-        <span className="kbd-hint"><kbd className="px-1.5 py-0.5 bg-gray-100 border rounded">Enter</kbd> 显示释义</span>
-        <span className="kbd-hint"><kbd className="px-1.5 py-0.5 bg-gray-100 border rounded">1 / 2</kbd> 会 / 不会</span>
-        <span className="kbd-hint"><kbd className="px-1.5 py-0.5 bg-gray-100 border rounded">Esc</kbd> 收工</span>
-        <span className="touch-hint hidden">← 不会 · 点卡片翻面 · 会 →</span>
-      </p>
-    </div>
-  );
+        <p className="text-center text-xs text-gray-400 mt-4">
+          <span className="kbd-hint">
+            <kbd className="px-1.5 py-0.5 bg-gray-100 border rounded">Enter</kbd> 提交 · 错词自动重测直到默写正确
+            · <kbd className="px-1.5 py-0.5 bg-gray-100 border rounded">Space</kbd> 朗读
+            · <kbd className="px-1.5 py-0.5 bg-gray-100 border rounded">Esc</kbd> 收工
+          </span>
+          <span className="touch-hint hidden">输入中文词义后提交 · 答错自动重测</span>
+        </p>
+      </div>
+    );
+  }
+
+  return null;
 }
