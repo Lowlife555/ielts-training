@@ -1,9 +1,10 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { CalendarDays, BookOpen, PenLine, BarChart3, Search, LogOut, Shield, Sun, Moon } from 'lucide-react';
+import { CalendarDays, BookOpen, PenLine, BarChart3, Search, LogOut, Shield, Sun, Moon, Smartphone } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useApp } from '../context/AppContext';
 import { useTheme } from '../context/ThemeContext';
+import { useTouch } from '../context/TouchContext';
 
 // 环境徽标：本地(laptop)=浅黄，服务器(server)=浅灰
 const IS_SERVER = !['localhost', '127.0.0.1'].includes(window.location.hostname);
@@ -14,6 +15,7 @@ export default function Navbar() {
   const { user, logout } = useAuth();
   const { showToast } = useApp();
   const { theme, toggle } = useTheme();
+  const { mode, setMode } = useTouch();
   const [searchQuery, setSearchQuery] = useState('');
   const searchRef = useRef(null);
 
@@ -132,6 +134,19 @@ export default function Navbar() {
               <span className="hidden md:inline text-sm font-medium text-gray-700 max-w-[100px] truncate">
                 {user?.username}
               </span>
+              {/* 界面模式切换：桌面 ↔ 触屏（手动覆盖自动检测） */}
+              <button
+                onClick={() => {
+                  const next = mode === 'touch' ? 'desktop' : 'touch';
+                  setMode(next);
+                  showToast(next === 'touch' ? '已切换为触屏模式（底部导航）' : '已切换为桌面模式', 'info');
+                }}
+                aria-label="切换界面模式"
+                title={mode === 'touch' ? '切换到桌面模式' : '切换到触屏模式'}
+                className="flex items-center px-2 py-2 rounded-lg text-sm text-gray-500 hover:text-indigo-600 hover:bg-gray-100 transition-colors"
+              >
+                <Smartphone className="w-4 h-4" />
+              </button>
               {/* 深色/浅色切换：浅色显示月亮，深色显示太阳 */}
               <button
                 onClick={toggle}

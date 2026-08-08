@@ -218,12 +218,14 @@ export default function AcceptanceTest() {
 
       <div className="text-center mt-6">
         <button onClick={submitAnswer} disabled={!userInput.trim() || !!feedback || submitting} className="btn-primary px-8">
-          提交 (Enter)
+          <span className="kbd-hint">提交 (Enter)</span>
+          <span className="touch-hint hidden">提交</span>
         </button>
       </div>
 
       <p className="text-center text-xs text-gray-400 mt-4">
-        <kbd className="px-1.5 py-0.5 bg-gray-100 border rounded">Enter</kbd> 提交 · 错词自动重测直到全部正确
+        <span className="kbd-hint"><kbd className="px-1.5 py-0.5 bg-gray-100 border rounded">Enter</kbd> 提交 · 错词自动重测直到全部正确</span>
+        <span className="touch-hint hidden">拼对为止 · 错词自动重测直到全部正确</span>
       </p>
     </div>
   );

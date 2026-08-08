@@ -111,9 +111,12 @@ export default function WrongWords() {
       </div>
 
       <p className="text-center text-xs text-gray-400 mt-4">
-        <kbd className="px-1.5 py-0.5 bg-gray-100 border border-gray-300 rounded">← →</kbd> 切换
-        · <kbd className="px-1.5 py-0.5 bg-gray-100 border border-gray-300 rounded">Space</kbd> 发音
-        · <kbd className="px-1.5 py-0.5 bg-gray-100 border border-gray-300 rounded">Esc</kbd> 返回
+        <span className="kbd-hint">
+          <kbd className="px-1.5 py-0.5 bg-gray-100 border border-gray-300 rounded">← →</kbd> 切换
+          · <kbd className="px-1.5 py-0.5 bg-gray-100 border border-gray-300 rounded">Space</kbd> 发音
+          · <kbd className="px-1.5 py-0.5 bg-gray-100 border border-gray-300 rounded">Esc</kbd> 返回
+        </span>
+        <span className="touch-hint hidden">点词卡翻面 · 左右按钮切换 · 点🔊 发音</span>
       </p>
     </div>
   );

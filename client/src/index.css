@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant touch (&:where(.touch, .touch *));
+
 @layer base {
   body {
     @apply bg-gray-50 text-gray-900 font-sans antialiased;
@@ -140,3 +142,20 @@ html.dark { color-scheme: dark; }
 /* 导航悬停反馈（在暗色下仍可见） */
 .dark .hover\:bg-gray-100:hover { background-color: #273449; }
 .dark .hover\:bg-gray-50:hover { background-color: #273449; }
+
+/* ===== 触屏布局（.touch 作用域） ===== */
+.touch { -webkit-tap-highlight-color: transparent; }
+.touch body { -webkit-tap-highlight-color: transparent; }
+
+/* 触屏设备隐藏键盘快捷键提示；显示触摸提示（.touch-hint 默认 hidden，.touch 下显示） */
+.touch kbd { display: none; }
+.touch .kbd-hint { display: none; }
+.touch .touch-hint { display: inline; }
+
+/* 触屏点击区域放大到 48px */
+.touch .btn-primary,
+.touch .btn-secondary { min-height: 48px; }
+.touch .input-field { font-size: 16px; } /* 避免 iOS 聚焦自动缩放 */
+
+/* 触屏词卡禁用长按/选中 */
+.touch .no-select { user-select: none; -webkit-user-select: none; touch-action: pan-y; }

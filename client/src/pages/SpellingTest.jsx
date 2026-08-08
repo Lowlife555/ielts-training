@@ -236,7 +236,8 @@ export default function SpellingTest() {
         </div>
 
         <p className="text-center text-xs text-gray-400 mt-4">
-          按 <kbd className="px-1.5 py-0.5 bg-gray-100 border border-gray-300 rounded">Enter</kbd> 或 <kbd className="px-1.5 py-0.5 bg-gray-100 border border-gray-300 rounded">Esc</kbd> 返回
+           <span className="kbd-hint">按 <kbd className="px-1.5 py-0.5 bg-gray-100 border border-gray-300 rounded">Enter</kbd> 或 <kbd className="px-1.5 py-0.5 bg-gray-100 border border-gray-300 rounded">Esc</kbd> 返回</span>
+           <span className="touch-hint hidden">测试完成！</span>
         </p>
       </div>
     );
@@ -330,14 +331,18 @@ export default function SpellingTest() {
       {/* Submit button */}
       <div className="text-center mt-6">
         <button onClick={submitAnswer} className="btn-primary px-8" disabled={!userInput.trim()}>
-          提交 (Enter)
+          <span className="kbd-hint">提交 (Enter)</span>
+          <span className="touch-hint hidden">提交</span>
         </button>
       </div>
 
       {/* Keyboard hint */}
       <p className="text-center text-xs text-gray-400 mt-4">
-        <kbd className="px-1.5 py-0.5 bg-gray-100 border border-gray-300 rounded">Enter</kbd> 提交答案
-        · <kbd className="px-1.5 py-0.5 bg-gray-100 border border-gray-300 rounded">Esc</kbd> 退出测试
+        <span className="kbd-hint">
+          <kbd className="px-1.5 py-0.5 bg-gray-100 border border-gray-300 rounded">Enter</kbd> 提交答案
+          · <kbd className="px-1.5 py-0.5 bg-gray-100 border border-gray-300 rounded">Esc</kbd> 退出测试
+        </span>
+        <span className="touch-hint hidden">输入后点提交 · 答错会重测</span>
       </p>
     </div>
   );

@@ -4,6 +4,8 @@ import { api } from '../utils/api';
 import { useApp } from '../context/AppContext';
 import { useKeyboard } from '../hooks/useKeyboard';
 import { useElapsed } from '../hooks/useTimer';
+import { useSwipe } from '../hooks/useSwipe';
+import { useTouch } from '../context/TouchContext';
 import { speak } from '../utils/speech';
 import TrainingTimer from '../components/TrainingTimer';
 import { Volume2, Check, X } from 'lucide-react';
@@ -12,6 +14,7 @@ export default function MainStudy() {
   const navigate = useNavigate();
   const location = useLocation();
   const { showToast } = useApp();
+  const { isTouch } = useTouch();
   const session = location.state?.session;
   const plan = location.state?.plan;
 
@@ -122,6 +125,14 @@ export default function MainStudy() {
     }
   }, [abandoning, session, elapsed, results, showToast, navigate]);
 
+  // 触屏手势：点卡片翻面；左右滑动 = 会/不会（未翻面时视为翻面）
+  const swipe = useSwipe({
+    enabled: isTouch,
+    onLeft: () => { if (showMeaning) { if (phase === 'first') markFirst(false); else markGrind(false); } else setShowMeaning(true); },
+    onRight: () => { if (showMeaning) { if (phase === 'first') markFirst(true); else markGrind(true); } else setShowMeaning(true); },
+    onTap: () => { if (!showMeaning) setShowMeaning(true); },
+  });
+
   useKeyboard({
     'Enter': enterKey,
     '1': () => { if (showMeaning) { if (phase === 'first') markFirst(true); else markGrind(true); } },
@@ -162,7 +173,10 @@ export default function MainStudy() {
 
       {/* Card */}
       {currentWord && (
-        <div className="card text-center py-12 min-h-[320px] flex flex-col justify-center">
+        <div
+          className={`card text-center py-12 min-h-[320px] flex flex-col justify-center ${isTouch ? 'no-select' : ''}`}
+          {...swipe}
+        >
           <span className="text-xs text-gray-400 uppercase tracking-wide mb-2">List {session.listNo}</span>
           <div className="text-4xl font-bold text-gray-900 mb-3">{currentWord.word}</div>
           <div className="flex items-center justify-center gap-2 mb-4">
@@ -173,7 +187,7 @@ export default function MainStudy() {
           </div>
 
           <button onClick={() => speak(currentWord.word)}
-            className="mx-auto mb-6 w-12 h-12 bg-indigo-50 hover:bg-indigo-100 rounded-full flex items-center justify-center transition-colors">
+            className={`mx-auto mb-6 w-12 h-12 ${isTouch ? 'w-14 h-14' : ''} bg-indigo-50 hover:bg-indigo-100 rounded-full flex items-center justify-center transition-colors`}>
             <Volume2 className="w-6 h-6 text-indigo-600" />
           </button>
 
@@ -182,30 +196,34 @@ export default function MainStudy() {
             <div className="grid grid-cols-2 gap-3 max-w-xs mx-auto">
               <button
                 onClick={() => isGrind ? markGrind(true) : markFirst(true)}
-                className="flex items-center justify-center gap-1 px-4 py-3 rounded-lg bg-green-500 text-white font-medium hover:bg-green-600 transition-colors"
+                className={`flex items-center justify-center gap-1 px-4 py-3 rounded-lg bg-green-500 text-white font-medium hover:bg-green-600 transition-colors ${isTouch ? 'min-h-[52px] text-base' : ''}`}
               >
-                <Check className="w-4 h-4" /> 会 (1)
+                <Check className="w-5 h-5" /> {isTouch ? '会' : '会 (1)'}
               </button>
               <button
                 onClick={() => isGrind ? markGrind(false) : markFirst(false)}
-                className="flex items-center justify-center gap-1 px-4 py-3 rounded-lg bg-red-400 text-white font-medium hover:bg-red-500 transition-colors"
+                className={`flex items-center justify-center gap-1 px-4 py-3 rounded-lg bg-red-400 text-white font-medium hover:bg-red-500 transition-colors ${isTouch ? 'min-h-[52px] text-base' : ''}`}
               >
-                <X className="w-4 h-4" /> 不会 (2)
+                <X className="w-5 h-5" /> {isTouch ? '不会' : '不会 (2)'}
               </button>
             </div>
           </div>
 
           {!showMeaning && (
-            <p className="text-sm text-gray-400">按 <kbd className="px-1.5 py-0.5 bg-gray-100 border rounded text-xs">Enter</kbd> 显示释义</p>
+            <p className="text-sm text-gray-400">
+              <span className="kbd-hint">按 <kbd className="px-1.5 py-0.5 bg-gray-100 border rounded text-xs">Enter</kbd> 显示释义</span>
+              <span className="touch-hint hidden">点卡片 显示释义</span>
+            </p>
           )}
         </div>
       )}
 
       <p className="text-center text-xs text-gray-400 mt-4 space-x-3">
-        <span><kbd className="px-1.5 py-0.5 bg-gray-100 border rounded">Space</kbd> 发音</span>
-        <span><kbd className="px-1.5 py-0.5 bg-gray-100 border rounded">Enter</kbd> 显示释义</span>
-        <span><kbd className="px-1.5 py-0.5 bg-gray-100 border rounded">1 / 2</kbd> 会 / 不会</span>
-        <span><kbd className="px-1.5 py-0.5 bg-gray-100 border rounded">Esc</kbd> 收工</span>
+        <span className="kbd-hint"><kbd className="px-1.5 py-0.5 bg-gray-100 border rounded">Space</kbd> 发音</span>
+        <span className="kbd-hint"><kbd className="px-1.5 py-0.5 bg-gray-100 border rounded">Enter</kbd> 显示释义</span>
+        <span className="kbd-hint"><kbd className="px-1.5 py-0.5 bg-gray-100 border rounded">1 / 2</kbd> 会 / 不会</span>
+        <span className="kbd-hint"><kbd className="px-1.5 py-0.5 bg-gray-100 border rounded">Esc</kbd> 收工</span>
+        <span className="touch-hint hidden">← 不会 · 点卡片翻面 · 会 →</span>
       </p>
     </div>
   );

@@ -291,8 +291,11 @@ export default function TodayBriefing() {
         </div>
 
         <p className="text-center text-xs text-gray-400 mt-6">
-          <kbd className="px-1.5 py-0.5 bg-gray-100 border rounded">Enter</kbd> 现在开始 ·{' '}
-          <kbd className="px-1.5 py-0.5 bg-gray-100 border rounded">Esc</kbd> 返回
+          <span className="kbd-hint">
+            <kbd className="px-1.5 py-0.5 bg-gray-100 border rounded">Enter</kbd> 现在开始 ·{' '}
+            <kbd className="px-1.5 py-0.5 bg-gray-100 border rounded">Esc</kbd> 返回
+          </span>
+          <span className="touch-hint hidden">点「现在开始」进入今日训练</span>
         </p>
       </div>
 

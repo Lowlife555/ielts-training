@@ -144,12 +144,14 @@ export default function SpellingPractice() {
 
       <div className="text-center mt-6">
         <button onClick={submitAnswer} disabled={!userInput.trim() || !!feedback} className="btn-primary px-8">
-          提交 (Enter)
+          <span className="kbd-hint">提交 (Enter)</span>
+          <span className="touch-hint hidden">提交</span>
         </button>
       </div>
 
       <p className="text-center text-xs text-gray-400 mt-4">
-        <kbd className="px-1.5 py-0.5 bg-gray-100 border rounded">Enter</kbd> 提交 · 答完后自动进入下一题 · <kbd className="px-1.5 py-0.5 bg-gray-100 border rounded">Esc</kbd> 收工
+        <span className="kbd-hint"><kbd className="px-1.5 py-0.5 bg-gray-100 border rounded">Enter</kbd> 提交 · 答完后自动进入下一题 · <kbd className="px-1.5 py-0.5 bg-gray-100 border rounded">Esc</kbd> 收工</span>
+        <span className="touch-hint hidden">输入完成后点提交 · 答完自动进入下一题</span>
       </p>
     </div>
   );

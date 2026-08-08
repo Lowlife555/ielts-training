@@ -182,7 +182,8 @@ export default function WritingResult() {
       </div>
 
       <p className="text-center text-xs text-gray-400 mt-4">
-        按 <kbd className="px-1.5 py-0.5 bg-gray-100 border border-gray-300 rounded">Esc</kbd> 返回选题页
+        <span className="kbd-hint">按 <kbd className="px-1.5 py-0.5 bg-gray-100 border border-gray-300 rounded">Esc</kbd> 返回选题页</span>
+        <span className="touch-hint hidden">点「返回选题」或返回按钮</span>
       </p>
     </div>
   );

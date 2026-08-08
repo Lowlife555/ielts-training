@@ -250,10 +250,11 @@ export default function WritingEditor() {
 
       {/* Keyboard hints */}
       <p className="text-center text-xs text-gray-400 mt-6 space-x-4">
-        <span><kbd className="px-1.5 py-0.5 bg-gray-100 border border-gray-300 rounded">Ctrl+Enter</kbd> 提交</span>
-        <span><kbd className="px-1.5 py-0.5 bg-gray-100 border border-gray-300 rounded">Tab</kbd> 缩进</span>
-        <span><kbd className="px-1.5 py-0.5 bg-gray-100 border border-gray-300 rounded">Ctrl+S</kbd> 保存草稿</span>
-        <span><kbd className="px-1.5 py-0.5 bg-gray-100 border border-gray-300 rounded">Esc</kbd> 返回</span>
+        <span className="kbd-hint"><kbd className="px-1.5 py-0.5 bg-gray-100 border border-gray-300 rounded">Ctrl+Enter</kbd> 提交</span>
+        <span className="kbd-hint"><kbd className="px-1.5 py-0.5 bg-gray-100 border border-gray-300 rounded">Tab</kbd> 缩进</span>
+        <span className="kbd-hint"><kbd className="px-1.5 py-0.5 bg-gray-100 border border-gray-300 rounded">Ctrl+S</kbd> 保存草稿</span>
+        <span className="kbd-hint"><kbd className="px-1.5 py-0.5 bg-gray-100 border border-gray-300 rounded">Esc</kbd> 返回</span>
+        <span className="touch-hint hidden">点「提交作文」交卷 · 自动保存草稿</span>
       </p>
     </div>
   );

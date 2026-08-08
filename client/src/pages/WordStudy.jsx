@@ -3,6 +3,8 @@ import { useParams, useSearchParams, Link, useNavigate } from 'react-router-dom'
 import { api } from '../utils/api';
 import Loading from '../components/Loading';
 import { useKeyboard } from '../hooks/useKeyboard';
+import { useSwipe } from '../hooks/useSwipe';
+import { useTouch } from '../context/TouchContext';
 import { speak } from '../utils/speech';
 import { ArrowLeft, Volume2, ChevronLeft, ChevronRight, RotateCcw } from 'lucide-react';
 
@@ -10,6 +12,7 @@ export default function WordStudy() {
   const { topic } = useParams();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const { isTouch } = useTouch();
   const [words, setWords] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -63,6 +66,14 @@ export default function WordStudy() {
     'Escape': () => navigate(-1),
   }, true, [showDefinition, currentIndex, next, prev, speakWord, navigate, words]);
 
+  // 触屏手势：左右滑动切换；点卡片翻面/下一个
+  const swipe = useSwipe({
+    enabled: isTouch,
+    onLeft: () => { if (showDefinition) next(); else setShowDefinition(true); },
+    onRight: () => { if (showDefinition) prev(); else setShowDefinition(true); },
+    onTap: () => { if (showDefinition) next(); else setShowDefinition(true); },
+  });
+
   // Note: Chrome blocks auto-speak (not a user gesture).
   // User must press Space or click the speaker button to hear pronunciation.
 
@@ -94,9 +105,13 @@ export default function WordStudy() {
       </div>
 
       {/* Word card */}
-      <div className="card text-center py-12 cursor-pointer" onClick={() => {
-        if (showDefinition) { next(); } else { setShowDefinition(true); }
-      }}>
+      <div
+        className={`card text-center py-12 cursor-pointer ${isTouch ? 'no-select' : ''}`}
+        onClick={() => {
+          if (showDefinition) { next(); } else { setShowDefinition(true); }
+        }}
+        {...swipe}
+      >
         {/* Word */}
         <div className="mb-2">
           <span className="text-4xl font-bold text-gray-900">{currentWord.word}</span>
@@ -133,7 +148,8 @@ export default function WordStudy() {
         {/* Hint if hidden */}
         {!showDefinition && (
           <p className="text-sm text-gray-400 mt-2">
-            按 <kbd className="px-1.5 py-0.5 bg-gray-100 border border-gray-300 rounded text-xs">Enter</kbd> 显示释义
+            <span className="kbd-hint">按 <kbd className="px-1.5 py-0.5 bg-gray-100 border border-gray-300 rounded text-xs">Enter</kbd> 显示释义</span>
+            <span className="touch-hint hidden">点卡片 显示释义</span>
           </p>
         )}
       </div>
@@ -168,10 +184,11 @@ export default function WordStudy() {
 
       {/* Keyboard hints */}
       <div className="mt-8 text-center text-xs text-gray-400 space-x-4">
-        <span><kbd className="px-1.5 py-0.5 bg-gray-100 border border-gray-300 rounded">← →</kbd> 切换</span>
-        <span><kbd className="px-1.5 py-0.5 bg-gray-100 border border-gray-300 rounded">Space</kbd> 发音</span>
-        <span><kbd className="px-1.5 py-0.5 bg-gray-100 border border-gray-300 rounded">Enter</kbd> {showDefinition ? '下一个' : '显示释义'}</span>
-        <span><kbd className="px-1.5 py-0.5 bg-gray-100 border border-gray-300 rounded">Esc</kbd> 返回</span>
+        <span className="kbd-hint"><kbd className="px-1.5 py-0.5 bg-gray-100 border border-gray-300 rounded">← →</kbd> 切换</span>
+        <span className="kbd-hint"><kbd className="px-1.5 py-0.5 bg-gray-100 border border-gray-300 rounded">Space</kbd> 发音</span>
+        <span className="kbd-hint"><kbd className="px-1.5 py-0.5 bg-gray-100 border border-gray-300 rounded">Enter</kbd> {showDefinition ? '下一个' : '显示释义'}</span>
+        <span className="kbd-hint"><kbd className="px-1.5 py-0.5 bg-gray-100 border border-gray-300 rounded">Esc</kbd> 返回</span>
+        <span className="touch-hint hidden">← 上一个 · 点卡片翻面 · 下一个 →</span>
       </div>
     </div>
   );
