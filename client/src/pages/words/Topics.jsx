@@ -62,7 +62,8 @@ export default function Topics() {
 
       {/* Quick actions */}
       <div className="mt-8 flex flex-wrap gap-3">
-        <Link to="/spelling-test" className="btn-primary">✍️ 开始拼写测试</Link>
+        <Link to="/lists" className="btn-primary">📚 List 背诵</Link>
+        <Link to="/spelling-test" className="btn-secondary">✍️ 拼写测试</Link>
         <Link to="/meaning-test" className="btn-secondary">🎯 词义判定</Link>
         <Link to="/review-words" className="btn-secondary">🔄 今日复习</Link>
         <Link to="/wrong-words" className="btn-secondary">📝 错词本</Link>

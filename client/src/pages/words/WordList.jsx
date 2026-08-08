@@ -3,7 +3,7 @@ import { useParams, Link, useSearchParams } from 'react-router-dom';
 import { api } from '../../utils/api';
 import Loading from '../../components/ui/Loading';
 import { useKeyboard } from '../../hooks/useKeyboard';
-import { ArrowLeft, Play, Volume2, Search } from 'lucide-react';
+import { ArrowLeft, Volume2, Search } from 'lucide-react';
 import { speak as speakUtil } from '../../utils/speech';
 
 const topicNames = {
@@ -90,13 +90,6 @@ export default function WordList() {
                   >
                     <Volume2 className="w-4 h-4" />
                   </button>
-                  <Link
-                    to={`/words/${topic || 'all'}/study?wordId=${word.id}`}
-                    className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
-                    title="学习"
-                  >
-                    <Play className="w-4 h-4" />
-                  </Link>
                 </div>
               </div>
             ))}

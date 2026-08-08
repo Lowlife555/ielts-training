@@ -71,6 +71,12 @@ export const api = {
   submitMeaningResult: (data) =>
     request('/meaning-test', { method: 'POST', body: JSON.stringify(data) }),
 
+  // v7.0 List study
+  getLists: () => request('/lists'),
+  getListWords: (listNo) => request(`/lists/${listNo}/words`),
+  submitDictation: (listNo, data) =>
+    request(`/lists/${listNo}/dictation`, { method: 'POST', body: JSON.stringify(data) }),
+
   // Reviews
   getReviewWords: () => request('/review-words'),
   submitReviewResult: (data) =>
