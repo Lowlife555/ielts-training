@@ -340,3 +340,24 @@ v4.0 核心需求的第一步——以机构原始词库文件为准，重建完
 - 重背完成 → pending_review 清除 ✅
 
 ---
+
+## 十二、v4.0-P1-5：释义深度扩充（DeepSeek 批量）（2026-08-08）
+
+> 开发 Agent: opencode (deepseek-v4-flash-free)
+
+### 实现
+- 新增 server/scripts/enrichDefinitions.js：
+  - 读取 words 表 level='ielts' 且 is_extra=0 的词，按 list_no 分批（35 词/批）
+  - DeepSeek API（deepseek-chat，复用 server/.env Key），失败重试 3 次（指数退避），超时 60s
+  - 提示词要求：3-4 个核心义项、词性标注、纯 JSON 输出
+  - 幂等 + 断点续跑：checkpoint（enrich_checkpoint.json 的 processed 字段）记录已处理词
+  - 参数：--lists 1,2（指定 List）/ --all（全量强制）/ --dry-run（预览）
+  - 默认模式：只处理不足 3 义项且未处理过的词
+- 数据处理：List 1-2（200 词）+ 其余不足 3 义项词（556 词），共 756 词深度扩充
+
+### 验收结果
+- 随机抽验 20 词：20/20 释义 2+ 义项且准确 ✅
+- 断点续跑/指定 List/幂等 均已实现（16 批全成功，无需续跑）✅
+- 中译英训练界面（SpellingPractice/AcceptanceTest）直接读取 chinese_definition，扩充即刻生效 ✅
+
+---

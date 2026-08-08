@@ -16,6 +16,7 @@
 | v4.0-P0-1 | 2026-08-07 | Claude Code + DeepSeek V4 | 词库整理与导入：List 1-24 编号、释义三级补齐、list_no/is_extra 字段 |
 | v4.0-P0-2/3 | 2026-08-08 | opencode (deepseek-v4-flash-free) | 今日简报 + 每日训练流程重构（热身→英译中→错词死磕→中译英→验收）+ 时间盒与欠债系统 |
 | v4.0-P1-4 | 2026-08-08 | opencode (deepseek-v4-flash-free) | 抽查机制：背完 3-4 天后随机抽查 30 词，≥80% 通过，不达标标记待重背次日优先 |
+| v4.0-P1-5 | 2026-08-08 | opencode (deepseek-v4-flash-free) | 释义深度扩充：DeepSeek 批量处理 756 词，全部 IELTS 词 2+ 义项，脚本支持断点续跑 |
 
 ## 🚀 快速启动
 
