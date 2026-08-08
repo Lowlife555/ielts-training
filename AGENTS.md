@@ -15,9 +15,10 @@
 - 服务器: 腾讯云轻量应用服务器 `43.135.22.140` (Ubuntu 24.04 LTS, root, SSH 密钥免密)
 - 部署目录: `/var/www/ielts-training` (git clone 自 GitHub origin/master)
 - 进程: pm2 `ielts-server` (server/index.js) + nginx (root=/var/www/ielts-training/client/dist, proxy → 127.0.0.1:3001)
-- 部署流程由 `deploy.ps1` 完成: 本地 push → 服务器 pull → npm install → client build → pm2 restart → 健康检查(API /api/health + 前端 HTTP 200)
+- 部署流程由 `deploy.ps1` 完成: 本地 push → 服务器 pull → npm install → **数据库迁移 (`npm run migrate:all`)** → client build → pm2 restart → 健康检查(API /api/health + 前端 HTTP 200)
 - ⚠️ 服务器配置(密码/密钥)不入库;公开信息仅限上面这些
 - ⚠️ 服务器数据库 SQLite 在服务器本地生成/增长,`git pull` 不影响用户数据(数据文件不入库);server 代码改动照常 pull 覆盖
+- **发新版本时**: 新增 `server/db/migrate_vN.js` 并在其中 `INSERT OR IGNORE` 一条公告(版本号/标题/特性列表 JSON),再把它加进 `server/package.json` 的 `migrate:all` 链;用户首次进入自动弹窗(v5.4 起,公告表 announcements + user_announcements)
 
 ## 3. 架构约定 (2026-08 重组后)
 
