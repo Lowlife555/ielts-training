@@ -90,6 +90,8 @@ export const api = {
   // v4.0 Daily Plan
   getDailyPlan: () => request('/daily-plan'),
   getDailyPlanStatus: () => request('/daily-plan/status'),
+  setStudySettings: (data) =>
+    request('/daily-plan/settings', { method: 'POST', body: JSON.stringify(data) }),
   completeDailyPlan: (sessionId) =>
     request('/daily-plan/complete', { method: 'POST', body: JSON.stringify({ sessionId }) }),
   submitSpotCheck: (data) =>
