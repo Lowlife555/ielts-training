@@ -158,11 +158,23 @@ router.post('/complete', (req, res) => {
 
     // List 完成标记（验收通过时）
     if (acceptancePassed && session.list_no) {
-      db.prepare(`
-        INSERT INTO list_completion (list_no, first_completed_date)
-        VALUES (?, ?)
-        ON CONFLICT(list_no) DO NOTHING
-      `).run(session.list_no, dateString());
+      const existing = db.prepare('SELECT * FROM list_completion WHERE list_no = ?').get(session.list_no);
+      if (!existing) {
+        db.prepare(`
+          INSERT INTO list_completion (list_no, first_completed_date)
+          VALUES (?, ?)
+          ON CONFLICT(list_no) DO NOTHING
+        `).run(session.list_no, dateString());
+      } else if (existing.pending_review === 1) {
+        // 重背完成：清除待重背标记，重置抽查状态
+        db.prepare(`
+          UPDATE list_completion SET
+            pending_review = 0,
+            reback_completed_date = ?,
+            spot_check_date = NULL
+          WHERE list_no = ?
+        `).run(dateString(), session.list_no);
+      }
     }
   });
   update();

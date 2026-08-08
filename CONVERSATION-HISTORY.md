@@ -321,3 +321,22 @@ v4.0 核心需求的第一步——以机构原始词库文件为准，重建完
 - 旧 /api/daily 路由保留但前端不再使用
 
 ---
+
+## 十一、v4.0-P1-4：抽查机制（间隔复习 v2）（2026-08-08）
+
+> 开发 Agent: opencode (deepseek-v4-flash-free)
+
+### 实现
+- GET /api/daily-plan 增加 spotCheck 字段：完成背诵 ≥3 天、未抽查过、非待重背的 List 中随机选一个，随机抽 30 词（不足取全部）
+- POST /api/daily-plan/spot-check：正确率 ≥80% 通过并记录 spot_check_date；否则 pending_review=1
+- 待重背 List 不会被随机抽到；重背完成（验收通过）清除 pending_review、重置抽查状态（reback_completed_date 记录）
+- 新页面 /daily/spotcheck：英译中翻卡 + 会/不会（1/2 键），结果页显示正确率与通过/待重背；插入在英译中主任务之后、中译英之前；计时延续同一训练会话
+- 今日简报展示抽查任务（词数、及格线）
+
+### 验收结果（E2E）
+- 4 天前完成的 List → 简报返回抽查（30 词）✅
+- 24/30 (80%) → 通过，不重复抽查 ✅
+- 20/30 (67%) → 待重背，次日简报 todayList=重背该 List ✅
+- 重背完成 → pending_review 清除 ✅
+
+---

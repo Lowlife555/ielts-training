@@ -129,8 +129,36 @@ router.get('/', (req, res) => {
     if (nextList) todayList = { listNo: nextList.list_no, wordCount: nextList.cnt, isReback: false };
   }
 
-  // 抽查任务（P1-4 实现；目前为 null）
+  // 抽查任务：完成背诵 ≥3 天且未抽查过、且非待重背的 List 中随机选一个，抽 30 词（不足取全部）
   let spotCheck = null;
+  const dueList = db.prepare(`
+    SELECT list_no, first_completed_date
+    FROM list_completion
+    WHERE spot_check_date IS NULL AND pending_review = 0
+      AND julianday(date('now')) - julianday(first_completed_date) >= 3
+    ORDER BY RANDOM()
+    LIMIT 1
+  `).get();
+  if (dueList) {
+    const cnt = db.prepare('SELECT COUNT(*) as cnt FROM words WHERE is_extra=0 AND list_no = ?').get(dueList.list_no);
+    const spotCount = Math.min(30, cnt.cnt);
+    const words = db.prepare(`
+      SELECT id, word, phonetic, part_of_speech, chinese_definition
+      FROM words
+      WHERE is_extra = 0 AND list_no = ?
+      ORDER BY RANDOM()
+      LIMIT ?
+    `).all(dueList.list_no, spotCount);
+    spotCheck = {
+      listNo: dueList.list_no,
+      wordCount: spotCount,
+      passRate: 80,
+      words: words.map(w => ({
+        wordId: w.id, word: w.word, phonetic: w.phonetic,
+        partOfSpeech: w.part_of_speech, chineseDefinition: w.chinese_definition,
+      })),
+    };
+  }
 
   // PET 热身词（不计时不计分）
   const petWords = db.prepare(`
@@ -224,6 +252,37 @@ router.post('/complete', (req, res) => {
   }
 
   res.json({ ok: true, sessionId: session.id });
+});
+
+// POST /api/spot-check — 提交抽查结果
+// body: { listNo, results: [{wordId, correct}] }
+// 正确率 ≥80% 通过并记录抽查日期；否则标记待重背（次日简报优先重背）
+router.post('/spot-check', (req, res) => {
+  const db = getDb();
+  const { listNo, results } = req.body || {};
+
+  if (!listNo || !results || !Array.isArray(results) || results.length === 0) {
+    return res.status(400).json({ error: 'listNo and results array required' });
+  }
+
+  const row = db.prepare('SELECT * FROM list_completion WHERE list_no = ?').get(listNo);
+  if (!row) {
+    return res.status(404).json({ error: `List ${listNo} 未完成背诵，无需抽查` });
+  }
+
+  const total = results.length;
+  const correct = results.filter(r => r.correct).length;
+  const accuracy = Math.round((correct / total) * 100);
+  const passed = accuracy >= 80;
+
+  db.prepare(`
+    UPDATE list_completion SET
+      spot_check_date = ?,
+      pending_review = ?
+    WHERE list_no = ?
+  `).run(dateString(), passed ? 0 : 1, listNo);
+
+  res.json({ ok: true, listNo, total, correct, accuracy, passed });
 });
 
 module.exports = router;

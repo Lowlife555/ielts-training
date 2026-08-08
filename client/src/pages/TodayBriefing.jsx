@@ -107,7 +107,7 @@ export default function TodayBriefing() {
               <Target className="w-5 h-5 text-green-600 shrink-0" />
               <div>
                 <div className="font-medium text-green-800">抽查 List {plan.spotCheckList.listNo}</div>
-                <div className="text-xs text-green-600">随机 30 词 · 正确率 ≥ 80% 算过</div>
+                <div className="text-xs text-green-600">随机 {plan.spotCheckList.wordCount} 词 · 正确率 ≥ {plan.spotCheckList.passRate}% 算过</div>
               </div>
             </div>
           )}
