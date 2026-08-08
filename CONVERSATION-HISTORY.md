@@ -1,8 +1,8 @@
 # IELTS 训练网站 — 完整对话历史与技术决策记录
 
 > 项目: IELTS 6.5 智能备考训练网站  
-> 对话跨度: 2026-08-05 ~ 2026-08-07  
-> 最新版本: v4.0-P0-1  
+> 对话跨度: 2026-08-05 ~ 2026-08-08  
+> 最新版本: v6.0-P1  
 > GitHub: `https://github.com/Lowlife555/ielts-training`
 
 ---
@@ -279,6 +279,43 @@ v4.0 核心需求的第一步——以机构原始词库文件为准，重建完
 1. **Cambridge 122 词重叠**：122 个 Cambridge 词同时也是 IELTS List 词，设为 is_extra=0（参与 List 训练）而非 is_extra=1。纯 Cambridge 词（不在任何 IELTS List）160 个，正确设为 is_extra=1
 2. **4 个重复词**：moral/bound/slit/filter 在 PDF 中两个不同 List 出现，word_bank 只保留一个
 3. **PET 词减少**：~262 个 PET 词同时也是 IELTS List 词，被重新分类为 level='ielts'，PET 剩余 1752 词（仍够热身用）
+
+---
+
+## 十四、v6.0-P1：词义判定测试（2026-08-08）
+
+> 开发 Agent: opencode (deepseek-v4-flash-free)
+
+### 需求（用户确认）
+1. 新增"词义判定"测试：给单词，从 4 个中文释义选项中选正确项
+2. 支持"词义 + 拼写混合"测试模式
+3. 判定基准：宽松判——选项展示完整多义项释义，任何义项对应上都不算错（避免多义词误判）
+
+### 数据层
+- `server/db/enrich_v6.js`：有道词典抓取脚本（`dict.youdao.com/jsonapi`），抓取全部 2319 个 List 词的完整多义项释义 + 判词关键词（按分号/逗号/括号拆义项），断点续传（v6_meanings.json），重试 3 次，220ms 限速
+- 结果：**2318/2319 成功**（唯一失败词 `oftcited` 为词表笔误词，无释义可抓）
+- `server/db/migrate_v10.js`：新建 `word_meanings` 表（word_id 主键、meanings JSON、keywords JSON、source），从 v6_meanings.json 幂等导入 2318 词
+
+### 后端
+- `server/routes/meaningTest.js`：
+  - GET `/api/meaning-test?mode=meaning|mixed&topic=&count=20`：meaning 模式每题 = 目标词 + 3 个干扰项释义（优先同话题），选项洗牌，正确项经 `correctOptionId` 标注；mixed 模式交替生成词义题与拼写题
+  - POST `/api/meaning-test`：判分写入 `user_word_progress`（与拼写测试同规则：对 +2 天复习、错 +1 天、连对 3 次标记 mastered），沿用拼写测试的客户端信任模型
+- 挂载 `index.js` → `/api/meaning-test`
+
+### 前端
+- `client/src/pages/words/MeaningTest.jsx`：三屏（设置/答题/结果），键盘 1-4 选释义、Enter 提交、空格朗读、Esc 退出；混合模式自动聚焦拼写输入框；结果页展示错题完整释义便于复习
+- `api.js` 新增 `getMeaningTest`/`submitMeaningResult`；App.jsx 注册 `/meaning-test` 路由；Home + Topics 增加"词义判定"入口按钮
+
+### 验收结果
+- 抓取：2318/2319，抽查 bolt 等释义完整多义项 ✅
+- 迁移：word_meanings 2318 行 ✅
+- API：mode=meaning 返回 4 选项题目（correctOptionId 正确）、mode=mixed 交替 meaning/spelling ✅
+- POST：词义题/拼写题均正确写入，错词正确进入 /wrong-words（incorrect_count=1）✅
+- 前端 build 通过 ✅
+
+### 技术备注
+- 抓取初期 Node fetch 连 dict.youdao.com "连接被拒绝"，而 PowerShell Invoke-RestMethod 正常 → 瞬时网络故障（非代理问题，系统代理未启用），重试后恢复
+- 长驻服务器启动不要用 `-RedirectStandardOutput` 重定向（会挂起 bash 工具），直接用 `Start-Process -WindowStyle Hidden`；旧实例占用 3001 端口会导致新路由 404
 
 ---
 

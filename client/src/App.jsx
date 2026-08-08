@@ -17,6 +17,7 @@ import Topics from './pages/words/Topics';
 import WordList from './pages/words/WordList';
 import WordStudy from './pages/words/WordStudy';
 import SpellingTest from './pages/words/SpellingTest';
+import MeaningTest from './pages/words/MeaningTest';
 import ReviewWords from './pages/words/ReviewWords';
 import WrongWords from './pages/words/WrongWords';
 import WritingQuestions from './pages/writing/WritingQuestions';
@@ -85,6 +86,7 @@ function Layout() {
           <Route path="/words/:topic" element={<RequireAuth><WordList /></RequireAuth>} />
           <Route path="/words/:topic/study" element={<RequireAuth><WordStudy /></RequireAuth>} />
           <Route path="/spelling-test" element={<RequireAuth><SpellingTest /></RequireAuth>} />
+          <Route path="/meaning-test" element={<RequireAuth><MeaningTest /></RequireAuth>} />
           <Route path="/review-words" element={<RequireAuth><ReviewWords /></RequireAuth>} />
           <Route path="/wrong-words" element={<RequireAuth><WrongWords /></RequireAuth>} />
           <Route path="/writing" element={<RequireAuth><WritingQuestions /></RequireAuth>} />

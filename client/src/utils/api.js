@@ -63,6 +63,14 @@ export const api = {
   submitSpellingResult: (data) =>
     request('/spelling-test', { method: 'POST', body: JSON.stringify(data) }),
 
+  // v6.0 Meaning test
+  getMeaningTest: (params = {}) => {
+    const query = new URLSearchParams(params).toString();
+    return request(`/meaning-test?${query}`);
+  },
+  submitMeaningResult: (data) =>
+    request('/meaning-test', { method: 'POST', body: JSON.stringify(data) }),
+
   // Reviews
   getReviewWords: () => request('/review-words'),
   submitReviewResult: (data) =>
