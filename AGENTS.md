@@ -7,9 +7,19 @@
 - 前端构建: `npm run build` (client/ 下,改完必跑,必须通过)
 - 前端开发服务器: `npm run dev`
 - 服务端: 见 `server/` 目录下的启动脚本 (Node 后端 + SQLite)
+- **部署(每次开发完成必须执行)**: `powershell -ExecutionPolicy Bypass -File deploy.ps1`
 - **禁止**: 无测试框架,不写单测;以 `npm run build` + 人工点检为验证手段
 
-## 2. 架构约定 (2026-08 重组后)
+## 2. 部署环境 (2026-08-08 配置)
+
+- 服务器: 腾讯云轻量应用服务器 `43.135.22.140` (Ubuntu 24.04 LTS, root, SSH 密钥免密)
+- 部署目录: `/var/www/ielts-training` (git clone 自 GitHub origin/master)
+- 进程: pm2 `ielts-server` (server/index.js) + nginx (root=/var/www/ielts-training/client/dist, proxy → 127.0.0.1:3001)
+- 部署流程由 `deploy.ps1` 完成: 本地 push → 服务器 pull → npm install → client build → pm2 restart → 健康检查(API /api/health + 前端 HTTP 200)
+- ⚠️ 服务器配置(密码/密钥)不入库;公开信息仅限上面这些
+- ⚠️ 服务器数据库 SQLite 在服务器本地生成/增长,`git pull` 不影响用户数据(数据文件不入库);server 代码改动照常 pull 覆盖
+
+## 3. 架构约定 (2026-08 重组后)
 
 ```
 client/src/
