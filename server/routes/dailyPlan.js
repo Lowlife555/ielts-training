@@ -103,10 +103,16 @@ router.get('/', (req, res) => {
   const userId = req.user.id;
   const today = dateString();
 
-  // 欠债计算
-  const { debt, yesterday } = computeDebtChain(db, userId);
-  const targetMinutes = Math.min(BASE_TARGET_MINUTES + debt, MAX_TARGET_MINUTES);
-  const reason = buildReason(yesterday);
+  // 测试账号：目标恒 60 分钟，永不欠债，无惩罚机制
+  let debt = 0;
+  let targetMinutes = BASE_TARGET_MINUTES;
+  let reason = req.user.isTest ? '测试账号：目标恒 60 分钟，永不欠债' : null;
+  if (!req.user.isTest) {
+    const chain = computeDebtChain(db, userId);
+    debt = chain.debt;
+    targetMinutes = Math.min(BASE_TARGET_MINUTES + debt, MAX_TARGET_MINUTES);
+    reason = buildReason(chain.yesterday);
+  }
 
   // 今日 List：优先待重背 List，否则下一个未完成 List
   const pendingReview = db.prepare(
@@ -204,8 +210,9 @@ router.get('/status', (req, res) => {
   const userId = req.user.id;
   const today = dateString();
 
-  const { debt } = computeDebtChain(db, userId);
-  const targetMinutes = Math.min(BASE_TARGET_MINUTES + debt, MAX_TARGET_MINUTES);
+  const isTest = req.user.isTest;
+  const debt = isTest ? 0 : computeDebtChain(db, userId).debt;
+  const targetMinutes = isTest ? BASE_TARGET_MINUTES : Math.min(BASE_TARGET_MINUTES + debt, MAX_TARGET_MINUTES);
 
   const sessions = getDaySessions(db, userId, today);
   const agg = aggregateDay(sessions);
@@ -258,6 +265,48 @@ router.post('/complete', (req, res) => {
   res.json({ ok: true, sessionId: session.id });
 });
 
+// GET /api/daily-plan/test-spot-check?listNo=N — 测试账号：任意 List 生成抽查
+// 同时创建真实训练会话，保证计时/收工可用
+router.get('/test-spot-check', (req, res) => {
+  const db = getDb();
+  if (!req.user.isTest) return res.status(403).json({ error: '仅测试账号可用' });
+
+  const listNo = Number(req.query.listNo);
+  if (!listNo || listNo < 1) return res.status(400).json({ error: 'listNo required' });
+
+  const cnt = db.prepare('SELECT COUNT(*) as cnt FROM words WHERE is_extra=0 AND list_no = ?').get(listNo);
+  if (!cnt.cnt) return res.status(404).json({ error: `List ${listNo} 没有单词` });
+
+  const spotCount = Math.min(30, cnt.cnt);
+  const words = db.prepare(`
+    SELECT id, word, phonetic, part_of_speech, chinese_definition
+    FROM words
+    WHERE is_extra = 0 AND list_no = ?
+    ORDER BY RANDOM()
+    LIMIT ?
+  `).all(listNo, spotCount);
+
+  const now = new Date();
+  const result = db.prepare(`
+    INSERT INTO daily_sessions (user_id, session_date, level, word_count, status, list_no, start_time, target_minutes, debt_minutes)
+    VALUES (?, ?, 'ielts', ?, 'studying', ?, ?, 60, 0)
+  `).run(req.user.id, dateString(), spotCount, listNo, now.toISOString());
+
+  res.json({
+    sessionId: result.lastInsertRowid,
+    startTime: now.toISOString(),
+    spotCheck: {
+      listNo,
+      wordCount: spotCount,
+      passRate: 80,
+      words: words.map(w => ({
+        wordId: w.id, word: w.word, phonetic: w.phonetic,
+        partOfSpeech: w.part_of_speech, chineseDefinition: w.chinese_definition,
+      })),
+    },
+  });
+});
+
 // POST /api/spot-check — 提交抽查结果
 // body: { listNo, results: [{wordId, correct}] }
 // 正确率 ≥80% 通过并记录抽查日期；否则标记待重背（次日简报优先重背）
@@ -270,9 +319,18 @@ router.post('/spot-check', (req, res) => {
     return res.status(400).json({ error: 'listNo and results array required' });
   }
 
-  const row = db.prepare('SELECT * FROM list_completion WHERE user_id = ? AND list_no = ?').get(userId, listNo);
+  let row = db.prepare('SELECT * FROM list_completion WHERE user_id = ? AND list_no = ?').get(userId, listNo);
   if (!row) {
-    return res.status(404).json({ error: `List ${listNo} 未完成背诵，无需抽查` });
+    // 测试账号：允许对任意 List 抽查（补一条完成记录）
+    if (!req.user.isTest) {
+      return res.status(404).json({ error: `List ${listNo} 未完成背诵，无需抽查` });
+    }
+    db.prepare(`
+      INSERT INTO list_completion (user_id, list_no, first_completed_date)
+      VALUES (?, ?, ?)
+      ON CONFLICT(user_id, list_no) DO NOTHING
+    `).run(userId, listNo, dateString());
+    row = db.prepare('SELECT * FROM list_completion WHERE user_id = ? AND list_no = ?').get(userId, listNo);
   }
 
   const total = results.length;

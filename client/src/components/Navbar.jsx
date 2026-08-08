@@ -1,8 +1,9 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { CalendarDays, BookOpen, PenLine, BarChart3, Search, LogOut, Shield } from 'lucide-react';
+import { CalendarDays, BookOpen, PenLine, BarChart3, Search, LogOut, Shield, Sun, Moon } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useApp } from '../context/AppContext';
+import { useTheme } from '../context/ThemeContext';
 
 // 环境徽标：本地(laptop)=浅黄，服务器(server)=浅灰
 const IS_SERVER = !['localhost', '127.0.0.1'].includes(window.location.hostname);
@@ -12,6 +13,7 @@ export default function Navbar() {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const { showToast } = useApp();
+  const { theme, toggle } = useTheme();
   const [searchQuery, setSearchQuery] = useState('');
   const searchRef = useRef(null);
 
@@ -130,6 +132,15 @@ export default function Navbar() {
               <span className="hidden md:inline text-sm font-medium text-gray-700 max-w-[100px] truncate">
                 {user?.username}
               </span>
+              {/* 深色/浅色切换：浅色显示月亮，深色显示太阳 */}
+              <button
+                onClick={toggle}
+                aria-label="切换深浅色模式"
+                title={theme === 'dark' ? '切换到浅色模式' : '切换到暗黑模式'}
+                className="flex items-center px-2 py-2 rounded-lg text-sm text-gray-500 hover:text-indigo-600 hover:bg-gray-100 transition-colors"
+              >
+                {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+              </button>
               <button
                 onClick={handleLogout}
                 aria-label="退出登录"

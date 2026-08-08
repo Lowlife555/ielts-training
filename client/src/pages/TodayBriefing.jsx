@@ -2,13 +2,21 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../utils/api';
 import { useKeyboard } from '../hooks/useKeyboard';
-import { ArrowLeft, Play, Clock, Flame, BookOpen, RefreshCw, Target } from 'lucide-react';
+import { useApp } from '../context/AppContext';
+import { useAuth } from '../context/AuthContext';
+import { ArrowLeft, Play, Clock, Flame, BookOpen, RefreshCw, Target, FlaskConical } from 'lucide-react';
+
+const TEST_LIST_COUNT = 24;
 
 export default function TodayBriefing() {
   const navigate = useNavigate();
+  const { showToast } = useApp();
+  const { user } = useAuth();
   const [plan, setPlan] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [testList, setTestList] = useState(1);
+  const [testBusy, setTestBusy] = useState(false);
 
   useEffect(() => {
     api.getDailyPlan()
@@ -18,6 +26,44 @@ export default function TodayBriefing() {
   }, []);
 
   const startNow = () => navigate('/daily/warmup', { state: { plan } });
+
+  // ===== 测试面板（admin_test 专属）：任意 List 任意环节直接进入 =====
+  const testSession = async (listNo) => {
+    return api.startTraining({ listNo, targetMinutes: 60, debtMinutes: 0 });
+  };
+
+  const testEnter = async (stage) => {
+    setTestBusy(true);
+    try {
+      if (stage === 'warmup') {
+        navigate('/daily/warmup', { state: { plan } });
+        return;
+      }
+      const session = await testSession(testList);
+      if (stage === 'main') {
+        navigate('/daily/study', { state: { session, plan } });
+      } else if (stage === 'spelling') {
+        navigate('/daily/spelling', { state: { session, plan, wrongPool: [], mainResults: [] } });
+      } else if (stage === 'acceptance') {
+        const wrongPool = session.words.slice(0, 3).map(w => ({
+          wordId: w.wordId, word: w.word, chineseDefinition: w.chineseDefinition, partOfSpeech: w.partOfSpeech,
+        }));
+        navigate('/daily/acceptance', { state: { session, plan, wrongPool, mainResults: [] } });
+      } else if (stage === 'spotcheck') {
+        const { sessionId, startTime, spotCheck } = await api.getTestSpotCheck({ listNo: testList });
+        navigate('/daily/spotcheck', {
+          state: {
+            session: { sessionId, startTime, listNo: testList },
+            plan: { ...plan, spotCheckList: spotCheck },
+          },
+        });
+      }
+    } catch (err) {
+      showToast('测试进入失败: ' + err.message, 'error');
+    } finally {
+      setTestBusy(false);
+    }
+  };
 
   useKeyboard({
     'Enter': () => plan && !plan.allListsDone && startNow(),
@@ -43,7 +89,7 @@ export default function TodayBriefing() {
     );
   }
 
-  if (plan.allListsDone) {
+  if (plan.allListsDone && !user?.isTest) {
     return (
       <div className="max-w-2xl mx-auto px-4 py-20 text-center">
         <div className="text-6xl mb-4">🎉</div>
@@ -81,16 +127,28 @@ export default function TodayBriefing() {
 
         {/* 今日内容 */}
         <div className="space-y-3 mb-8 text-left">
-          <div className="flex items-center gap-3 p-3 rounded-lg border border-gray-200">
-            <BookOpen className="w-5 h-5 text-indigo-600 shrink-0" />
-            <div>
-              <div className="font-medium text-gray-900">
-                {todayList.isReback ? `优先重背 List ${todayList.listNo}` : `新词 List ${todayList.listNo}`}
-                <span className="text-sm text-gray-400 font-normal"> · {todayList.wordCount} 词</span>
+          {todayList && (
+            <div className="flex items-center gap-3 p-3 rounded-lg border border-gray-200">
+              <BookOpen className="w-5 h-5 text-indigo-600 shrink-0" />
+              <div>
+                <div className="font-medium text-gray-900">
+                  {todayList.isReback ? `优先重背 List ${todayList.listNo}` : `新词 List ${todayList.listNo}`}
+                  <span className="text-sm text-gray-400 font-normal"> · {todayList.wordCount} 词</span>
+                </div>
+                <div className="text-xs text-gray-500">英译中主任务 → 错词死磕 → 中译英拼写 → 验收</div>
               </div>
-              <div className="text-xs text-gray-500">英译中主任务 → 错词死磕 → 中译英拼写 → 验收</div>
             </div>
-          </div>
+          )}
+
+          {!todayList && user?.isTest && (
+            <div className="flex items-center gap-3 p-3 rounded-lg border border-indigo-200 bg-indigo-50">
+              <FlaskConical className="w-5 h-5 text-indigo-600 shrink-0" />
+              <div>
+                <div className="font-medium text-gray-900">测试账号：24 个 List 均已可测</div>
+                <div className="text-xs text-gray-500">下方测试面板可选任意 List 直接进入任意环节</div>
+              </div>
+            </div>
+          )}
 
           {plan.pendingReviewList && (
             <div className="flex items-center gap-3 p-3 rounded-lg border border-amber-200 bg-amber-50">
@@ -136,6 +194,52 @@ export default function TodayBriefing() {
           <kbd className="px-1.5 py-0.5 bg-gray-100 border rounded">Esc</kbd> 返回
         </p>
       </div>
+
+      {/* 测试面板（仅测试账号可见）：无惩罚机制 + 任意 List/环节直入 */}
+      {user?.isTest && (
+        <div className="card mt-6 border-dashed border-indigo-300">
+          <div className="flex items-center gap-2 text-indigo-700 font-bold mb-1">
+            <FlaskConical className="w-5 h-5" />
+            测试面板
+            <span className="text-xs font-normal bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded-full">
+              无惩罚机制 · 目标恒 60 分钟 · 永不欠债
+            </span>
+          </div>
+          <p className="text-xs text-gray-500 mb-4">选一个 List，任意环节直接进入（跳过正常串联流程）</p>
+
+          <div className="flex items-center gap-3 mb-4">
+            <label className="text-sm text-gray-600 shrink-0">List</label>
+            <select
+              value={testList}
+              onChange={(e) => setTestList(Number(e.target.value))}
+              className="border border-gray-300 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            >
+              {Array.from({ length: TEST_LIST_COUNT }, (_, i) => (
+                <option key={i + 1} value={i + 1}>List {i + 1}</option>
+              ))}
+            </select>
+            {testBusy && <span className="text-sm text-gray-400">准备中...</span>}
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+            <button onClick={() => testEnter('warmup')} className="btn-secondary !px-2" disabled={testBusy}>
+              🏃 热身
+            </button>
+            <button onClick={() => testEnter('main')} className="btn-primary !px-2" disabled={testBusy}>
+              📖 主任务
+            </button>
+            <button onClick={() => testEnter('spelling')} className="btn-primary !px-2" disabled={testBusy}>
+              ✍️ 拼写
+            </button>
+            <button onClick={() => testEnter('spotcheck')} className="btn-primary !px-2" disabled={testBusy}>
+              🎯 抽查
+            </button>
+            <button onClick={() => testEnter('acceptance')} className="btn-primary !px-2" disabled={testBusy}>
+              ✅ 验收
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -32,7 +32,7 @@ function requireAuth(req, res, next) {
 
   const db = getDb();
   const session = db.prepare(`
-    SELECT s.user_id, u.username, u.is_admin, u.status
+    SELECT s.user_id, u.username, u.is_admin, u.status, u.is_test
     FROM sessions s JOIN users u ON u.id = s.user_id
     WHERE s.token = ? AND s.expires_at > datetime('now')
   `).get(token);
@@ -40,7 +40,7 @@ function requireAuth(req, res, next) {
   if (!session) return res.status(401).json({ error: '登录已过期，请重新登录' });
   if (session.status !== 'active') return res.status(403).json({ error: '账号已被禁用' });
 
-  req.user = { id: session.user_id, username: session.username, isAdmin: session.is_admin };
+  req.user = { id: session.user_id, username: session.username, isAdmin: session.is_admin, isTest: !!session.is_test };
   next();
 }
 
