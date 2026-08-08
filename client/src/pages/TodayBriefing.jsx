@@ -4,9 +4,100 @@ import { api } from '../utils/api';
 import { useKeyboard } from '../hooks/useKeyboard';
 import { useApp } from '../context/AppContext';
 import { useAuth } from '../context/AuthContext';
-import { ArrowLeft, Play, Clock, Flame, BookOpen, RefreshCw, Target, FlaskConical } from 'lucide-react';
+import { ArrowLeft, Play, Clock, Flame, BookOpen, RefreshCw, Target, FlaskConical, ListOrdered } from 'lucide-react';
 
 const TEST_LIST_COUNT = 24;
+
+// 学习模式切换器：顺序模式（自动 List 1→24）/ 自定义模式（固定选某个 List，插队不丢顺序）
+function ModeSwitcher({ plan, onSaved }) {
+  const { showToast } = useApp();
+  const [pick, setPick] = useState(1);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    setPick(plan?.customListNo || plan?.todayList?.listNo || 1);
+  }, [plan]);
+
+  const save = async (mode, listNo) => {
+    setSaving(true);
+    try {
+      await api.setStudySettings({ mode, ...(mode === 'custom' ? { listNo } : {}) });
+      showToast(
+        mode === 'custom' ? `已切换为自定义模式：List ${listNo}` : '已切换为顺序模式',
+        'success'
+      );
+      onSaved?.();
+    } catch (err) {
+      showToast(err.message, 'error');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const custom = plan?.studyMode === 'custom';
+
+  return (
+    <div className="card mb-6 animate-fade-in">
+      <div className="flex flex-wrap items-center gap-2 mb-3">
+        <ListOrdered className="w-4 h-4 text-indigo-600" />
+        <h2 className="font-semibold text-gray-900">学习模式</h2>
+        <span className="text-xs text-gray-400 ml-auto">
+          顺序进度：{plan?.sequentialProgressList ? `List ${plan.sequentialProgressList} 待学` : '已全部完成'}
+        </span>
+      </div>
+
+      <div className="flex flex-wrap items-center gap-3">
+        <div className="flex rounded-lg border border-gray-200 overflow-hidden">
+          <button
+            onClick={() => !custom && save('sequential')}
+            className={`px-4 py-2 text-sm font-medium transition-colors ${
+              !custom ? 'bg-indigo-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'
+            }`}
+          >
+            顺序模式
+          </button>
+          <button
+            onClick={() => custom && save('custom', pick)}
+            className={`px-4 py-2 text-sm font-medium transition-colors ${
+              custom ? 'bg-indigo-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'
+            }`}
+          >
+            自定义模式
+          </button>
+        </div>
+
+        {custom && (
+          <div className="flex items-center gap-2">
+            <label className="text-sm text-gray-600">选择 List</label>
+            <select
+              value={pick}
+              onChange={(e) => setPick(Number(e.target.value))}
+              disabled={saving}
+              className="border border-gray-300 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            >
+              {Array.from({ length: TEST_LIST_COUNT }, (_, i) => (
+                <option key={i + 1} value={i + 1}>List {i + 1}</option>
+              ))}
+            </select>
+            <button
+              onClick={() => save('custom', pick)}
+              disabled={saving || pick === plan?.customListNo}
+              className="btn-primary !px-4 !py-2 text-sm"
+            >
+              确定
+            </button>
+          </div>
+        )}
+      </div>
+
+      <p className="text-xs text-gray-400 mt-3">
+        {custom
+          ? '自定义模式：固定学习所选 List（已完成也可选做复习）；切回顺序模式后从原进度继续，不会跳过中间的 List。'
+          : '顺序模式：按 List 1 → 24 依次自动推进，抽考未达标会优先重背。'}
+      </p>
+    </div>
+  );
+}
 
 export default function TodayBriefing() {
   const navigate = useNavigate();
@@ -24,6 +115,8 @@ export default function TodayBriefing() {
       .catch(err => setError(err.message))
       .finally(() => setLoading(false));
   }, []);
+
+  const reload = () => api.getDailyPlan().then(setPlan);
 
   const startNow = () => navigate('/daily/warmup', { state: { plan } });
 
@@ -91,11 +184,14 @@ export default function TodayBriefing() {
 
   if (plan.allListsDone && !user?.isTest) {
     return (
-      <div className="max-w-2xl mx-auto px-4 py-20 text-center">
-        <div className="text-6xl mb-4">🎉</div>
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">24 个 List 已全部完成!</h1>
-        <p className="text-gray-500 mb-8">恭喜！你可以去复习错词或做拼写练习巩固。</p>
-        <button className="btn-primary" onClick={() => navigate('/')}>返回首页</button>
+      <div className="max-w-2xl mx-auto px-4 py-8">
+        <div className="text-center mb-8">
+          <div className="text-6xl mb-4">🎉</div>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">24 个 List 已全部完成!</h1>
+          <p className="text-gray-500 mb-8">恭喜！你可以去复习错词或做拼写练习巩固。</p>
+          <button className="btn-primary" onClick={() => navigate('/')}>返回首页</button>
+        </div>
+        <ModeSwitcher plan={plan} onSaved={reload} />
       </div>
     );
   }
@@ -108,6 +204,8 @@ export default function TodayBriefing() {
       <button onClick={() => navigate('/')} className="inline-flex items-center gap-1 text-gray-500 hover:text-gray-700 mb-6">
         <ArrowLeft className="w-4 h-4" /> 返回
       </button>
+
+      <ModeSwitcher plan={plan} onSaved={reload} />
 
       <div className="card animate-fade-in">
         <div className="text-5xl mb-4">📅</div>
@@ -132,8 +230,11 @@ export default function TodayBriefing() {
               <BookOpen className="w-5 h-5 text-indigo-600 shrink-0" />
               <div>
                 <div className="font-medium text-gray-900">
-                  {todayList.isReback ? `优先重背 List ${todayList.listNo}` : `新词 List ${todayList.listNo}`}
+                  {todayList.isReback ? `优先重背 List ${todayList.listNo}` : todayList.isCustom ? `已选 List ${todayList.listNo}` : `新词 List ${todayList.listNo}`}
                   <span className="text-sm text-gray-400 font-normal"> · {todayList.wordCount} 词</span>
+                  {todayList.isCustom && (
+                    <span className="ml-2 text-xs font-normal bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full">自定义</span>
+                  )}
                 </div>
                 <div className="text-xs text-gray-500">英译中主任务 → 错词死磕 → 中译英拼写 → 验收</div>
               </div>

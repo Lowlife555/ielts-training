@@ -114,17 +114,28 @@ router.get('/', (req, res) => {
     reason = buildReason(chain.yesterday);
   }
 
-  // 今日 List：优先待重背 List，否则下一个未完成 List
+// 今日 List：优先待重背 List；否则自定义模式取用户选定 List（插队，不影响顺序进度）；否则下一个未完成 List
   const pendingReview = db.prepare(
     'SELECT list_no FROM list_completion WHERE user_id = ? AND pending_review = 1 ORDER BY list_no LIMIT 1'
   ).get(userId);
+
+  const settings = db.prepare('SELECT study_mode, custom_list_no FROM users WHERE id = ?').get(userId);
+  const customMode = settings && settings.study_mode === 'custom' && settings.custom_list_no;
 
   let todayList = null;
   if (pendingReview) {
     const cnt = db.prepare(
       'SELECT COUNT(*) as cnt FROM words WHERE is_extra=0 AND list_no = ?'
     ).get(pendingReview.list_no);
-    todayList = { listNo: pendingReview.list_no, wordCount: cnt.cnt, isReback: true };
+    todayList = { listNo: pendingReview.list_no, wordCount: cnt.cnt, isReback: true, isCustom: false };
+  } else if (customMode) {
+    // 自定义模式：固定学用户选定的 List（已完成也可选，用于复习）
+    const cnt = db.prepare(
+      'SELECT COUNT(*) as cnt FROM words WHERE is_extra=0 AND list_no = ?'
+    ).get(settings.custom_list_no);
+    if (cnt.cnt > 0) {
+      todayList = { listNo: settings.custom_list_no, wordCount: cnt.cnt, isReback: false, isCustom: true };
+    }
   } else {
     const nextList = db.prepare(`
       SELECT w.list_no, COUNT(*) as cnt
@@ -135,8 +146,19 @@ router.get('/', (req, res) => {
       ORDER BY w.list_no
       LIMIT 1
     `).get(userId);
-    if (nextList) todayList = { listNo: nextList.list_no, wordCount: nextList.cnt, isReback: false };
+    if (nextList) todayList = { listNo: nextList.list_no, wordCount: nextList.cnt, isReback: false, isCustom: false };
   }
+
+  // 顺序进度（自定义插队后仍从原进度继续；全部完成后为 null）
+  const nextSeq = db.prepare(`
+    SELECT w.list_no
+    FROM words w
+    WHERE w.is_extra = 0 AND w.list_no IS NOT NULL
+      AND w.list_no NOT IN (SELECT list_no FROM list_completion WHERE user_id = ?)
+    GROUP BY w.list_no
+    ORDER BY w.list_no
+    LIMIT 1
+  `).get(userId);
 
   // 抽查任务：完成背诵 ≥3 天且未抽查过、且非待重背的 List 中随机选一个，抽 30 词（不足取全部）
   let spotCheck = null;
@@ -201,7 +223,38 @@ router.get('/', (req, res) => {
       sessionCount: todayAgg.sessionCount,
     },
     allListsDone: !todayList,
+    studyMode: settings ? settings.study_mode : 'sequential',
+    customListNo: settings ? settings.custom_list_no : null,
+    sequentialProgressList: nextSeq ? nextSeq.list_no : null,
   });
+});
+
+// POST /api/daily-plan/settings — 切换学习模式
+// body: { mode: 'sequential' | 'custom', listNo?: 1-24 }
+router.post('/settings', (req, res) => {
+  const db = getDb();
+  const userId = req.user.id;
+  const { mode, listNo } = req.body || {};
+
+  if (mode !== 'sequential' && mode !== 'custom') {
+    return res.status(400).json({ error: 'mode 必须是 sequential 或 custom' });
+  }
+
+  let customListNo = null;
+  if (mode === 'custom') {
+    const n = Number(listNo);
+    if (!Number.isInteger(n) || n < 1) {
+      return res.status(400).json({ error: '请选择要学习的 List' });
+    }
+    const cnt = db.prepare('SELECT COUNT(*) as cnt FROM words WHERE is_extra = 0 AND list_no = ?').get(n);
+    if (!cnt.cnt) return res.status(404).json({ error: `List ${n} 没有单词` });
+    customListNo = n;
+  }
+
+  db.prepare('UPDATE users SET study_mode = ?, custom_list_no = ? WHERE id = ?')
+    .run(mode, customListNo, userId);
+
+  res.json({ ok: true, studyMode: mode, customListNo });
 });
 
 // GET /api/daily-plan/status — 今日训练状态
