@@ -112,6 +112,9 @@ export default function Admin() {
                   {u.is_admin && (
                     <span className="ml-2 px-1.5 py-0.5 bg-indigo-50 text-indigo-600 text-xs rounded">管理员</span>
                   )}
+                  {u.is_test && (
+                    <span className="ml-2 px-1.5 py-0.5 bg-purple-100 text-purple-700 text-xs rounded">测试账号</span>
+                  )}
                   {u.id === me?.id && <span className="ml-1 text-xs text-gray-400">(我)</span>}
                 </td>
                 <td className="px-4 py-3 text-gray-600">{fmtDate(u.created_at)}</td>

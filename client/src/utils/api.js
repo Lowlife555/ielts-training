@@ -94,6 +94,10 @@ export const api = {
     request('/daily-plan/complete', { method: 'POST', body: JSON.stringify({ sessionId }) }),
   submitSpotCheck: (data) =>
     request('/daily-plan/spot-check', { method: 'POST', body: JSON.stringify(data) }),
+  getTestSpotCheck: (params = {}) => {
+    const query = new URLSearchParams(params).toString();
+    return request(`/daily-plan/test-spot-check?${query}`);
+  },
 
   // v4.0 Training
   startTraining: (data) =>

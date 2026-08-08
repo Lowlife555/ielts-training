@@ -70,3 +70,73 @@
   from { opacity: 0; transform: scale(0.95); }
   to { opacity: 1; transform: scale(1); }
 }
+
+/* ===== 暗黑模式（.dark 作用域整体颜色映射，未分层 CSS 优先级高于 Tailwind 工具类） ===== */
+html.dark { color-scheme: dark; }
+
+.dark body { background-color: #0f172a; color: #e2e8f0; }
+
+/* 背景 */
+.dark .bg-white { background-color: #1e293b; }
+.dark .bg-gray-50 { background-color: #0f172a; }
+.dark .bg-gray-100 { background-color: #334155; }
+.dark .bg-gray-200 { background-color: #475569; }
+.dark .bg-indigo-50 { background-color: #1e2a44; }
+.dark .bg-indigo-100 { background-color: #1e2a44; }
+.dark .bg-green-50 { background-color: #0f2e21; }
+.dark .bg-green-100 { background-color: #123d2b; }
+.dark .bg-red-50 { background-color: #3b1416; }
+.dark .bg-red-100 { background-color: #4a1a1d; }
+.dark .bg-amber-50 { background-color: #3a2e10; }
+.dark .bg-amber-100 { background-color: #3a2e10; }
+.dark .bg-yellow-100 { background-color: #3a2e10; }
+.dark .bg-blue-50 { background-color: #17283f; }
+.dark .bg-blue-100 { background-color: #1a2f4a; }
+.dark .bg-purple-100 { background-color: #2e2547; }
+.dark .bg-orange-50 { background-color: #3b2810; }
+.dark .bg-green-200 { background-color: #166534; }
+
+/* 文字 */
+.dark .text-gray-900, .dark .text-gray-800 { color: #e2e8f0; }
+.dark .text-gray-700 { color: #cbd5e1; }
+.dark .text-gray-600 { color: #94a3b8; }
+.dark .text-gray-500 { color: #94a3b8; }
+.dark .text-gray-400 { color: #64748b; }
+.dark .text-gray-300 { color: #94a3b8; }
+.dark .text-indigo-600 { color: #818cf8; }
+.dark .text-indigo-500 { color: #818cf8; }
+.dark .text-indigo-700 { color: #a5b4fc; }
+.dark .text-indigo-400 { color: #a5b4fc; }
+.dark .text-indigo-300 { color: #c7d2fe; }
+.dark .text-green-600, .dark .text-green-500 { color: #4ade80; }
+.dark .text-green-700 { color: #4ade80; }
+.dark .text-green-800 { color: #86efac; }
+.dark .text-green-400 { color: #86efac; }
+.dark .text-red-600, .dark .text-red-500, .dark .text-red-700, .dark .text-red-400 { color: #f87171; }
+.dark .text-amber-600, .dark .text-amber-700, .dark .text-amber-800 { color: #fcd34d; }
+.dark .text-yellow-600, .dark .text-yellow-700, .dark .text-yellow-500 { color: #fcd34d; }
+.dark .text-yellow-400 { color: #fde047; }
+.dark .text-orange-600, .dark .text-orange-500 { color: #fb923c; }
+.dark .text-blue-700, .dark .text-blue-500 { color: #93c5fd; }
+.dark .text-purple-700 { color: #c4b5fd; }
+
+/* 边框 */
+.dark .border-gray-100, .dark .border-gray-200 { border-color: #334155; }
+.dark .border-gray-300, .dark .border-gray-600 { border-color: #475569; }
+.dark .border-indigo-100, .dark .border-indigo-200 { border-color: #334e8f; }
+.dark .border-indigo-300 { border-color: #475e9c; }
+.dark .border-green-200, .dark .border-green-300 { border-color: #166534; }
+.dark .border-red-200 { border-color: #7f1d1d; }
+.dark .border-amber-200 { border-color: #854d0e; }
+.dark .border-blue-200 { border-color: #1e3a5f; }
+
+/* 组件 */
+.dark .card { background-color: #1e293b; border-color: #334155; }
+.dark .btn-secondary { background-color: #1e293b; color: #cbd5e1; border-color: #475569; }
+.dark .btn-secondary:hover { background-color: #273449; }
+.dark .input-field { background-color: #0f172a; color: #e2e8f0; border-color: #475569; }
+.dark .input-field::placeholder { color: #64748b; }
+
+/* 导航悬停反馈（在暗色下仍可见） */
+.dark .hover\:bg-gray-100:hover { background-color: #273449; }
+.dark .hover\:bg-gray-50:hover { background-color: #273449; }

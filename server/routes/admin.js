@@ -50,7 +50,7 @@ function getUserStats(db, userId) {
 // GET /api/admin/users — 所有账号 + 状态
 router.get('/users', requireAdmin, (req, res) => {
   const db = getDb();
-  const users = db.prepare('SELECT id, username, is_admin, status, created_at, last_login_at FROM users ORDER BY id').all();
+  const users = db.prepare('SELECT id, username, is_admin, is_test, status, created_at, last_login_at FROM users ORDER BY id').all();
   const list = users.map(u => ({ ...u, stats: getUserStats(db, u.id) }));
   res.json({ users: list });
 });

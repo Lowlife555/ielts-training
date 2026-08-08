@@ -26,9 +26,9 @@ router.post('/register', (req, res) => {
       UPDATE users SET username = ?, password_hash = ?, is_admin = 1, status = 'active'
       WHERE id = 1
     `).run(username, hashPassword(String(password)));
-    const user = db.prepare('SELECT id, username, is_admin, status FROM users WHERE id = 1').get();
+    const user = db.prepare('SELECT id, username, is_admin, is_test FROM users WHERE id = 1').get();
     const token = createSession(user.id);
-    return res.json({ token, user });
+    return res.json({ token, user: { ...user, isAdmin: !!user.is_admin, isTest: !!user.is_test } });
   }
 
   const exists = db.prepare('SELECT id FROM users WHERE username = ?').get(username);
@@ -39,9 +39,9 @@ router.post('/register', (req, res) => {
     VALUES (?, ?, 0, 'active', ?)
   `).run(username, hashPassword(String(password)), new Date().toISOString());
 
-  const user = db.prepare('SELECT id, username, is_admin, status FROM users WHERE id = ?').get(result.lastInsertRowid);
+  const user = db.prepare('SELECT id, username, is_admin, is_test FROM users WHERE id = ?').get(result.lastInsertRowid);
   const token = createSession(user.id);
-  res.json({ token, user });
+  res.json({ token, user: { ...user, isAdmin: !!user.is_admin, isTest: !!user.is_test } });
 });
 
 // POST /api/auth/login { username, password }
@@ -58,7 +58,7 @@ router.post('/login', (req, res) => {
 
   db.prepare('UPDATE users SET last_login_at = ? WHERE id = ?').run(new Date().toISOString(), user.id);
   const token = createSession(user.id);
-  res.json({ token, user: { id: user.id, username: user.username, isAdmin: user.is_admin } });
+  res.json({ token, user: { id: user.id, username: user.username, isAdmin: !!user.is_admin, isTest: !!user.is_test } });
 });
 
 // POST /api/auth/logout — 销毁当前 token
