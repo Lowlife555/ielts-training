@@ -1,11 +1,14 @@
 const express = require('express');
 const router = express.Router();
-const { getDb, getUserId } = require('../db/database');
+const { getDb } = require('../db/database');
+const { requireAuth } = require('../auth');
+
+router.use(requireAuth);
 
 // Submit review result (SM-2 algorithm)
 router.post('/', (req, res) => {
   const db = getDb();
-  const userId = getUserId();
+  const userId = req.user.id;
   const { wordId, quality } = req.body; // quality: 0-5 (SM-2 grading)
 
   if (!wordId || quality === undefined) {

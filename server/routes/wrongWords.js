@@ -1,11 +1,14 @@
 const express = require('express');
 const router = express.Router();
-const { getDb, getUserId } = require('../db/database');
+const { getDb } = require('../db/database');
+const { requireAuth } = require('../auth');
+
+router.use(requireAuth);
 
 // Get wrong words (words with incorrect_count > 0)
 router.get('/', (req, res) => {
   const db = getDb();
-  const userId = getUserId();
+  const userId = req.user.id;
 
   const words = db.prepare(`
     SELECT w.*, uwp.correct_count, uwp.incorrect_count, uwp.mastered

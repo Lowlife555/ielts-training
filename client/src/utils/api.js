@@ -1,12 +1,27 @@
 const API_BASE = '/api';
 
+function getToken() {
+  return localStorage.getItem('ielts_token') || '';
+}
+
 async function request(url, options = {}) {
   const config = {
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      ...(getToken() ? { Authorization: `Bearer ${getToken()}` } : {}),
+    },
     ...options,
   };
 
   const response = await fetch(`${API_BASE}${url}`, config);
+
+  if (response.status === 401 && !url.startsWith('/auth')) {
+    localStorage.removeItem('ielts_token');
+    localStorage.removeItem('ielts_user');
+    if (window.location.pathname !== '/login') {
+      window.location.href = '/login';
+    }
+  }
 
   if (!response.ok) {
     const error = await response.json().catch(() => ({ error: 'Request failed' }));
@@ -17,6 +32,19 @@ async function request(url, options = {}) {
 }
 
 export const api = {
+  // Auth
+  register: (data) => request('/auth/register', { method: 'POST', body: JSON.stringify(data) }),
+  login: (data) => request('/auth/login', { method: 'POST', body: JSON.stringify(data) }),
+  logout: () => request('/auth/logout', { method: 'POST' }),
+  getMe: () => request('/auth/me'),
+
+  // Admin
+  getAdminUsers: () => request('/admin/users'),
+  resetUserPassword: (id, newPassword) =>
+    request(`/admin/users/${id}/reset-password`, { method: 'POST', body: JSON.stringify({ newPassword }) }),
+  toggleUserStatus: (id) =>
+    request(`/admin/users/${id}/toggle-status`, { method: 'POST' }),
+
   // Topics
   getTopics: () => request('/topics'),
 

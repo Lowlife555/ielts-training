@@ -21,11 +21,4 @@ function closeDb() {
   }
 }
 
-/** Get current user ID — always returns the first user */
-function getUserId() {
-  const database = getDb();
-  const user = database.prepare('SELECT id FROM users ORDER BY id LIMIT 1').get();
-  return user ? user.id : 1;
-}
-
-module.exports = { getDb, closeDb, DB_PATH, getUserId };
+module.exports = { getDb, closeDb, DB_PATH };
