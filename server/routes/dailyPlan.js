@@ -11,9 +11,18 @@ const PENALTY_MINUTES = 30;
 const CLEAR_DEBT_SECONDS = 2 * 3600; // 练满 2 小时视为欠债全部结清
 const GRACE_MINUTES = 15; // 目标时长 - 15 分钟内不算欠训
 
-/** 用户设置的基础目标时长（测试账号恒 60） */
+/** 用户设置的基础目标时长（测试账号恒 60；v7.2.2 起优先读 user_kv，回退 user_settings 表） */
 function getUserBaseTarget(db, req) {
   if (req.user.isTest) return BASE_TARGET_MINUTES;
+  // 1) KV 存储（新）
+  const kv = db.prepare('SELECT value FROM user_kv WHERE user_id = ? AND key = ?').get(req.user.id, 'settings.baseTargetMinutes');
+  if (kv) {
+    try {
+      const v = JSON.parse(kv.value);
+      if (typeof v === 'number' && v > 0) return v;
+    } catch { /* fall through */ }
+  }
+  // 2) 旧表回退
   const s = db.prepare('SELECT base_target_minutes FROM user_settings WHERE user_id = ?').get(req.user.id);
   return s && s.base_target_minutes ? s.base_target_minutes : BASE_TARGET_MINUTES;
 }

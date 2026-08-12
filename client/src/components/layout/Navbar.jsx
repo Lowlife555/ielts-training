@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { CalendarDays, BookOpen, PenLine, BarChart3, Search, LogOut, Shield, Sun, Moon, Smartphone, HelpCircle } from 'lucide-react';
+import { CalendarDays, BookOpen, PenLine, BarChart3, Search, LogOut, Shield, Sun, Moon, Smartphone, HelpCircle, Settings as SettingsIcon } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useApp } from '../../context/AppContext';
@@ -156,6 +156,18 @@ export default function Navbar() {
               >
                 <Smartphone className="w-4 h-4" />
               </button>
+              {/* 设置：与暗黑模式同级 */}
+              <Link
+                to="/settings" aria-label="设置"
+                title="设置"
+                className={`flex items-center px-2 py-2 rounded-lg text-sm transition-colors ${
+                  location.pathname === '/settings'
+                    ? 'text-indigo-600 bg-indigo-50'
+                    : 'text-gray-500 hover:text-indigo-600 hover:bg-gray-100'
+                }`}
+              >
+                <SettingsIcon className="w-4 h-4" />
+              </Link>
               {/* 深色/浅色切换：浅色显示月亮，深色显示太阳 */}
               <button
                 onClick={toggle}

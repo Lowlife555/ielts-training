@@ -26,6 +26,7 @@ export default function PetWarmup() {
   const [starting, setStarting] = useState(false);
   const inputRef = useRef(null);
   const submitLockRef = useRef(false); // 防止 Enter 双触发重复提交
+  const feedbackShownAtRef = useRef(0); // 反馈显示时间戳（防止提交后立即 Enter 跳过）
 
   const words = plan?.petWarmupWords || [];
   const currentWord = words[currentIndex];
@@ -73,6 +74,7 @@ export default function PetWarmup() {
       isCorrect = checkAnswer(userInput, currentWord.keywords, currentWord.chineseDefinition);
     }
     setFeedback(isCorrect ? 'correct' : 'incorrect');
+    feedbackShownAtRef.current = Date.now();
     submitLockRef.current = false;
     // 不自动跳转：停留展示对错与答案，由用户主动前进
   }, [userInput, feedback, currentWord, isCeMode]);
@@ -91,7 +93,11 @@ export default function PetWarmup() {
       // 输入框聚焦时 Enter 由 input.onKeyDown 处理（避免双触发提交）
       if (document.activeElement === inputRef.current) return;
       if (!feedback) submitAnswer();
-      else goNext();
+      else {
+        // 反馈刚显示 700ms 内忽略 Enter，避免提交后连按/长按瞬间跳过导致看不到反馈
+        if (Date.now() - feedbackShownAtRef.current < 700) return;
+        goNext();
+      }
     },
     'ArrowRight': goNext,
     'ArrowLeft': prev,

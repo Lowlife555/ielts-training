@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+﻿import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { api } from '../../utils/api';
 import { useApp } from '../../context/AppContext';
@@ -146,7 +146,7 @@ export default function MainStudy() {
 
     // 答对的词记入本轮已通过集合（重测轮次剔除用）
     if (isCorrect) {
-      roundPassedRef.current.add(currentDictWord.id);
+      roundPassedRef.current.add(currentDictWord.wordId);
     }
 
     // 首试统计
@@ -158,7 +158,7 @@ export default function MainStudy() {
     }
 
     api.submitDictation(session?.listNo, {
-      wordId: currentDictWord.id,
+      wordId: currentDictWord.wordId,
       isCorrect,
       userAnswer: userInput.trim(),
     }).catch((err) => {
@@ -168,7 +168,7 @@ export default function MainStudy() {
     setTimeout(() => {
       if (currentIndex + 1 >= dictWords.length) {
         // 下一轮只重测本轮未通过的词（已通过的直接剔除）
-        const retryWords = dictWords.filter(w => !roundPassedRef.current.has(w.id));
+        const retryWords = dictWords.filter(w => !roundPassedRef.current.has(w.wordId));
         if (retryWords.length > 0) {
           setDictWords(retryWords);
           setRound(r => r + 1);
@@ -267,7 +267,7 @@ export default function MainStudy() {
           <button
             onClick={() => {
               if (showAllMeaning) setFlippedSet(new Set());
-              else setFlippedSet(new Set(currentBatch.map(w => w.id)));
+              else setFlippedSet(new Set(currentBatch.map(w => w.wordId)));
             }}
             className="mt-3 text-sm font-medium px-3 py-2 rounded-lg border-2 border-gray-200 text-gray-600 hover:border-gray-300"
           >
@@ -277,11 +277,11 @@ export default function MainStudy() {
 
         <div className="space-y-2 mb-6">
           {currentBatch.map((word, idx) => {
-            const isFlipped = flippedSet.has(word.id);
-            const isMarked = marked[word.id] === true;
-            const isNotMarked = marked[word.id] === false;
+            const isFlipped = flippedSet.has(word.wordId);
+            const isMarked = marked[word.wordId] === true;
+            const isNotMarked = marked[word.wordId] === false;
             return (
-              <div key={word.id} className={`relative ${isMarked ? 'border-2 border-green-300 rounded-xl' : isNotMarked ? 'border-2 border-red-200 rounded-xl' : ''}`}>
+              <div key={word.wordId} className={`relative ${isMarked ? 'border-2 border-green-300 rounded-xl' : isNotMarked ? 'border-2 border-red-200 rounded-xl' : ''}`}>
                 <span className="absolute -top-2 left-2 text-[10px] text-gray-400 bg-gray-50 px-1 rounded z-10">{startIndex + idx + 1}.</span>
                 <FlipCard
                   word={word}
@@ -289,8 +289,8 @@ export default function MainStudy() {
                   onClick={() => {
                     setFlippedSet(prev => {
                       const next = new Set(prev);
-                      if (next.has(word.id)) next.delete(word.id);
-                      else next.add(word.id);
+                      if (next.has(word.wordId)) next.delete(word.wordId);
+                      else next.add(word.wordId);
                       return next;
                     });
                   }}
@@ -303,14 +303,14 @@ export default function MainStudy() {
                   markNode={
                     <>
                       <button
-                        onClick={(e) => { e.stopPropagation(); setMarked(m => ({ ...m, [word.id]: true })); }}
+                        onClick={(e) => { e.stopPropagation(); setMarked(m => ({ ...m, [word.wordId]: true })); }}
                         className={`p-2 rounded-lg transition-colors ${isMarked ? 'bg-green-100 text-green-600' : 'text-gray-400 hover:bg-green-50'}`}
                         title="会 (1)"
                       >
                         <Check className="w-4 h-4" />
                       </button>
                       <button
-                        onClick={(e) => { e.stopPropagation(); setMarked(m => ({ ...m, [word.id]: false })); }}
+                        onClick={(e) => { e.stopPropagation(); setMarked(m => ({ ...m, [word.wordId]: false })); }}
                         className={`p-2 rounded-lg transition-colors ${isNotMarked ? 'bg-red-100 text-red-500' : 'text-gray-400 hover:bg-red-50'}`}
                         title="不会 (2)"
                       >
@@ -503,3 +503,4 @@ export default function MainStudy() {
 
   return null;
 }
+

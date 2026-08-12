@@ -131,4 +131,14 @@ export const api = {
   getSettings: () => request('/settings'),
   updateSettings: (data) =>
     request('/settings', { method: 'PUT', body: JSON.stringify(data) }),
+
+  // v14.0 User KV storage
+  getUserKV: (keys) => {
+    const query = keys && keys.length ? `?keys=${keys.join(',')}` : '';
+    return request(`/user-kv${query}`);
+  },
+  setUserKV: (data) =>
+    request('/user-kv', { method: 'PUT', body: JSON.stringify(data) }),
+  deleteUserKV: (key) =>
+    request(`/user-kv/${encodeURIComponent(key)}`, { method: 'DELETE' }),
 };

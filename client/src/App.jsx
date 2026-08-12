@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AppProvider } from './context/AppContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { SettingsProvider } from './context/SettingsContext';
+import { UserKVProvider } from './context/UserKVContext';
 import { useTouch } from './context/TouchContext';
 import ErrorBoundary from './components/ui/ErrorBoundary';
 import Navbar from './components/layout/Navbar';
@@ -63,11 +64,13 @@ export default function App() {
     <ErrorBoundary>
       <BrowserRouter>
         <AuthProvider>
-          <SettingsProvider>
-            <AppProvider>
-              <Layout />
-            </AppProvider>
-          </SettingsProvider>
+          <UserKVProvider>
+            <SettingsProvider>
+              <AppProvider>
+                <Layout />
+              </AppProvider>
+            </SettingsProvider>
+          </UserKVProvider>
         </AuthProvider>
       </BrowserRouter>
     </ErrorBoundary>

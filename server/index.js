@@ -40,6 +40,7 @@ app.use('/api/daily-plan', require('./routes/dailyPlan'));
 app.use('/api/training', require('./routes/training'));
 app.use('/api/announcements', require('./routes/announcements'));
 app.use('/api/settings', require('./routes/settings'));
+app.use('/api/user-kv', require('./routes/userKv'));
 
 // Error handling middleware
 app.use((err, req, res, next) => {
