@@ -126,4 +126,9 @@ export const api = {
   // v7.1 Spell check (daily flow final stage)
   submitSpellCheck: (data) =>
     request('/training/spell-check', { method: 'POST', body: JSON.stringify(data) }),
+
+  // v7.2 User settings
+  getSettings: () => request('/settings'),
+  updateSettings: (data) =>
+    request('/settings', { method: 'PUT', body: JSON.stringify(data) }),
 };

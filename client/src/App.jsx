@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AppProvider } from './context/AppContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { SettingsProvider } from './context/SettingsContext';
 import { useTouch } from './context/TouchContext';
 import ErrorBoundary from './components/ui/ErrorBoundary';
 import Navbar from './components/layout/Navbar';
@@ -40,6 +41,7 @@ import Login from './pages/user/Login';
 import Register from './pages/user/Register';
 import Admin from './pages/user/Admin';
 import Me from './pages/user/Me';
+import Settings from './pages/user/Settings';
 
 function RequireAuth({ children }) {
   const { user, loading } = useAuth();
@@ -61,9 +63,11 @@ export default function App() {
     <ErrorBoundary>
       <BrowserRouter>
         <AuthProvider>
-          <AppProvider>
-            <Layout />
-          </AppProvider>
+          <SettingsProvider>
+            <AppProvider>
+              <Layout />
+            </AppProvider>
+          </SettingsProvider>
         </AuthProvider>
       </BrowserRouter>
     </ErrorBoundary>
@@ -110,6 +114,7 @@ function Layout() {
           <Route path="/daily/report" element={<RequireAuth><DailyReport /></RequireAuth>} />
           <Route path="/admin" element={<RequireAdmin><Admin /></RequireAdmin>} />
           <Route path="/me" element={<RequireAuth><Me /></RequireAuth>} />
+          <Route path="/settings" element={<RequireAuth><Settings /></RequireAuth>} />
           <Route path="/speech-test" element={<RequireAuth><SpeechDiagnostic /></RequireAuth>} />
         </Routes>
       </main>

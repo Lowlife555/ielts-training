@@ -26,7 +26,7 @@ export default function AcceptanceTest() {
   const [userInput, setUserInput] = useState('');
   const [results, setResults] = useState([]); // 每词结果（correct=最终，firstTry=首试）
   const resultsRef = useRef([]);
-  const [roundWrongIds, setRoundWrongIds] = useState([]); // 本轮拼错的词
+  const roundPassedRef = useRef(new Set()); // 本轮已答对的词 id（重测轮次剔除用）
   const [feedback, setFeedback] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const inputRef = useRef(null);
@@ -69,10 +69,9 @@ export default function AcceptanceTest() {
     const isCorrect = userInput.trim().toLowerCase() === currentWord.word.toLowerCase();
     setFeedback(isCorrect ? 'correct' : 'incorrect');
 
-    let newWrongIds = roundWrongIds;
-    if (!isCorrect && !newWrongIds.includes(currentWord.wordId)) {
-      newWrongIds = [...newWrongIds, currentWord.wordId];
-      setRoundWrongIds(newWrongIds);
+    // 答对的词记入本轮已通过集合（重测轮次剔除用）
+    if (isCorrect) {
+      roundPassedRef.current.add(currentWord.wordId);
     }
 
     setResults(prev => {
@@ -95,11 +94,10 @@ export default function AcceptanceTest() {
 
     setTimeout(() => {
       if (currentIndex + 1 >= words.length) {
-        if (newWrongIds.length > 0) {
-          // 本轮有错词：只重测错词，直到全部拼对
-          const retryWords = words.filter(w => newWrongIds.includes(w.wordId));
+        // 下一轮只重测本轮未通过的词（已通过的直接剔除）
+        const retryWords = words.filter(w => !roundPassedRef.current.has(w.wordId));
+        if (retryWords.length > 0) {
           setWords(retryWords);
-          setRoundWrongIds([]);
           setRound(r => r + 1);
           setCurrentIndex(0);
           setUserInput('');
@@ -116,7 +114,7 @@ export default function AcceptanceTest() {
         inputRef.current?.focus();
       }
     }, 800);
-  }, [userInput, feedback, currentIndex, currentWord, words, round, roundWrongIds, submitting, finish]);
+  }, [userInput, feedback, currentIndex, currentWord, words, round, submitting, finish]);
 
   const abandon = useCallback(async () => {
     if (submitting) return;

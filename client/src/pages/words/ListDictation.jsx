@@ -4,6 +4,7 @@ import { api } from '../../utils/api';
 import { useApp } from '../../context/AppContext';
 import { useKeyboard } from '../../hooks/useKeyboard';
 import { speak } from '../../utils/speech';
+import { checkAnswer } from '../../utils/checkAnswer';
 import Loading from '../../components/ui/Loading';
 import { ArrowLeft, Volume2, CheckCircle, XCircle, RotateCcw, Trophy } from 'lucide-react';
 
@@ -12,30 +13,6 @@ const COUNT_OPTIONS = [
   { value: 50, label: '50 词' },
   { value: 100, label: '100 词' },
 ];
-
-function cleanKw(k) {
-  return k.replace(/^[a-z]+\.\s*/i, '')
-    .replace(/[，,。;；、()（）<>《》「」"'“”]/g, '')
-    .trim();
-}
-
-function fallbackKeywords(def) {
-  return def.split(/[;；,，、]/)
-    .map(cleanKw)
-    .filter(k => k.length >= 2);
-}
-
-// 关键词自动判分:输入包含任一核心义项词即算对(宽松判,多义词不误判)
-function checkAnswer(input, keywords, chineseDefinition) {
-  const clean = input.replace(/\s+/g, '').replace(/[，,。;；、()（）<>《》「」"'“”]/g, '');
-  if (!clean) return false;
-  const kws = (keywords && keywords.length > 0) ? keywords : fallbackKeywords(chineseDefinition || '');
-  for (const k of kws) {
-    const ck = cleanKw(k);
-    if (ck.length >= 2 && clean.includes(ck)) return true;
-  }
-  return false;
-}
 
 export default function ListDictation() {
   const { listNo } = useParams();
@@ -46,8 +23,8 @@ export default function ListDictation() {
   const [round, setRound] = useState(1);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [userInput, setUserInput] = useState('');
-  const [results, setResults] = useState([]);
-  const [roundWrongIds, setRoundWrongIds] = useState([]);
+  const [results, setResults] = useState([]); // 每词结果（correct=最终，firstTry=首试）
+  const roundPassedRef = useRef(new Set()); // 本轮已答对的词 id（跨轮次累积通过词，用于剔除重测）
   const [feedback, setFeedback] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedCount, setSelectedCount] = useState(0);
@@ -74,7 +51,7 @@ export default function ListDictation() {
     setRound(1);
     setCurrentIndex(0);
     setResults([]);
-    setRoundWrongIds([]);
+    roundPassedRef.current = new Set();
     setFeedback(null);
     setUserInput('');
     setFinished(false);
@@ -89,10 +66,9 @@ export default function ListDictation() {
     const isCorrect = checkAnswer(userInput, currentWord.keywords, currentWord.chineseDefinition);
     setFeedback(isCorrect ? 'correct' : 'incorrect');
 
-    let newWrongIds = roundWrongIds;
-    if (!isCorrect && !newWrongIds.includes(currentWord.id)) {
-      newWrongIds = [...newWrongIds, currentWord.id];
-      setRoundWrongIds(newWrongIds);
+    // 答对的词记入本轮已通过集合（重测轮次剔除用）
+    if (isCorrect) {
+      roundPassedRef.current.add(currentWord.id);
     }
 
     setResults(prev => {
@@ -120,10 +96,10 @@ export default function ListDictation() {
 
     setTimeout(() => {
       if (currentIndex + 1 >= testWords.length) {
-        if (newWrongIds.length > 0) {
-          const retryWords = testWords.filter(w => newWrongIds.includes(w.id));
+        // 下一轮只重测本轮未通过的词（已通过的直接剔除）
+        const retryWords = testWords.filter(w => !roundPassedRef.current.has(w.id));
+        if (retryWords.length > 0) {
           setTestWords(retryWords);
-          setRoundWrongIds([]);
           setRound(r => r + 1);
           setCurrentIndex(0);
           setUserInput('');
@@ -140,7 +116,7 @@ export default function ListDictation() {
         inputRef.current?.focus();
       }
     }, 800);
-  }, [userInput, feedback, currentIndex, currentWord, testWords, roundWrongIds, submitting, listNo]);
+  }, [userInput, feedback, currentIndex, currentWord, testWords, submitting, listNo]);
 
   useKeyboard({
     'Enter': () => { if (started) submitAnswer(); },

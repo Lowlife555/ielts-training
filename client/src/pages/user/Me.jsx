@@ -4,7 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { useTouch } from '../../context/TouchContext';
 import { useApp } from '../../context/AppContext';
-import { Shield, Sun, Moon, Smartphone, Monitor, LogOut, Check, FlaskConical } from 'lucide-react';
+import { Shield, Sun, Moon, Smartphone, Monitor, LogOut, Check, FlaskConical, Settings as SettingsIcon } from 'lucide-react';
 
 export default function Me() {
   const { user, logout } = useAuth();
@@ -109,8 +109,19 @@ export default function Me() {
         </Row>
 
         <Row icon={<Monitor className="w-4 h-4 text-indigo-600" />} label="版本">
-          <span className="text-xs text-gray-400">v5.4</span>
+          <span className="text-xs text-gray-400">v7.2</span>
         </Row>
+
+        <Link
+          to="/settings"
+          className="flex items-center justify-between px-5 py-4 border-b border-gray-100 hover:bg-gray-50 transition-colors"
+        >
+          <span className="flex items-center gap-2.5 text-sm text-gray-700">
+            <SettingsIcon className="w-4 h-4 text-gray-500" />
+            设置
+          </span>
+          <span className="text-xs text-gray-400">读音/音标/番茄钟 →</span>
+        </Link>
       </div>
 
       {/* 退出 */}

@@ -50,7 +50,7 @@ function ModeSwitcher({ plan, onSaved }) {
       <div className="flex flex-wrap items-center gap-3">
         <div className="flex rounded-lg border border-gray-200 overflow-hidden">
           <button
-            onClick={() => !custom && save('sequential')}
+            onClick={() => save('sequential')}
             className={`px-4 py-2 text-sm font-medium transition-colors ${
               !custom ? 'bg-indigo-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'
             }`}
@@ -58,7 +58,7 @@ function ModeSwitcher({ plan, onSaved }) {
             顺序模式
           </button>
           <button
-            onClick={() => custom && save('custom', pick)}
+            onClick={() => save('custom', pick)}
             className={`px-4 py-2 text-sm font-medium transition-colors ${
               custom ? 'bg-indigo-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'
             }`}

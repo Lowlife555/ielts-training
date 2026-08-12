@@ -5,11 +5,18 @@ const { requireAuth } = require('../auth');
 
 router.use(requireAuth);
 
-const BASE_TARGET_MINUTES = 60;
+const BASE_TARGET_MINUTES = 60; // 默认，用户可在设置中修改（见 getUserBaseTarget）
 const MAX_TARGET_MINUTES = 120; // 单日上限 2 小时
 const PENALTY_MINUTES = 30;
 const CLEAR_DEBT_SECONDS = 2 * 3600; // 练满 2 小时视为欠债全部结清
 const GRACE_MINUTES = 15; // 目标时长 - 15 分钟内不算欠训
+
+/** 用户设置的基础目标时长（测试账号恒 60） */
+function getUserBaseTarget(db, req) {
+  if (req.user.isTest) return BASE_TARGET_MINUTES;
+  const s = db.prepare('SELECT base_target_minutes FROM user_settings WHERE user_id = ?').get(req.user.id);
+  return s && s.base_target_minutes ? s.base_target_minutes : BASE_TARGET_MINUTES;
+}
 
 function dateString(offsetDays = 0) {
   const d = new Date();
@@ -46,7 +53,7 @@ function aggregateDay(sessions) {
  *  - 练满 2 小时：欠债全部结清，次日回到 60 分钟
  *  - 首次训练记录之前的日期不累计欠债
  */
-function computeDebtChain(db, userId) {
+function computeDebtChain(db, userId, baseTargetMinutes = BASE_TARGET_MINUTES) {
   const first = db.prepare(`
     SELECT MIN(session_date) as d FROM daily_sessions WHERE user_id = ?
   `).get(userId);
@@ -65,7 +72,7 @@ function computeDebtChain(db, userId) {
     const date = t.toISOString().slice(0, 10);
     const sessions = getDaySessions(db, userId, date);
     const agg = aggregateDay(sessions);
-    const target = Math.min(BASE_TARGET_MINUTES + debt, MAX_TARGET_MINUTES);
+    const target = Math.min(baseTargetMinutes + debt, MAX_TARGET_MINUTES);
 
     let nextDebt;
     if (agg.trainedSeconds >= CLEAR_DEBT_SECONDS) {
@@ -108,9 +115,10 @@ router.get('/', (req, res) => {
   let targetMinutes = BASE_TARGET_MINUTES;
   let reason = req.user.isTest ? '测试账号：目标恒 60 分钟，永不欠债' : null;
   if (!req.user.isTest) {
-    const chain = computeDebtChain(db, userId);
+    const baseTarget = getUserBaseTarget(db, req);
+    const chain = computeDebtChain(db, userId, baseTarget);
     debt = chain.debt;
-    targetMinutes = Math.min(BASE_TARGET_MINUTES + debt, MAX_TARGET_MINUTES);
+    targetMinutes = Math.min(baseTarget + debt, MAX_TARGET_MINUTES);
     reason = buildReason(chain.yesterday);
   }
 
@@ -264,8 +272,9 @@ router.get('/status', (req, res) => {
   const today = dateString();
 
   const isTest = req.user.isTest;
-  const debt = isTest ? 0 : computeDebtChain(db, userId).debt;
-  const targetMinutes = isTest ? BASE_TARGET_MINUTES : Math.min(BASE_TARGET_MINUTES + debt, MAX_TARGET_MINUTES);
+  const baseTarget = isTest ? BASE_TARGET_MINUTES : getUserBaseTarget(db, req);
+  const debt = isTest ? 0 : computeDebtChain(db, userId, baseTarget).debt;
+  const targetMinutes = isTest ? BASE_TARGET_MINUTES : Math.min(baseTarget + debt, MAX_TARGET_MINUTES);
 
   const sessions = getDaySessions(db, userId, today);
   const agg = aggregateDay(sessions);

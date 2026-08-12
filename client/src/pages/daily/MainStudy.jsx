@@ -5,43 +5,23 @@ import { useApp } from '../../context/AppContext';
 import { useKeyboard } from '../../hooks/useKeyboard';
 import { useElapsed } from '../../hooks/useTimer';
 import { speak } from '../../utils/speech';
+import { checkAnswer } from '../../utils/checkAnswer';
 import TrainingTimer from '../../components/training/TrainingTimer';
-import { Volume2, Check, X, Play, Coffee, Timer } from 'lucide-react';
+import FlipCard from '../../components/ui/FlipCard';
+import { useSettings } from '../../context/SettingsContext';
+import { Check, X, Play, Coffee, Timer, Volume2 } from 'lucide-react';
 
-const REST_SECONDS = 5 * 60;
 const TIME_UP_BUFFER = 10 * 60; // 剩余不足 10 分钟不再开始新批次
-
-function cleanKw(k) {
-  return k.replace(/^[a-z]+\.\s*/i, '')
-    .replace(/[，,。;；、()（）<>《》「」"'“”]/g, '')
-    .trim();
-}
-
-function fallbackKeywords(def) {
-  return def.split(/[;；,，、]/)
-    .map(cleanKw)
-    .filter(k => k.length >= 2);
-}
-
-// 关键词自动判分:输入包含任一核心义项词即算对(宽松判,多义词不误判)
-function checkAnswer(input, keywords, chineseDefinition) {
-  const clean = input.replace(/\s+/g, '').replace(/[，,。;；、()（）<>《》「」"'“”]/g, '');
-  if (!clean) return false;
-  const kws = (keywords && keywords.length > 0) ? keywords : fallbackKeywords(chineseDefinition || '');
-  for (const k of kws) {
-    const ck = cleanKw(k);
-    if (ck.length >= 2 && clean.includes(ck)) return true;
-  }
-  return false;
-}
 
 export default function MainStudy() {
   const navigate = useNavigate();
   const location = useLocation();
   const { showToast } = useApp();
+  const { settings } = useSettings();
   const session = location.state?.session;
   const plan = location.state?.plan;
   const batchSize = session?.batchSize || location.state?.batchSize || 30;
+  const restMinutes = settings?.restMinutes || 5;
 
   const allWords = session?.words || [];
 
@@ -59,7 +39,7 @@ export default function MainStudy() {
   const currentBatch = batches[batchIndex] || [];
 
   // 单词表状态
-  const [expanded, setExpanded] = useState(new Set());
+  const [flippedSet, setFlippedSet] = useState(new Set()); // 已翻到背面(隐藏释义)的单词
   const [marked, setMarked] = useState({});
 
   // 默写状态
@@ -68,10 +48,10 @@ export default function MainStudy() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [userInput, setUserInput] = useState('');
   const [feedback, setFeedback] = useState(null);
-  const [roundWrongIds, setRoundWrongIds] = useState([]);
+  const roundPassedRef = useRef(new Set()); // 本轮已答对的词 id（重测轮次剔除用）
 
   // 休息状态
-  const [restLeft, setRestLeft] = useState(REST_SECONDS);
+  const [restLeft, setRestLeft] = useState(5 * 60);
   const [restRunning, setRestRunning] = useState(false);
 
   const [abandoning, setAbandoning] = useState(false);
@@ -133,7 +113,7 @@ export default function MainStudy() {
       goCheck();
     } else {
       setPhase('rest');
-      setRestLeft(REST_SECONDS);
+      setRestLeft(restMinutes * 60);
       setRestRunning(true);
     }
   }, [batchIndex, batches.length, timeUp, goCheck]);
@@ -146,7 +126,7 @@ export default function MainStudy() {
     }
     setBatchIndex(i => i + 1);
     setPhase('wordtable');
-    setExpanded(new Set());
+    setFlippedSet(new Set());
     setMarked({});
   }, [plan, elapsed, goCheck]);
 
@@ -164,10 +144,9 @@ export default function MainStudy() {
     const isCorrect = checkAnswer(userInput, currentDictWord.keywords, currentDictWord.chineseDefinition);
     setFeedback(isCorrect ? 'correct' : 'incorrect');
 
-    let newWrongIds = roundWrongIds;
-    if (!isCorrect && !newWrongIds.includes(currentDictWord.id)) {
-      newWrongIds = [...newWrongIds, currentDictWord.id];
-      setRoundWrongIds(newWrongIds);
+    // 答对的词记入本轮已通过集合（重测轮次剔除用）
+    if (isCorrect) {
+      roundPassedRef.current.add(currentDictWord.id);
     }
 
     // 首试统计
@@ -188,10 +167,10 @@ export default function MainStudy() {
 
     setTimeout(() => {
       if (currentIndex + 1 >= dictWords.length) {
-        if (newWrongIds.length > 0) {
-          const retryWords = dictWords.filter(w => newWrongIds.includes(w.id));
+        // 下一轮只重测本轮未通过的词（已通过的直接剔除）
+        const retryWords = dictWords.filter(w => !roundPassedRef.current.has(w.id));
+        if (retryWords.length > 0) {
           setDictWords(retryWords);
-          setRoundWrongIds([]);
           setRound(r => r + 1);
           setCurrentIndex(0);
           setUserInput('');
@@ -207,14 +186,14 @@ export default function MainStudy() {
         inputRef.current?.focus();
       }
     }, 800);
-  }, [userInput, feedback, currentDictWord, dictWords, roundWrongIds, currentIndex, batchDictationDone, session]);
+  }, [userInput, feedback, currentDictWord, dictWords, currentIndex, batchDictationDone, session]);
 
   // 开始默写本批
   const startDictation = () => {
     setDictWords(currentBatch);
     setRound(1);
     setCurrentIndex(0);
-    setRoundWrongIds([]);
+    roundPassedRef.current = new Set();
     setUserInput('');
     setFeedback(null);
     setPhase('dictation');
@@ -256,7 +235,7 @@ export default function MainStudy() {
 
   // ===== 单词表阶段 =====
   if (phase === 'wordtable') {
-    const showAllMeaning = expanded.size >= currentBatch.length && currentBatch.length > 0;
+    const showAllMeaning = flippedSet.size >= currentBatch.length && currentBatch.length > 0;
     const startIndex = batchIndex * batchSize;
     return (
       <div className="max-w-2xl mx-auto px-4 py-8">
@@ -282,86 +261,64 @@ export default function MainStudy() {
         <div className="text-center mb-6">
           <h1 className="text-2xl font-bold text-gray-900 mb-1">本批背诵单词</h1>
           <p className="text-sm text-gray-500">
-            <span className="kbd-hint">点击卡片查看释义 · 1/2 键标记会/不会（仅记录）· 标记后点「开始背诵」</span>
-            <span className="touch-hint hidden">点击卡片查看释义 · 标记会/不会后点「开始背诵」</span>
+            <span className="kbd-hint">先看释义回忆单词，点击卡片翻卡核对 · 1/2 键标记会/不会（仅记录）· 标记后点「开始背诵」</span>
+            <span className="touch-hint hidden">点卡片翻卡核对 · 标记会/不会后点「开始背诵」</span>
           </p>
           <button
             onClick={() => {
-              if (showAllMeaning) setExpanded(new Set());
-              else setExpanded(new Set(currentBatch.map(w => w.id)));
+              if (showAllMeaning) setFlippedSet(new Set());
+              else setFlippedSet(new Set(currentBatch.map(w => w.id)));
             }}
             className="mt-3 text-sm font-medium px-3 py-2 rounded-lg border-2 border-gray-200 text-gray-600 hover:border-gray-300"
           >
-            {showAllMeaning ? '隐藏全部释义' : '显示全部释义'}
+            {showAllMeaning ? '显示全部释义' : '隐藏全部释义'}
           </button>
         </div>
 
         <div className="space-y-2 mb-6">
           {currentBatch.map((word, idx) => {
-            const isExpanded = expanded.has(word.id);
+            const isFlipped = flippedSet.has(word.id);
             const isMarked = marked[word.id] === true;
             const isNotMarked = marked[word.id] === false;
-            const meaningText = Array.isArray(word.meanings) && word.meanings.length > 0
-              ? word.meanings.join('；')
-              : word.chineseDefinition;
             return (
-              <div
-                key={word.id}
-                className={`card cursor-pointer transition-colors ${isMarked ? 'border-green-300 bg-green-50/50' : isNotMarked ? 'border-red-200 bg-red-50/40' : ''}`}
-                onClick={() => {
-                  setExpanded(prev => {
-                    const next = new Set(prev);
-                    if (next.has(word.id)) next.delete(word.id);
-                    else next.add(word.id);
-                    return next;
-                  });
-                }}
-              >
-                <div className="flex items-center justify-between py-1">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className="text-sm text-gray-400 w-8">{startIndex + idx + 1}.</span>
-                      <span className="text-lg font-semibold text-gray-900">{word.word}</span>
-                      <span className="text-sm text-gray-400">{word.phonetic}</span>
-                      {word.partOfSpeech && (
-                        <span className="text-xs px-1.5 py-0.5 bg-indigo-50 text-indigo-600 rounded">{word.partOfSpeech}</span>
-                      )}
+              <div key={word.id} className={`relative ${isMarked ? 'border-2 border-green-300 rounded-xl' : isNotMarked ? 'border-2 border-red-200 rounded-xl' : ''}`}>
+                <span className="absolute -top-2 left-2 text-[10px] text-gray-400 bg-gray-50 px-1 rounded z-10">{startIndex + idx + 1}.</span>
+                <FlipCard
+                  word={word}
+                  flipped={isFlipped}
+                  onClick={() => {
+                    setFlippedSet(prev => {
+                      const next = new Set(prev);
+                      if (next.has(word.id)) next.delete(word.id);
+                      else next.add(word.id);
+                      return next;
+                    });
+                  }}
+                  showMarked={(w) => (
+                    <>
                       {isMarked && <span className="text-xs px-1.5 py-0.5 bg-green-100 text-green-700 rounded">会</span>}
                       {isNotMarked && <span className="text-xs px-1.5 py-0.5 bg-red-100 text-red-500 rounded">不会</span>}
-                    </div>
-                    {isExpanded ? (
-                      <p className="text-sm text-gray-700 ml-8 mt-1">{meaningText}</p>
-                    ) : (
-                      <p className="text-sm text-gray-400 ml-8">
-                        <span className="kbd-hint">点击查看释义</span>
-                        <span className="touch-hint hidden">点按展开释义</span>
-                      </p>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-1 ml-3">
-                    <button
-                      onClick={(e) => { e.stopPropagation(); speak(word.word); }}
-                      className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
-                      title="朗读 (Space)"
-                    >
-                      <Volume2 className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={(e) => { e.stopPropagation(); setMarked(m => ({ ...m, [word.id]: true })); }}
-                      className={`p-2 rounded-lg transition-colors ${isMarked ? 'bg-green-100 text-green-600' : 'text-gray-400 hover:bg-green-50'}`}
-                      title="会 (1)"
-                    >
-                      <Check className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={(e) => { e.stopPropagation(); setMarked(m => ({ ...m, [word.id]: false })); }}
-                      className={`p-2 rounded-lg transition-colors ${isNotMarked ? 'bg-red-100 text-red-500' : 'text-gray-400 hover:bg-red-50'}`}
-                      title="不会 (2)"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
+                    </>
+                  )}
+                  markNode={
+                    <>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); setMarked(m => ({ ...m, [word.id]: true })); }}
+                        className={`p-2 rounded-lg transition-colors ${isMarked ? 'bg-green-100 text-green-600' : 'text-gray-400 hover:bg-green-50'}`}
+                        title="会 (1)"
+                      >
+                        <Check className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); setMarked(m => ({ ...m, [word.id]: false })); }}
+                        className={`p-2 rounded-lg transition-colors ${isNotMarked ? 'bg-red-100 text-red-500' : 'text-gray-400 hover:bg-red-50'}`}
+                        title="不会 (2)"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </>
+                  }
+                />
               </div>
             );
           })}
@@ -381,7 +338,7 @@ export default function MainStudy() {
             · <kbd className="px-1.5 py-0.5 bg-gray-100 border rounded">Space</kbd> 朗读
             · <kbd className="px-1.5 py-0.5 bg-gray-100 border rounded">Esc</kbd> 收工
           </span>
-          <span className="touch-hint hidden">点卡片看释义 · 标记会/不会 · 开始背诵</span>
+          <span className="touch-hint hidden">点卡片翻卡 · 标记会/不会 · 开始背诵</span>
         </p>
       </div>
     );
@@ -408,7 +365,7 @@ export default function MainStudy() {
           <div className="text-6xl mb-4"><Coffee /></div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">休息一下</h1>
           <p className="text-gray-500 mb-6">
-            第 {batchIndex + 1} 批完成，休息 5 分钟（不计入训练时长）
+            第 {batchIndex + 1} 批完成，休息 {restMinutes} 分钟（不计入训练时长）
           </p>
           <div className="text-6xl font-mono font-bold text-amber-600 mb-8">
             {mm}:{ss}
@@ -425,7 +382,7 @@ export default function MainStudy() {
             <kbd className="px-1.5 py-0.5 bg-gray-100 border rounded">Enter</kbd> 跳过休息
             · <kbd className="px-1.5 py-0.5 bg-gray-100 border rounded">Esc</kbd> 收工
           </span>
-          <span className="touch-hint hidden">休息 5 分钟或点按钮继续</span>
+          <span className="touch-hint hidden">休息 {restMinutes} 分钟或点按钮继续</span>
         </p>
       </div>
     );
