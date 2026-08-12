@@ -192,9 +192,11 @@ router.get('/', (req, res) => {
     const cnt = db.prepare('SELECT COUNT(*) as cnt FROM words WHERE is_extra=0 AND list_no = ?').get(dueList.list_no);
     const spotCount = Math.min(30, cnt.cnt);
     const words = db.prepare(`
-      SELECT id, word, phonetic, part_of_speech, chinese_definition
-      FROM words
-      WHERE is_extra = 0 AND list_no = ?
+      SELECT w.id, w.word, w.phonetic, w.part_of_speech, w.chinese_definition,
+             wm.keywords, wm.synonyms
+      FROM words w
+      LEFT JOIN word_meanings wm ON wm.word_id = w.id
+      WHERE w.is_extra = 0 AND w.list_no = ?
       ORDER BY RANDOM()
       LIMIT ?
     `).all(dueList.list_no, spotCount);
@@ -205,20 +207,26 @@ router.get('/', (req, res) => {
       words: words.map(w => ({
         wordId: w.id, word: w.word, phonetic: w.phonetic,
         partOfSpeech: w.part_of_speech, chineseDefinition: w.chinese_definition,
+        keywords: parseJson(w.keywords) || [],
+        synonyms: parseJson(w.synonyms) || [],
       })),
     };
   }
 
   // PET 热身词（不计时不计分）
   const petWords = db.prepare(`
-    SELECT id, word, phonetic, part_of_speech, chinese_definition
-    FROM words
-    WHERE level = 'pet' AND is_extra = 0
+    SELECT w.id, w.word, w.phonetic, w.part_of_speech, w.chinese_definition,
+           wm.keywords, wm.synonyms
+    FROM words w
+    LEFT JOIN word_meanings wm ON wm.word_id = w.id
+    WHERE w.level = 'pet' AND w.is_extra = 0
     ORDER BY RANDOM()
     LIMIT 10
   `).all().map(w => ({
     wordId: w.id, word: w.word, phonetic: w.phonetic,
     partOfSpeech: w.part_of_speech, chineseDefinition: w.chinese_definition,
+    keywords: parseJson(w.keywords) || [],
+    synonyms: parseJson(w.synonyms) || [],
   }));
 
   // 今日已训练状态
@@ -350,9 +358,11 @@ router.get('/test-spot-check', (req, res) => {
 
   const spotCount = Math.min(30, cnt.cnt);
   const words = db.prepare(`
-    SELECT id, word, phonetic, part_of_speech, chinese_definition
-    FROM words
-    WHERE is_extra = 0 AND list_no = ?
+    SELECT w.id, w.word, w.phonetic, w.part_of_speech, w.chinese_definition,
+           wm.keywords, wm.synonyms
+    FROM words w
+    LEFT JOIN word_meanings wm ON wm.word_id = w.id
+    WHERE w.is_extra = 0 AND w.list_no = ?
     ORDER BY RANDOM()
     LIMIT ?
   `).all(listNo, spotCount);
@@ -373,6 +383,8 @@ router.get('/test-spot-check', (req, res) => {
       words: words.map(w => ({
         wordId: w.id, word: w.word, phonetic: w.phonetic,
         partOfSpeech: w.part_of_speech, chineseDefinition: w.chinese_definition,
+        keywords: parseJson(w.keywords) || [],
+        synonyms: parseJson(w.synonyms) || [],
       })),
     },
   });
@@ -418,6 +430,11 @@ router.post('/spot-check', (req, res) => {
 
   res.json({ ok: true, listNo, total, correct, accuracy, passed });
 });
+
+function parseJson(str) {
+  if (!str) return null;
+  try { return JSON.parse(str); } catch { return null; }
+}
 
 module.exports = router;
 module.exports.computeDebtChain = computeDebtChain;

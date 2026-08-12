@@ -5,7 +5,7 @@ import { useApp } from '../../context/AppContext';
 import { useKeyboard } from '../../hooks/useKeyboard';
 import { useTouch } from '../../context/TouchContext';
 import { speak } from '../../utils/speech';
-import { checkAnswer } from '../../utils/checkAnswer';
+import { checkEnglishAnswer, checkChineseAnswer } from '../../utils/answerCheck';
 import { Volume2, ChevronLeft, ChevronRight, CheckCircle, XCircle } from 'lucide-react';
 
 /**
@@ -67,11 +67,11 @@ export default function PetWarmup() {
     submitLockRef.current = true;
     let isCorrect;
     if (isCeMode) {
-      // 中译英：拼写判分（忽略大小写）
-      isCorrect = userInput.trim().toLowerCase() === currentWord.word.toLowerCase();
+      // 中译英：拼写判分（词形变化 + 编辑距离≤1 容错）
+      isCorrect = checkEnglishAnswer(userInput, currentWord.word);
     } else {
-      // 英译中：关键词判分
-      isCorrect = checkAnswer(userInput, currentWord.keywords, currentWord.chineseDefinition);
+      // 英译中：关键词 + 近义词判分
+      isCorrect = checkChineseAnswer(userInput, currentWord.keywords, currentWord.synonyms, currentWord.chineseDefinition, { allowSynonym: true });
     }
     setFeedback(isCorrect ? 'correct' : 'incorrect');
     feedbackShownAtRef.current = Date.now();

@@ -22,7 +22,7 @@ router.post('/start', (req, res) => {
 
   const listWords = db.prepare(`
     SELECT w.id, w.word, w.phonetic, w.part_of_speech, w.chinese_definition,
-           wm.meanings, wm.keywords
+           wm.meanings, wm.keywords, wm.synonyms
     FROM words w
     LEFT JOIN word_meanings wm ON wm.word_id = w.id
     WHERE w.is_extra = 0 AND w.list_no = ?
@@ -64,6 +64,7 @@ router.post('/start', (req, res) => {
     chineseDefinition: w.chinese_definition,
     meanings: parseJson(w.meanings) || [w.chinese_definition],
     keywords: parseJson(w.keywords) || [],
+    synonyms: parseJson(w.synonyms) || [],
   });
 
   res.json({

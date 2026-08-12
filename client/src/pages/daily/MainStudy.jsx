@@ -5,7 +5,7 @@ import { useApp } from '../../context/AppContext';
 import { useKeyboard } from '../../hooks/useKeyboard';
 import { useElapsed } from '../../hooks/useTimer';
 import { speak } from '../../utils/speech';
-import { checkAnswer } from '../../utils/checkAnswer';
+import { checkChineseAnswer } from '../../utils/answerCheck';
 import TrainingTimer from '../../components/training/TrainingTimer';
 import FlipCard from '../../components/ui/FlipCard';
 import { useSettings } from '../../context/SettingsContext';
@@ -141,7 +141,7 @@ export default function MainStudy() {
   const submitDictation = useCallback(() => {
     if (feedback || !userInput.trim() || !currentDictWord) return;
 
-    const isCorrect = checkAnswer(userInput, currentDictWord.keywords, currentDictWord.chineseDefinition);
+    const isCorrect = checkChineseAnswer(userInput, currentDictWord.keywords, currentDictWord.synonyms, currentDictWord.chineseDefinition, { allowSynonym: true });
     setFeedback(isCorrect ? 'correct' : 'incorrect');
 
     // 答对的词记入本轮已通过集合（重测轮次剔除用）

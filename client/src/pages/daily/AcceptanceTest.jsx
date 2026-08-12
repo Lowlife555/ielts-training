@@ -7,6 +7,7 @@ import { useElapsed } from '../../hooks/useTimer';
 import TrainingTimer from '../../components/training/TrainingTimer';
 import { CheckCircle, XCircle, Volume2 } from 'lucide-react';
 import { speak } from '../../utils/speech';
+import { checkEnglishAnswer } from '../../utils/answerCheck';
 
 export default function AcceptanceTest() {
   const navigate = useNavigate();
@@ -66,7 +67,7 @@ export default function AcceptanceTest() {
 
   const submitAnswer = useCallback(() => {
     if (feedback || !userInput.trim() || submitting) return;
-    const isCorrect = userInput.trim().toLowerCase() === currentWord.word.toLowerCase();
+    const isCorrect = checkEnglishAnswer(userInput, currentWord.word, { allowMorph: true, allowEdit: false });
     setFeedback(isCorrect ? 'correct' : 'incorrect');
 
     // 答对的词记入本轮已通过集合（重测轮次剔除用）

@@ -4,7 +4,7 @@ import { api } from '../../utils/api';
 import { useApp } from '../../context/AppContext';
 import { useKeyboard } from '../../hooks/useKeyboard';
 import { speak } from '../../utils/speech';
-import { checkAnswer } from '../../utils/checkAnswer';
+import { checkChineseAnswer } from '../../utils/answerCheck';
 import Loading from '../../components/ui/Loading';
 import { ArrowLeft, Volume2, CheckCircle, XCircle, RotateCcw, Trophy } from 'lucide-react';
 
@@ -63,7 +63,7 @@ export default function ListDictation() {
   const submitAnswer = useCallback(() => {
     if (feedback || !userInput.trim() || submitting || !currentWord) return;
 
-    const isCorrect = checkAnswer(userInput, currentWord.keywords, currentWord.chineseDefinition);
+    const isCorrect = checkChineseAnswer(userInput, currentWord.keywords, currentWord.synonyms, currentWord.chineseDefinition, { allowSynonym: true });
     setFeedback(isCorrect ? 'correct' : 'incorrect');
 
     // 答对的词记入本轮已通过集合（重测轮次剔除用）

@@ -5,6 +5,7 @@ import { useApp } from '../../context/AppContext';
 import { useKeyboard } from '../../hooks/useKeyboard';
 import { useElapsed } from '../../hooks/useTimer';
 import { speak } from '../../utils/speech';
+import { checkEnglishAnswer } from '../../utils/answerCheck';
 import TrainingTimer from '../../components/training/TrainingTimer';
 import { Volume2, CheckCircle, XCircle, Target, Home, RotateCcw } from 'lucide-react';
 
@@ -54,7 +55,7 @@ export default function SpellCheck() {
 
   const submitAnswer = useCallback(() => {
     if (feedback || !userInput.trim() || submitting) return;
-    const isCorrect = userInput.trim().toLowerCase() === currentWord.word.toLowerCase();
+    const isCorrect = checkEnglishAnswer(userInput, currentWord.word, { allowMorph: true, allowEdit: false });
     setFeedback(isCorrect ? 'correct' : 'incorrect');
     setResults(prev => [...prev, { wordId: currentWord.id, correct: isCorrect, answer: userInput.trim() }]);
 

@@ -27,7 +27,7 @@ export function fallbackKeywords(def) {
   return String(def || '')
     .split(/[;；,，、/／|｜+＋]/)
     .map(cleanKw)
-    .filter(k => k.length >= 2);
+    .filter(k => k.length >= 1); // 允许单字（如释义"糖"→"糖"）
 }
 
 /**
@@ -50,9 +50,14 @@ export function checkAnswer(input, keywords, chineseDefinition) {
 
   for (const k of kws) {
     const ck = cleanKw(k);
-    if (ck.length < 2) continue;
+    if (!ck) continue;
 
-    // 双向包含：输入含关键词（"安静的"含"安静"）或关键词含输入（"位于" ⊂ "位于..."→"位于"）
+    // 单字关键词：仅精确匹配（如释义"糖"，输入"糖"才对，"糖水"不应命中"糖"的精确义）
+    if (ck.length === 1) {
+      if (cleanInput === ck) return true;
+      continue;
+    }
+    // 双字及以上：双向包含（输入含关键词（"安静的"含"安静"）或关键词含输入（"位于" ⊂ "位于..."→"位于"））
     if (cleanInput.includes(ck)) return true;
     if (ck.includes(cleanInput) && cleanInput.length >= 2) return true;
   }

@@ -4,6 +4,7 @@ import { api } from '../../utils/api';
 import { useKeyboard } from '../../hooks/useKeyboard';
 import { useApp } from '../../context/AppContext';
 import { speak as speakUtil } from '../../utils/speech';
+import { checkEnglishAnswer } from '../../utils/answerCheck';
 import Loading from '../../components/ui/Loading';
 import { ArrowLeft, Volume2, CheckCircle, XCircle, RotateCcw, Trophy } from 'lucide-react';
 
@@ -51,7 +52,7 @@ export default function SpellingTest() {
     if (!userInput.trim()) return;
 
     const currentWord = words[currentIndex];
-    const isCorrect = userInput.trim().toLowerCase() === currentWord.answer.toLowerCase();
+    const       isCorrect = checkEnglishAnswer(userInput, currentWord.answer);
 
     setFeedback(isCorrect ? 'correct' : 'incorrect');
     setResults(prev => [...prev, {

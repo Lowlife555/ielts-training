@@ -7,6 +7,7 @@ import { useElapsed, formatDuration } from '../../hooks/useTimer';
 import TrainingTimer from '../../components/training/TrainingTimer';
 import { CheckCircle, XCircle, Volume2 } from 'lucide-react';
 import { speak } from '../../utils/speech';
+import { checkEnglishAnswer } from '../../utils/answerCheck';
 
 export default function SpellingPractice() {
   const navigate = useNavigate();
@@ -34,7 +35,7 @@ export default function SpellingPractice() {
 
   const submitAnswer = useCallback(() => {
     if (feedback || !userInput.trim()) return;
-    const isCorrect = userInput.trim().toLowerCase() === currentWord.word.toLowerCase();
+    const isCorrect = checkEnglishAnswer(userInput, currentWord.word);
     setFeedback(isCorrect ? 'correct' : 'incorrect');
     const newResults = [...spellingResults, { wordId: currentWord.wordId, correct: isCorrect, answer: userInput.trim() }];
     setSpellingResults(newResults);

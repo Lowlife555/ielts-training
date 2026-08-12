@@ -4,6 +4,7 @@ import { api } from '../../utils/api';
 import { useKeyboard } from '../../hooks/useKeyboard';
 import { useApp } from '../../context/AppContext';
 import { speak as speakUtil } from '../../utils/speech';
+import { checkEnglishAnswer } from '../../utils/answerCheck';
 import Loading from '../../components/ui/Loading';
 import { ArrowLeft, Volume2, CheckCircle, XCircle, RotateCcw, Trophy } from 'lucide-react';
 
@@ -78,7 +79,7 @@ export default function MeaningTest() {
       userAnswer = selectedOptionId;
     } else {
       if (!userInput.trim()) return;
-      isCorrect = userInput.trim().toLowerCase() === currentWord.answer.toLowerCase();
+      isCorrect = checkEnglishAnswer(userInput, currentWord.answer);
       userAnswer = userInput.trim();
     }
 

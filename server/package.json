@@ -7,9 +7,9 @@
     "start": "node index.js",
     "dev": "nodemon index.js",
     "migrate": "node db/migrate.js",
-    "migrate:all": "node db/migrate.js && node db/migrate_v4.js && node db/migrate_v5.js && node db/migrate_v9.js && node db/migrate_v10.js && node db/migrate_v11.js && node db/migrate_v12.js && node db/migrate_v13.js && node db/migrate_v14.js && node db/migrate_v15.js",
+    "migrate:all": "node db/migrate.js && node db/migrate_v4.js && node db/migrate_v5.js && node db/migrate_v9.js && node db/migrate_v10.js && node db/migrate_v11.js && node db/migrate_v12.js && node db/migrate_v13.js && node db/migrate_v14.js && node db/migrate_v15.js && node db/migrate_v16.js && node db/migrate_v17.js",
     "seed": "node db/seed.js",
-    "setup": "node db/migrate.js && node db/seed.js && node db/migrate_v4.js && node db/migrate_v5.js && node db/migrate_v9.js && node db/migrate_v10.js && node db/migrate_v11.js && node db/migrate_v12.js && node db/migrate_v13.js && node db/migrate_v14.js && node db/migrate_v15.js"
+    "setup": "node db/migrate.js && node db/seed.js && node db/migrate_v4.js && node db/migrate_v5.js && node db/migrate_v9.js && node db/migrate_v10.js && node db/migrate_v11.js && node db/migrate_v12.js && node db/migrate_v13.js && node db/migrate_v14.js && node db/migrate_v15.js && node db/migrate_v16.js && node db/migrate_v17.js"
   },
   "keywords": [],
   "author": "",

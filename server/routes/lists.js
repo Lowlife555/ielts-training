@@ -40,7 +40,7 @@ router.get('/:listNo/words', (req, res) => {
 
   const words = db.prepare(`
     SELECT w.id, w.word, w.phonetic, w.part_of_speech, w.chinese_definition,
-           wm.meanings, wm.keywords,
+           wm.meanings, wm.keywords, wm.synonyms,
            uwp.mastered
     FROM words w
     LEFT JOIN word_meanings wm ON wm.word_id = w.id
@@ -64,6 +64,7 @@ router.get('/:listNo/words', (req, res) => {
       chineseDefinition: w.chinese_definition,
       meanings: parseJson(w.meanings) || [w.chinese_definition],
       keywords: parseJson(w.keywords) || [],
+      synonyms: parseJson(w.synonyms) || [],
       mastered: w.mastered || 0,
     })),
   });
