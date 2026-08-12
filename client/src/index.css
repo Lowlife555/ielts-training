@@ -64,12 +64,15 @@
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
 }
+/* 正反两面用 grid 同格堆叠：高度取两者较大值，背面不溢出、无滚动条 */
+.flip-card-inner {
+  display: grid;
+}
+.flip-face {
+  grid-area: 1 / 1;
+}
 .flip-back {
-  position: absolute;
-  inset: 0;
   transform: rotateY(180deg);
-  overflow-y: auto;
-  min-height: 100%;
 }
 .flip-front,
 .flip-back {
