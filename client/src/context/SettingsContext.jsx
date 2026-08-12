@@ -18,7 +18,7 @@ const SettingsContext = createContext(null);
 const KV_PREFIX = 'settings.';
 
 /**
- * v7.2.2: 设置数据迁移到 user_kv 存储（兼容后续迭代，无需再迁移表结构）。
+ * V7.2.2: 设置数据迁移到 user_kv 存储（兼容后续迭代，无需再迁移表结构）。
  * 旧 user_settings 表仅作回退读取（老数据无缝迁移），写入一律走 KV。
  */
 export function SettingsProvider({ children }) {

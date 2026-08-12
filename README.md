@@ -4,20 +4,33 @@
 
 ## 📅 版本记录
 
-> 每个版本的 README 均在此记录发布日期与开发 Agent。历史提交对应 git tag，可随时回滚。
+> 版本号采用 **V 主.次.补丁**（SemVer）语义：主版本=重大改版，次版本=新功能，补丁=修复。
+> 历史提交对应 git 提交（无独立 tag），可随时回滚。
 
 | 版本 | 日期 | 开发 Agent | 核心内容 |
 |------|------|-----------|---------|
-| v1.0 | 2026-08-05 | Claude Code + DeepSeek V4 | 初始版本：脚手架 + 数据库 + 14 API + 282 真题词 + 30 写作题 |
-| v2.0 | 2026-08-06 | Claude Code + DeepSeek V4 | 验收后修复：user_id 动态化、语音、空 catch 吞错、评分按钮颜色 |
-| v3.0 | 2026-08-06 | Claude Code + DeepSeek V4 | 每日单词训练系统（设置→单词卡→测验→订正→报告）+ 4237 词词库 |
-| v3.1 | 2026-08-06 | Claude Code + DeepSeek V4 | 修复语音发音：改用本地 Microsoft 离线语音（Google 远程被墙） |
-| v3.2 | 2026-08-06 | Claude Code + DeepSeek V4 | 交付前修复：PET/IELTS 词汇隔离、端口统一、反馈延时、自动保存等 |
-| v4.0-P0-1 | 2026-08-07 | Claude Code + DeepSeek V4 | 词库整理与导入：List 1-24 编号、释义三级补齐、list_no/is_extra 字段 |
-| v4.0-P0-2/3 | 2026-08-08 | opencode (deepseek-v4-flash-free) | 今日简报 + 每日训练流程重构（热身→英译中→错词死磕→中译英→验收）+ 时间盒与欠债系统 |
-| v4.0-P1-4 | 2026-08-08 | opencode (deepseek-v4-flash-free) | 抽查机制：背完 3-4 天后随机抽查 30 词，≥80% 通过，不达标标记待重背次日优先 |
-| v4.0-P1-5 | 2026-08-08 | opencode (deepseek-v4-flash-free) | 释义深度扩充：DeepSeek 批量处理 756 词，全部 IELTS 词 2+ 义项，脚本支持断点续跑 |
-| v5.0-P1 | 2026-08-08 | opencode (deepseek-v4-flash-free) | 用户系统：开放注册/登录（首个注册自动成为管理员并继承旧数据）、全路由数据隔离、Admin 管理面板（查看状态/重置密码/禁用账号）、标题 server(灰)/laptop(黄) 徽标 |
+| V1.0.0 | 2026-08-05 | Claude Code + DeepSeek V4 | 初始版本：脚手架 + 数据库 + 14 API + 282 真题词 + 30 写作题 |
+| V2.0.0 | 2026-08-06 | Claude Code + DeepSeek V4 | 验收后修复：user_id 动态化、语音、空 catch 吞错、评分按钮颜色 |
+| V3.0.0 | 2026-08-06 | Claude Code + DeepSeek V4 | 每日单词训练系统（设置→单词卡→测验→订正→报告）+ 4237 词词库 |
+| V3.0.1 | 2026-08-06 | Claude Code + DeepSeek V4 | 修复语音发音：改用本地 Microsoft 离线语音（Google 远程被墙） |
+| V3.0.2 | 2026-08-06 | Claude Code + DeepSeek V4 | 交付前修复：PET/IELTS 词汇隔离、端口统一、反馈延时、自动保存等 |
+| V4.0.0 | 2026-08-07 | Claude Code + DeepSeek V4 | 词库整理与导入：List 1-24 编号、释义三级补齐、list_no/is_extra 字段 |
+| V4.1.0 | 2026-08-08 | opencode (deepseek-v4-flash-free) | 今日简报 + 每日训练流程重构（热身→英译中→错词死磕→中译英→验收）+ 时间盒与欠债系统 |
+| V4.2.0 | 2026-08-08 | opencode (deepseek-v4-flash-free) | 抽查机制：背完 3-4 天后随机抽查 30 词，≥80% 通过，不达标标记待重背次日优先 |
+| V4.3.0 | 2026-08-08 | opencode (deepseek-v4-flash-free) | 释义深度扩充：DeepSeek 批量处理 756 词，全部 IELTS 词 2+ 义项，脚本支持断点续跑 |
+| V5.0.0 | 2026-08-08 | opencode (deepseek-v4-flash-free) | 用户系统：开放注册/登录（首个注册自动成为管理员并继承旧数据）、全路由数据隔离、Admin 管理面板（查看状态/重置密码/禁用账号）、标题 server(灰)/laptop(黄) 徽标 |
+| V5.1.0 | 2026-08-08 | opencode (deepseek-v4-flash-free) | 测试账号 admin_test（免惩罚+测试面板任意跳转）+ 暗黑模式（太阳/月亮切换） |
+| V5.2.0 | 2026-08-08 | opencode (deepseek-v4-flash-free) | 学习模式选择：顺序/自定义 List（插队不丢进度，已完成可复习，设置长期保存） |
+| V5.3.0 | 2026-08-08 | opencode (deepseek-v4-flash-free) | 触屏适配：滑动翻卡/底部标签栏/我的页面/键盘提示触屏化 |
+| V5.3.1 | 2026-08-08 | opencode (deepseek-v4-flash-free) | 触屏交互修复（点卡片只翻面不跳题/帮助面板触屏化）+ 前端目录按功能域重组 |
+| V5.4.0 | 2026-08-08 | opencode (deepseek-v4-flash-free) | 触屏模式右上角切回桌面入口 + 新版本公告系统 |
+| V6.0.0 | 2026-08-08 | opencode (deepseek-v4-flash-free) | 词义判定测试（给单词选释义，宽松判）+ 词义/拼写混合模式 + 有道全量释义抓取(2318词) |
+| V7.0.0 | 2026-08-08 | opencode (deepseek-v4-flash-free) | List 背诵（整 List 完整释义+显隐开关）+ 中文默写测试（关键词判分+错词重测），移除旧单词卡入口 |
+| V7.1.0 | 2026-08-08 | opencode (deepseek-v4-flash-free) | 番茄钟分批背诵（单词表→中文默写→休息）+ 间隔抽查→拼写抽查（随机30词≥80%过）+ 词数现选 + batch_size 迁移 |
+| V7.2.0 | 2026-08-08 | opencode (deepseek-v4-flash-free) | 翻卡背诵（3D翻转/隐藏释义）+ 热身中译英输入判分 + 多音源（本地/有道/百度）+ 设置页 + 宽松判分 + 重测剔除已通过词 |
+| V7.2.1 | 2026-08-08 | opencode (deepseek-v4-flash-free) | 修复热身两个 bug：提交后自动跳词/无法进入下一环节（去自动跳转、Enter 防双触发）+ 版本公告 |
+| V7.2.2 | 2026-08-12 | opencode (deepseek-v4-flash-free) | 修复热身反馈停留/单卡翻卡（全部翻转 bug）+ 设置齿轮顶部入口 + KV 用户记忆存储系统（user_kv 表/API/前端 hook/数据迁移） |
+| V7.2.3 | 2026-08-12 | opencode (deepseek-v4-flash-free) | 修复翻卡背面滚动条（grid 同格堆叠，卡片高度自适应，滚轮可正常滚动列表）+ 翻卡正反两面均支持读音 |
 
 ## 🚀 快速启动
 
