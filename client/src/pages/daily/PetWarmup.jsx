@@ -25,6 +25,7 @@ export default function PetWarmup() {
   const [feedback, setFeedback] = useState(null);
   const [starting, setStarting] = useState(false);
   const inputRef = useRef(null);
+  const submitLockRef = useRef(false); // 防止 Enter 双触发重复提交
 
   const words = plan?.petWarmupWords || [];
   const currentWord = words[currentIndex];
@@ -50,6 +51,7 @@ export default function PetWarmup() {
   }, [plan, starting, navigate, showToast, batchSize]);
 
   const goNext = useCallback(() => {
+    submitLockRef.current = false;
     if (currentIndex < words.length - 1) {
       setCurrentIndex(i => i + 1);
       setUserInput('');
@@ -60,7 +62,8 @@ export default function PetWarmup() {
   }, [currentIndex, words.length, startMain]);
 
   const submitAnswer = useCallback(() => {
-    if (feedback || !userInput.trim() || !currentWord) return;
+    if (feedback || submitLockRef.current || !userInput.trim() || !currentWord) return;
+    submitLockRef.current = true;
     let isCorrect;
     if (isCeMode) {
       // 中译英：拼写判分（忽略大小写）
@@ -70,10 +73,12 @@ export default function PetWarmup() {
       isCorrect = checkAnswer(userInput, currentWord.keywords, currentWord.chineseDefinition);
     }
     setFeedback(isCorrect ? 'correct' : 'incorrect');
-    setTimeout(goNext, 900);
-  }, [userInput, feedback, currentWord, isCeMode, goNext]);
+    submitLockRef.current = false;
+    // 不自动跳转：停留展示对错与答案，由用户主动前进
+  }, [userInput, feedback, currentWord, isCeMode]);
 
   const prev = useCallback(() => {
+    submitLockRef.current = false;
     if (currentIndex > 0) {
       setCurrentIndex(i => i - 1);
       setUserInput('');
@@ -83,6 +88,8 @@ export default function PetWarmup() {
 
   useKeyboard({
     'Enter': () => {
+      // 输入框聚焦时 Enter 由 input.onKeyDown 处理（避免双触发提交）
+      if (document.activeElement === inputRef.current) return;
       if (!feedback) submitAnswer();
       else goNext();
     },
@@ -190,7 +197,7 @@ export default function PetWarmup() {
           <ChevronLeft className="w-4 h-4 inline" /> 上一个
         </button>
         <button
-          onClick={() => { if (feedback) goNext(); else if (userInput.trim()) submitAnswer(); }}
+          onClick={() => { if (feedback) goNext(); else if (userInput.trim()) submitAnswer(); else goNext(); }}
           className="btn-secondary"
         >
           跳过 <ChevronRight className="w-4 h-4 inline" />
