@@ -16,6 +16,7 @@
  *   allowSynonym — 近义词容错（默认 true；验收/抽查建议 false）
  */
 import { checkAnswer as keywordCheck, fallbackKeywords } from './checkAnswer.js';
+import { variantMatch, charOverlapMatch } from './variantNormalize.js';
 
 // ===== 编辑距离（Damerau-Levenshtein，含换位） =====
 function damerauLevenshtein(a, b) {
@@ -190,6 +191,9 @@ export function checkChineseAnswer(input, keywords, synonyms, chineseDefinition,
         // 双向包含（与 checkAnswer 一致的口径）
         if (cleanInput.includes(cs)) return true;
         if (cs.includes(cleanInput) && cleanInput.length >= 2) return true;
+        // V7.3.2: 变体归一化 + 保守字符重叠
+        if (variantMatch(cleanInput, cs)) return true;
+        if (charOverlapMatch(cleanInput, cs)) return true;
       }
     }
   }
