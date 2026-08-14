@@ -110,15 +110,39 @@ export default function TodayBriefing() {
   const [testList, setTestList] = useState(1);
   const [testBusy, setTestBusy] = useState(false);
   const [batchSize, setBatchSize] = useState(30);
+  const [resumeInfo, setResumeInfo] = useState(null);
 
   useEffect(() => {
     api.getDailyPlan()
       .then(setPlan)
       .catch(err => setError(err.message))
       .finally(() => setLoading(false));
+    // V7.3.1: 断点续训信息
+    api.getResumeInfo()
+      .then(data => setResumeInfo(data.resume))
+      .catch(() => {});
   }, []);
 
   const reload = () => api.getDailyPlan().then(setPlan);
+
+  // V7.3.1: 继续上次进度（重学当前批 / 从断点续学）
+  const continueResume = async (mode) => {
+    if (!resumeInfo) return;
+    setTestBusy(true);
+    try {
+      const session = await api.startTraining({ listNo: resumeInfo.listNo, targetMinutes: plan?.targetMinutes || 60, debtMinutes: 0 });
+      navigate('/daily/study', {
+        state: {
+          session, plan,
+          resumeFrom: mode === 'continue' ? resumeInfo.completedBatches : 0,
+        },
+      });
+    } catch (err) {
+      showToast('续训失败: ' + err.message, 'error');
+    } finally {
+      setTestBusy(false);
+    }
+  };
 
   const startNow = () => navigate('/daily/warmup', { state: { plan, batchSize } });
 
@@ -210,6 +234,37 @@ export default function TodayBriefing() {
       <ModeSwitcher plan={plan} onSaved={reload} />
 
       <div className="card animate-fade-in">
+        {/* 今日已完成横幅 */}
+        {plan.today?.completed && (
+          <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-6 flex items-center gap-3">
+            <span className="text-3xl">✅</span>
+            <div className="flex-1">
+              <div className="font-bold text-green-700">今日任务已完成</div>
+              <div className="text-xs text-green-600">
+                今日已训练 {Math.floor((plan.today?.trainedSeconds || 0) / 60)} 分钟
+              </div>
+            </div>
+            <button onClick={() => navigate('/daily/report', { state: { report: { durationSeconds: plan.today?.trainedSeconds || 0, dictationAccuracy: null, spellingAccuracy: null, spotCheckAccuracy: null, completed: true }, plan, passed: true } })} className="btn-primary !py-2 !px-4 text-sm">
+              查看结算
+            </button>
+          </div>
+        )}
+
+        {/* 断点续训横幅 */}
+        {resumeInfo && !plan.today?.completed && (
+          <div className="bg-indigo-50 border border-indigo-200 rounded-xl p-4 mb-6 flex items-center gap-3">
+            <span className="text-3xl">▶️</span>
+            <div className="flex-1">
+              <div className="font-bold text-indigo-700">上次进度：List {resumeInfo.listNo} 已完成 {resumeInfo.completedBatches} 批</div>
+              <div className="text-xs text-indigo-600">可选择从断点继续，或从本批重新开始</div>
+            </div>
+            <div className="flex gap-2">
+              <button onClick={() => continueResume('relearn')} disabled={testBusy} className="btn-secondary !py-2 !px-3 text-sm">本批重学</button>
+              <button onClick={() => continueResume('continue')} disabled={testBusy} className="btn-primary !py-2 !px-3 text-sm">从断点继续</button>
+            </div>
+          </div>
+        )}
+
         <div className="text-5xl mb-4">📅</div>
         <h1 className="text-3xl font-bold text-gray-900 mb-2">今日简报</h1>
 
@@ -253,12 +308,16 @@ export default function TodayBriefing() {
             </div>
           )}
 
-          {plan.pendingReviewList && (
+          {plan.pendingReviewLists && plan.pendingReviewLists.length > 0 && (
             <div className="flex items-center gap-3 p-3 rounded-lg border border-amber-200 bg-amber-50">
               <RefreshCw className="w-5 h-5 text-amber-600 shrink-0" />
               <div>
-                <div className="font-medium text-amber-800">待重背 List {plan.pendingReviewList}</div>
-                <div className="text-xs text-amber-600">上次抽查未达标，优先重背</div>
+                <div className="font-medium text-amber-800">
+                  待重背 List {plan.pendingReviewLists.map(l => l.list_no).join('、')}
+                </div>
+                <div className="text-xs text-amber-600">
+                  {plan.pendingReviewLists.length === 1 ? '上次抽查未达标，优先重背' : `共 ${plan.pendingReviewLists.length} 个 List 未达标`}
+                </div>
               </div>
             </div>
           )}

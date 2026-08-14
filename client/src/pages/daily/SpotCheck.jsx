@@ -1,15 +1,19 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { api } from '../../utils/api';
 import { useApp } from '../../context/AppContext';
 import { useKeyboard } from '../../hooks/useKeyboard';
 import { useElapsed } from '../../hooks/useTimer';
-import { useSwipe } from '../../hooks/useSwipe';
 import { useTouch } from '../../context/TouchContext';
 import TrainingTimer from '../../components/training/TrainingTimer';
 import { speak } from '../../utils/speech';
-import { Volume2, Check, X, Target, ChevronRight } from 'lucide-react';
+import { checkChineseAnswer } from '../../utils/answerCheck';
+import { Volume2, CheckCircle, XCircle, Target, ChevronRight, ChevronLeft } from 'lucide-react';
 
+/**
+ * V7.3.1: 抽查改为输入判分（看英文→输入中文→系统判分→手动前进）
+ * 与当天默写形式一致。正确率 ≥80% 通过，否则标记待重背。
+ */
 export default function SpotCheck() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -22,26 +26,40 @@ export default function SpotCheck() {
 
   const words = plan?.spotCheckList?.words || [];
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [showMeaning, setShowMeaning] = useState(false);
+  const [userInput, setUserInput] = useState('');
+  const [feedback, setFeedback] = useState(null);
   const [results, setResults] = useState([]);
   const [finished, setFinished] = useState(false);
   const [outcome, setOutcome] = useState(null);
   const [submitting, setSubmitting] = useState(false);
+  const inputRef = useRef(null);
+  const submitLockRef = useRef(false);
 
   const elapsed = useElapsed(session?.startTime);
   const currentWord = words[currentIndex];
 
-  const mark = useCallback((correct) => {
-    if (!currentWord || finished) return;
-    const newResults = [...results, { wordId: currentWord.wordId, correct }];
+  useEffect(() => { inputRef.current?.focus(); }, [currentIndex]);
+
+  const submitAnswer = useCallback(() => {
+    if (feedback || submitLockRef.current || !userInput.trim() || !currentWord || finished) return;
+    submitLockRef.current = true;
+    const isCorrect = checkChineseAnswer(userInput, currentWord.keywords, currentWord.synonyms, currentWord.chineseDefinition, { allowSynonym: true });
+    setFeedback(isCorrect ? 'correct' : 'incorrect');
+    submitLockRef.current = false;
+  }, [userInput, feedback, currentWord, finished]);
+
+  const goNext = useCallback(() => {
+    submitLockRef.current = false;
+    const newResults = [...results, { wordId: currentWord.wordId, correct: feedback === 'correct' }];
     setResults(newResults);
-    setShowMeaning(false);
     if (currentIndex + 1 >= words.length) {
       submit(newResults);
     } else {
       setCurrentIndex(i => i + 1);
+      setUserInput('');
+      setFeedback(null);
     }
-  }, [currentWord, results, currentIndex, words.length, finished]);
+  }, [currentIndex, words.length, results, feedback, currentWord]);
 
   const submit = async (finalResults) => {
     setFinished(true);
@@ -70,21 +88,16 @@ export default function SpotCheck() {
     }
   }, [session, elapsed, showToast, navigate]);
 
-  // 触屏手势：点卡片显示释义；左右滑动 = 会/不会
-  const swipe = useSwipe({
-    enabled: isTouch,
-    onLeft: () => { if (showMeaning) mark(false); else setShowMeaning(true); },
-    onRight: () => { if (showMeaning) mark(true); else setShowMeaning(true); },
-    onTap: () => { if (!showMeaning) setShowMeaning(true); },
-  });
-
   useKeyboard({
-    'Enter': () => { if (!showMeaning && !finished) setShowMeaning(true); },
-    '1': () => { if (showMeaning) mark(true); },
-    '2': () => { if (showMeaning) mark(false); },
-    ' ': (e) => { e.preventDefault(); if (currentWord) speak(currentWord.word); },
-    'Escape': abandon,
-  }, true, [showMeaning, mark, currentWord, finished, abandon]);
+    'Enter': () => {
+      if (finished && outcome) { continueToSpellCheck(); return; }
+      if (document.activeElement === inputRef.current) return; // 输入框聚焦由 input.onKeyDown 处理
+      if (!feedback) submitAnswer();
+      else goNext();
+    },
+    ' ': (e) => { e.preventDefault(); if (currentWord && !finished) speak(currentWord.word); },
+    'Escape': () => { if (finished) navigate('/'); else abandon(); },
+  }, true, [feedback, submitAnswer, goNext, currentWord, finished, outcome, abandon, navigate]);
 
   if (!session || !plan?.spotCheckList) return null;
 
@@ -105,7 +118,7 @@ export default function SpotCheck() {
     return (
       <div className="max-w-2xl mx-auto px-4 py-8 text-center">
         <div className="card animate-fade-in">
-          <div className={`text-6xl mb-4 ${passed ? '' : ''}`}>{passed ? '🎉' : '📌'}</div>
+          <div className="text-6xl mb-4">{passed ? '🎉' : '📌'}</div>
           <h2 className={`text-2xl font-bold mb-2 ${passed ? 'text-green-600' : 'text-amber-600'}`}>
             {passed ? '抽查通过!' : '未达标，标记待重背'}
           </h2>
@@ -125,6 +138,7 @@ export default function SpotCheck() {
   }
 
   const progress = (currentIndex / words.length) * 100;
+  const borderClass = feedback === 'correct' ? 'border-green-300 bg-green-50/40' : feedback === 'incorrect' ? 'border-red-300 bg-red-50/40' : '';
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-8">
@@ -149,56 +163,90 @@ export default function SpotCheck() {
       </div>
 
       {currentWord && (
-        <div
-          className={`card text-center py-12 min-h-[320px] flex flex-col justify-center ${isTouch ? 'no-select' : ''}`}
-          {...swipe}
-        >
-          <span className="text-xs text-gray-400 uppercase tracking-wide mb-2">抽查 · List {plan.spotCheckList.listNo}</span>
-          <div className="text-4xl font-bold text-gray-900 mb-3">{currentWord.word}</div>
-          <div className="flex items-center justify-center gap-2 mb-4">
-            {currentWord.phonetic && <span className="text-lg text-gray-400">{currentWord.phonetic}</span>}
-            {currentWord.partOfSpeech && (
-              <span className="px-2 py-0.5 bg-green-50 text-green-600 text-sm rounded">{currentWord.partOfSpeech}</span>
-            )}
+        <div className={`card text-center py-10 min-h-[320px] flex flex-col justify-center transition-all duration-300 ${borderClass}`}>
+          <span className="text-xs text-gray-400 uppercase tracking-wide mb-2">抽查 · List {plan.spotCheckList.listNo} · 看英文写中文</span>
+
+          <div className="flex items-center justify-center gap-2 mb-2">
+            <p className="text-4xl font-bold text-gray-900">{currentWord.word}</p>
+            <button
+              onClick={() => speak(currentWord.word)}
+              className={`ml-2 w-12 h-12 ${isTouch ? 'w-14 h-14' : ''} bg-green-50 hover:bg-green-100 rounded-full flex items-center justify-center transition-colors`}
+            >
+              <Volume2 className="w-6 h-6 text-green-600" />
+            </button>
           </div>
+          {currentWord.phonetic && <span className="text-lg text-gray-400 mb-4">{currentWord.phonetic}</span>}
 
-          <button onClick={() => speak(currentWord.word)}
-            className={`mx-auto mb-6 w-12 h-12 ${isTouch ? 'w-14 h-14' : ''} bg-green-50 hover:bg-green-100 rounded-full flex items-center justify-center transition-colors`}>
-            <Volume2 className="w-6 h-6 text-green-600" />
-          </button>
-
-          <div className={`transition-all duration-300 ${showMeaning ? 'opacity-100' : 'opacity-0 max-h-0 overflow-hidden'}`}>
-            <p className="text-2xl text-gray-700 mb-6">{currentWord.chineseDefinition}</p>
-            <div className="grid grid-cols-2 gap-3 max-w-xs mx-auto">
-              <button
-                onClick={() => mark(true)}
-                className={`flex items-center justify-center gap-1 px-4 py-3 rounded-lg bg-green-500 text-white font-medium hover:bg-green-600 transition-colors ${isTouch ? 'min-h-[52px] text-base' : ''}`}
-              >
-                <Check className="w-5 h-5" /> {isTouch ? '会' : '会 (1)'}
-              </button>
-              <button
-                onClick={() => mark(false)}
-                className={`flex items-center justify-center gap-1 px-4 py-3 rounded-lg bg-red-400 text-white font-medium hover:bg-red-500 transition-colors ${isTouch ? 'min-h-[52px] text-base' : ''}`}
-              >
-                <X className="w-5 h-5" /> {isTouch ? '不会' : '不会 (2)'}
+          {feedback ? (
+            <div className="max-w-md mx-auto">
+              {feedback === 'correct' ? (
+                <div>
+                  <p className="flex items-center justify-center gap-2 text-green-600 font-medium mb-1">
+                    <CheckCircle className="w-5 h-5" /> 正确!
+                  </p>
+                  <p className="text-sm text-gray-600 leading-relaxed">{currentWord.chineseDefinition}</p>
+                </div>
+              ) : (
+                <div className="mb-2">
+                  <p className="flex items-center justify-center gap-2 text-red-500 font-medium mb-1">
+                    <XCircle className="w-5 h-5" /> 错误
+                  </p>
+                  <p className="text-sm text-gray-600 leading-relaxed">
+                    参考答案: <span className="font-semibold text-green-600">{currentWord.chineseDefinition}</span>
+                  </p>
+                </div>
+              )}
+              <button onClick={goNext} className="btn-primary w-full py-2.5 mt-3">
+                {currentIndex + 1 >= words.length ? '提交抽查结果' : '下一个'} <ChevronRight className="w-4 h-4 inline" />
               </button>
             </div>
-          </div>
-
-          {!showMeaning && (
-            <p className="text-sm text-gray-400">
-              <span className="kbd-hint">按 <kbd className="px-1.5 py-0.5 bg-gray-100 border rounded text-xs">Enter</kbd> 显示释义</span>
-              <span className="touch-hint hidden">点卡片 显示释义</span>
-            </p>
+          ) : (
+            <div className="max-w-md mx-auto">
+              <input
+                ref={inputRef}
+                type="text"
+                value={userInput}
+                onChange={(e) => setUserInput(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); submitAnswer(); } }}
+                placeholder="输入中文释义..."
+                className="input-field text-center text-xl py-3"
+                autoComplete="off"
+                autoCorrect="off"
+                spellCheck="false"
+              />
+              <button
+                onClick={submitAnswer}
+                disabled={!userInput.trim()}
+                className="btn-primary w-full mt-3 py-2.5 disabled:opacity-40"
+              >
+                确认
+              </button>
+            </div>
           )}
         </div>
       )}
 
+      <div className="flex justify-between mt-6">
+        <button
+          onClick={() => { if (currentIndex > 0) { setCurrentIndex(i => i - 1); setUserInput(''); setFeedback(null); } }}
+          disabled={currentIndex === 0}
+          className="btn-secondary disabled:opacity-30"
+        >
+          <ChevronLeft className="w-4 h-4 inline" /> 上一个
+        </button>
+        <button
+          onClick={() => { if (feedback) goNext(); else if (userInput.trim()) submitAnswer(); else if (currentIndex + 1 < words.length) { setCurrentIndex(i => i + 1); setUserInput(''); } }}
+          className="btn-secondary"
+        >
+          跳过 <ChevronRight className="w-4 h-4 inline" />
+        </button>
+      </div>
+
       <p className="text-center text-xs text-gray-400 mt-4 space-x-3">
+        <span className="kbd-hint"><kbd className="px-1.5 py-0.5 bg-gray-100 border rounded">Enter</kbd> 提交/下一个</span>
         <span className="kbd-hint"><kbd className="px-1.5 py-0.5 bg-gray-100 border rounded">Space</kbd> 发音</span>
-        <span className="kbd-hint"><kbd className="px-1.5 py-0.5 bg-gray-100 border rounded">1 / 2</kbd> 会 / 不会</span>
         <span className="kbd-hint"><kbd className="px-1.5 py-0.5 bg-gray-100 border rounded">Esc</kbd> 收工</span>
-        <span className="touch-hint hidden">← 不会 · 点卡片翻面 · 会 →</span>
+        <span className="touch-hint hidden">输入中文释义后确认 · 答对答错手动前进</span>
       </p>
     </div>
   );

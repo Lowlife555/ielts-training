@@ -109,7 +109,7 @@ export default function Me() {
         </Row>
 
         <Row icon={<Monitor className="w-4 h-4 text-indigo-600" />} label="版本">
-          <span className="text-xs text-gray-400">V7.2.4</span>
+          <span className="text-xs text-gray-400">V7.3.1</span>
         </Row>
 
         <Link

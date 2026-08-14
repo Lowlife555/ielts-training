@@ -1,5 +1,8 @@
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import { formatDuration } from '../../hooks/useTimer';
+import { api } from '../../utils/api';
+import SummaryModal from '../../components/training/SummaryModal';
 import { Home, Clock, Target, Sparkles, RefreshCw } from 'lucide-react';
 
 export default function DailyReport() {
@@ -8,6 +11,21 @@ export default function DailyReport() {
   const report = location.state?.report;
   const plan = location.state?.plan;
   const passed = location.state?.passed;
+
+  // V7.3.1: 自动拉取最近一次结算弹窗展示
+  const [summary, setSummary] = useState(null);
+  const [summaryOpen, setSummaryOpen] = useState(false);
+
+  useEffect(() => {
+    api.getTrainingSummaries({ limit: 1 })
+      .then(data => {
+        if (data && data.length > 0) {
+          setSummary(data[0]);
+          setSummaryOpen(true);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   if (!report) return null;
 
@@ -92,7 +110,17 @@ export default function DailyReport() {
         <button onClick={() => navigate('/')} className="btn-primary px-10">
           <Home className="w-4 h-4 inline mr-1" /> 返回首页
         </button>
+
+        {/* V7.3.1: 结算弹窗（可关闭后重新打开） */}
+        <button
+          onClick={() => setSummaryOpen(true)}
+          className="btn-secondary mt-4 px-6"
+        >
+          查看词级明细
+        </button>
       </div>
+
+      {summaryOpen && <SummaryModal summary={summary} onClose={() => setSummaryOpen(false)} />}
     </div>
   );
 }

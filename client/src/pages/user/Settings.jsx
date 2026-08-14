@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useSettings } from '../../context/SettingsContext';
 import { useApp } from '../../context/AppContext';
 import { speak, setSpeechConfig, getSpeechConfig } from '../../utils/speech';
-import { ArrowLeft, Volume2, RotateCcw, Download, Trash2 } from 'lucide-react';
+import { ArrowLeft, Volume2, RotateCcw, Download, Trash2, CalendarDays } from 'lucide-react';
 
 const VOICE_SOURCES = [
   { value: 'local', label: '本地语音', desc: '系统离线发音，最稳' },
@@ -187,6 +187,15 @@ export default function Settings() {
         <div className="px-5 py-3 bg-gray-100 text-gray-700 text-sm font-semibold">
           💾 数据管理
         </div>
+
+        <Row label="训练历史" desc="按日历查看每次训练结算与词级明细">
+          <Link
+            to="/training-history"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
+          >
+            <CalendarDays className="w-3.5 h-3.5" /> 查看
+          </Link>
+        </Row>
 
         <Row label="清除本地缓存" desc="清掉界面模式等本地偏好（不影响账号数据）">
           <button

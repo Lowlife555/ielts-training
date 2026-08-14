@@ -104,6 +104,7 @@ export const api = {
   // v4.0 Daily Plan
   getDailyPlan: () => request('/daily-plan'),
   getDailyPlanStatus: () => request('/daily-plan/status'),
+  getResumeInfo: () => request('/daily-plan/resume'),
   setStudySettings: (data) =>
     request('/daily-plan/settings', { method: 'POST', body: JSON.stringify(data) }),
   completeDailyPlan: (sessionId) =>
@@ -122,6 +123,13 @@ export const api = {
     request('/training/complete', { method: 'POST', body: JSON.stringify(data) }),
   abandonTraining: (data) =>
     request('/training/abandon', { method: 'POST', body: JSON.stringify(data) }),
+
+  // v7.3.1 Training summaries（结算）
+  getTrainingSummaries: (params = {}) => {
+    const query = new URLSearchParams(params).toString();
+    return request(`/training/summaries?${query}`);
+  },
+  getTrainingSummary: (id) => request(`/training/summaries/${id}`),
 
   // v7.1 Spell check (daily flow final stage)
   submitSpellCheck: (data) =>

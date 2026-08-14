@@ -53,25 +53,12 @@ export default function SpellCheck() {
     if (session && !finished) inputRef.current?.focus();
   }, [session, finished, currentIndex]);
 
-  const submitAnswer = useCallback(() => {
-    if (feedback || !userInput.trim() || submitting) return;
-    const isCorrect = checkEnglishAnswer(userInput, currentWord.word, { allowMorph: true, allowEdit: false });
-    setFeedback(isCorrect ? 'correct' : 'incorrect');
-    setResults(prev => [...prev, { wordId: currentWord.id, correct: isCorrect, answer: userInput.trim() }]);
+  // 用 ref 追踪最新 results，避免 setTimeout 闭包读到旧值
+  const resultsRef = useRef([]);
+  useEffect(() => { resultsRef.current = results; }, [results]);
 
-    setTimeout(() => {
-      if (currentIndex + 1 >= words.length) {
-        finish([...results, { wordId: currentWord.id, correct: isCorrect, answer: userInput.trim() }]);
-      } else {
-        setCurrentIndex(i => i + 1);
-        setUserInput('');
-        setFeedback(null);
-        inputRef.current?.focus();
-      }
-    }, 800);
-  }, [userInput, feedback, currentIndex, currentWord, words, results, submitting]);
-
-  const finish = async (finalResults) => {
+  // finish 必须先于 submitAnswer 声明（否则 submitAnswer 闭包引用 TDZ 报错：Cannot access 'finish' before initialization）
+  const finish = useCallback(async (finalResults) => {
     setFinished(true);
     setSubmitting(true);
     try {
@@ -88,7 +75,28 @@ export default function SpellCheck() {
     } finally {
       setSubmitting(false);
     }
-  };
+  }, [session, elapsed, restedSeconds, showToast]);
+
+  const submitAnswer = useCallback(() => {
+    if (feedback || !userInput.trim() || submitting) return;
+    const isCorrect = checkEnglishAnswer(userInput, currentWord.word, { allowMorph: true, allowEdit: false });
+    setFeedback(isCorrect ? 'correct' : 'incorrect');
+    const newResult = { wordId: currentWord.id, correct: isCorrect, answer: userInput.trim() };
+    const nextResults = [...resultsRef.current, newResult];
+    setResults(nextResults);
+    resultsRef.current = nextResults;
+
+    setTimeout(() => {
+      if (currentIndex + 1 >= words.length) {
+        finish(nextResults);
+      } else {
+        setCurrentIndex(i => i + 1);
+        setUserInput('');
+        setFeedback(null);
+        inputRef.current?.focus();
+      }
+    }, 800);
+  }, [userInput, feedback, currentIndex, currentWord, words, submitting, finish]);
 
   const abandon = useCallback(async () => {
     if (abandoning || submitting) return;

@@ -239,6 +239,10 @@ router.get('/', (req, res) => {
     reason,
     todayList,
     pendingReviewList: pendingReview ? pendingReview.list_no : null,
+    pendingReviewLists: db.prepare(`
+      SELECT list_no, first_completed_date FROM list_completion
+      WHERE user_id = ? AND pending_review = 1 ORDER BY list_no
+    `).all(userId),
     spotCheckList: spotCheck,
     petWarmupCount: petWords.length,
     petWarmupWords: petWords,
@@ -390,7 +394,31 @@ router.get('/test-spot-check', (req, res) => {
   });
 });
 
-// POST /api/spot-check — 提交抽查结果
+// GET /api/daily-plan/resume — 断点续训信息（最近一次未完成且有进度的会话）
+router.get('/resume', (req, res) => {
+  const db = getDb();
+  const userId = req.user.id;
+
+  const row = db.prepare(`
+    SELECT id, list_no, batch_size, completed_batches, start_time, status
+    FROM daily_sessions
+    WHERE user_id = ? AND status = 'abandoned' AND completed = 0 AND completed_batches > 0
+    ORDER BY id DESC LIMIT 1
+  `).get(userId);
+
+  if (!row) return res.json({ resume: null });
+
+  res.json({
+    resume: {
+      sessionId: row.id,
+      listNo: row.list_no,
+      batchSize: row.batch_size || 30,
+      completedBatches: row.completed_batches || 0,
+    },
+  });
+});
+
+// POST /api/daily-plan/spot-check — 提交抽查结果
 // body: { listNo, results: [{wordId, correct}] }
 // 正确率 ≥80% 通过并记录抽查日期；否则标记待重背（次日简报优先重背）
 router.post('/spot-check', (req, res) => {

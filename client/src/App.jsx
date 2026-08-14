@@ -43,6 +43,7 @@ import Register from './pages/user/Register';
 import Admin from './pages/user/Admin';
 import Me from './pages/user/Me';
 import Settings from './pages/user/Settings';
+import TrainingHistory from './pages/misc/TrainingHistory';
 
 function RequireAuth({ children }) {
   const { user, loading } = useAuth();
@@ -118,6 +119,7 @@ function Layout() {
           <Route path="/admin" element={<RequireAdmin><Admin /></RequireAdmin>} />
           <Route path="/me" element={<RequireAuth><Me /></RequireAuth>} />
           <Route path="/settings" element={<RequireAuth><Settings /></RequireAuth>} />
+          <Route path="/training-history" element={<RequireAuth><TrainingHistory /></RequireAuth>} />
           <Route path="/speech-test" element={<RequireAuth><SpeechDiagnostic /></RequireAuth>} />
         </Routes>
       </main>

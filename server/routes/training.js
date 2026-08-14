@@ -299,6 +299,33 @@ router.post('/complete', (req, res) => {
   });
   update();
 
+  // V7.3.1: 写入训练结算（词级明细）
+  try {
+    const wordStats = [];
+    const wordRows = db.prepare(`
+      SELECT w.word, dsw.main_correct, dsw.spelling_correct, dsw.acceptance_correct
+      FROM daily_session_words dsw JOIN words w ON w.id = dsw.word_id
+      WHERE dsw.session_id = ?
+    `).all(sessionId);
+    for (const r of wordRows) {
+      const errors = (r.main_correct === 0 ? 1 : 0) + (r.spelling_correct === 0 ? 1 : 0) + (r.acceptance_correct === 0 ? 1 : 0);
+      wordStats.push({ word: r.word, errors, mainCorrect: r.main_correct, spellingCorrect: r.spelling_correct, acceptanceCorrect: r.acceptance_correct });
+    }
+    db.prepare(`
+      INSERT INTO training_summaries (user_id, session_id, list_no, duration_seconds, main_accuracy, spelling_accuracy, acceptance_accuracy, completed, word_stats)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(
+      userId, sessionId, session.list_no, finalDuration,
+      mainTotal ? Math.round((mainCorrect / mainTotal) * 100) : null,
+      spellingTotal ? Math.round((spellingCorrect / spellingTotal) * 100) : null,
+      acceptanceTotal ? Math.round((firstTryCorrect / acceptanceTotal) * 100) : null,
+      acceptancePassed ? 1 : 0,
+      JSON.stringify(wordStats)
+    );
+  } catch (e) {
+    console.warn('Failed to write training summary:', e.message);
+  }
+
   res.json({
     ok: true,
     sessionId,
@@ -311,12 +338,12 @@ router.post('/complete', (req, res) => {
   });
 });
 
-// POST /api/training/abandon — 中途收工（保存部分进度）
-// body: { sessionId, durationSeconds, mainResults?, spellingResults? }
+// POST /api/training/abandon — 中途收工（保存部分进度 + 已完成批次）
+// body: { sessionId, durationSeconds, mainResults?, completedBatches? }
 router.post('/abandon', (req, res) => {
   const db = getDb();
   const userId = req.user.id;
-  const { sessionId, durationSeconds, mainResults = [] } = req.body || {};
+  const { sessionId, durationSeconds, mainResults = [], completedBatches } = req.body || {};
 
   const session = db.prepare('SELECT * FROM daily_sessions WHERE id = ? AND user_id = ?')
     .get(sessionId, userId);
@@ -333,17 +360,75 @@ router.post('/abandon', (req, res) => {
   db.prepare(`
     UPDATE daily_sessions SET
       status = 'abandoned', duration_seconds = ?, end_time = ?,
-      main_accuracy = ?, wrong_pool_count = ?
+      main_accuracy = ?, wrong_pool_count = ?,
+      completed_batches = COALESCE(?, completed_batches)
     WHERE id = ?
   `).run(
     finalDuration,
     new Date().toISOString(),
     mainTotal ? Math.round((mainCorrect / mainTotal) * 100) : null,
     mainResults.filter(r => r.wrongPool).length,
+    completedBatches !== undefined ? completedBatches : null,
     sessionId
   );
 
   res.json({ ok: true, sessionId, durationSeconds: finalDuration });
+});
+
+// GET /api/training/summaries — 训练结算列表（可重开的历史结算）
+// query: ?limit=20（默认最近 20 条）
+router.get('/summaries', (req, res) => {
+  const db = getDb();
+  const userId = req.user.id;
+  const limit = Math.min(Math.max(parseInt(req.query.limit) || 20, 1), 100);
+
+  const rows = db.prepare(`
+    SELECT id, session_id, list_no, duration_seconds, main_accuracy, spelling_accuracy,
+           acceptance_accuracy, spot_accuracy, completed, word_stats, created_at
+    FROM training_summaries
+    WHERE user_id = ?
+    ORDER BY id DESC
+    LIMIT ?
+  `).all(userId, limit);
+
+  res.json(rows.map(r => ({
+    id: r.id,
+    sessionId: r.session_id,
+    listNo: r.list_no,
+    durationSeconds: r.duration_seconds || 0,
+    mainAccuracy: r.main_accuracy,
+    spellingAccuracy: r.spelling_accuracy,
+    acceptanceAccuracy: r.acceptance_accuracy,
+    spotAccuracy: r.spot_accuracy,
+    completed: !!r.completed,
+    wordStats: (() => { try { return JSON.parse(r.word_stats || '[]'); } catch { return []; } })(),
+    createdAt: r.created_at,
+  })));
+});
+
+// GET /api/training/summaries/:id — 单条结算详情
+router.get('/summaries/:id', (req, res) => {
+  const db = getDb();
+  const userId = req.user.id;
+  const row = db.prepare(`
+    SELECT * FROM training_summaries WHERE id = ? AND user_id = ?
+  `).get(Number(req.params.id), userId);
+
+  if (!row) return res.status(404).json({ error: '结算记录不存在' });
+
+  res.json({
+    id: row.id,
+    sessionId: row.session_id,
+    listNo: row.list_no,
+    durationSeconds: row.duration_seconds || 0,
+    mainAccuracy: row.main_accuracy,
+    spellingAccuracy: row.spelling_accuracy,
+    acceptanceAccuracy: row.acceptance_accuracy,
+    spotAccuracy: row.spot_accuracy,
+    completed: !!row.completed,
+    wordStats: (() => { try { return JSON.parse(row.word_stats || '[]'); } catch { return []; } })(),
+    createdAt: row.created_at,
+  });
 });
 
 module.exports = router;

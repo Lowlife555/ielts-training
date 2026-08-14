@@ -9,7 +9,7 @@ import { checkChineseAnswer } from '../../utils/answerCheck';
 import TrainingTimer from '../../components/training/TrainingTimer';
 import FlipCard from '../../components/ui/FlipCard';
 import { useSettings } from '../../context/SettingsContext';
-import { Check, X, Play, Coffee, Timer, Volume2 } from 'lucide-react';
+import { Check, X, Play, Coffee, Timer, Volume2, ChevronRight } from 'lucide-react';
 
 const TIME_UP_BUFFER = 10 * 60; // 剩余不足 10 分钟不再开始新批次
 
@@ -35,8 +35,16 @@ export default function MainStudy() {
   }, [allWords, batchSize]);
 
   const [phase, setPhase] = useState('wordtable'); // wordtable | dictation | rest
-  const [batchIndex, setBatchIndex] = useState(0);
+  // V7.3.1: 支持断点续训——从 resumeFrom 指定的批次开始
+  const [batchIndex, setBatchIndex] = useState(() => {
+    const r = location.state?.resumeFrom;
+    return typeof r === 'number' && r > 0 ? r : 0;
+  });
   const currentBatch = batches[batchIndex] || [];
+  const [completedBatches, setCompletedBatches] = useState(() => {
+    const r = location.state?.resumeFrom;
+    return typeof r === 'number' && r > 0 ? r : 0;
+  });
 
   // 单词表状态
   const [flippedSet, setFlippedSet] = useState(new Set()); // 已翻到背面(隐藏释义)的单词
@@ -109,6 +117,8 @@ export default function MainStudy() {
 
   // 默写一批完成
   const batchDictationDone = useCallback(() => {
+    // V7.3.1: 记录已完成批次（供断点续训）
+    setCompletedBatches(b => Math.max(b, batchIndex + 1));
     if (batchIndex + 1 >= batches.length || timeUp) {
       goCheck();
     } else {
@@ -164,29 +174,31 @@ export default function MainStudy() {
     }).catch((err) => {
       console.warn('Failed to save dictation result:', err.message);
     });
+    // 不自动前进：停留展示对错与完整释义，由用户手动进入下一个
+  }, [userInput, feedback, currentDictWord, session]);
 
-    setTimeout(() => {
-      if (currentIndex + 1 >= dictWords.length) {
-        // 下一轮只重测本轮未通过的词（已通过的直接剔除）
-        const retryWords = dictWords.filter(w => !roundPassedRef.current.has(w.wordId));
-        if (retryWords.length > 0) {
-          setDictWords(retryWords);
-          setRound(r => r + 1);
-          setCurrentIndex(0);
-          setUserInput('');
-          setFeedback(null);
-          inputRef.current?.focus();
-        } else {
-          batchDictationDone();
-        }
-      } else {
-        setCurrentIndex(i => i + 1);
+  // 手动前进到下一个词（反馈显示后点"下一个"/Enter）
+  const goNextDictation = useCallback(() => {
+    if (currentIndex + 1 >= dictWords.length) {
+      // 本轮结束：下一轮只重测未通过的词（已通过的直接剔除）
+      const retryWords = dictWords.filter(w => !roundPassedRef.current.has(w.wordId));
+      if (retryWords.length > 0) {
+        setDictWords(retryWords);
+        setRound(r => r + 1);
+        setCurrentIndex(0);
         setUserInput('');
         setFeedback(null);
         inputRef.current?.focus();
+      } else {
+        batchDictationDone();
       }
-    }, 800);
-  }, [userInput, feedback, currentDictWord, dictWords, currentIndex, batchDictationDone, session]);
+    } else {
+      setCurrentIndex(i => i + 1);
+      setUserInput('');
+      setFeedback(null);
+      inputRef.current?.focus();
+    }
+  }, [currentIndex, dictWords, batchDictationDone]);
 
   // 开始默写本批
   const startDictation = () => {
@@ -209,6 +221,7 @@ export default function MainStudy() {
         sessionId: session.sessionId,
         durationSeconds: Math.max(0, elapsed - restedSecondsRef.current),
         mainResults: [],
+        completedBatches,
       });
       showToast('已收工，进度已保存', 'info');
       navigate('/');
@@ -221,7 +234,10 @@ export default function MainStudy() {
 
   useKeyboard({
     'Enter': () => {
-      if (phase === 'dictation') submitDictation();
+      if (phase === 'dictation') {
+        if (feedback) goNextDictation();
+        else submitDictation();
+      }
       if (phase === 'rest') skipRest();
     },
     ' ': (e) => {
@@ -229,7 +245,7 @@ export default function MainStudy() {
       if (phase === 'dictation' && currentDictWord) speak(currentDictWord.word);
     },
     'Escape': abandon,
-  }, true, [phase, submitDictation, abandon, currentDictWord, skipRest]);
+  }, true, [phase, submitDictation, goNextDictation, feedback, abandon, currentDictWord, skipRest]);
 
   if (!session) return null;
 
@@ -455,9 +471,16 @@ export default function MainStudy() {
               {feedback && (
                 <div className={`text-center mt-3 ${feedback === 'correct' ? 'text-green-600' : 'text-red-500'}`}>
                   {feedback === 'correct' ? (
-                    <span className="flex items-center justify-center gap-1">
-                      <Check className="w-5 h-5" /> 正确!
-                    </span>
+                    <div>
+                      <span className="flex items-center justify-center gap-1 mb-1">
+                        <Check className="w-5 h-5" /> 正确!
+                      </span>
+                      <p className="text-sm text-gray-600 leading-relaxed max-w-md mx-auto">
+                        {Array.isArray(currentDictWord.meanings) && currentDictWord.meanings.length > 0
+                          ? currentDictWord.meanings.join('；')
+                          : currentDictWord.chineseDefinition}
+                      </p>
+                    </div>
                   ) : (
                     <div>
                       <span className="flex items-center justify-center gap-1">
@@ -474,24 +497,31 @@ export default function MainStudy() {
                   )}
                 </div>
               )}
+              {feedback && (
+                <button onClick={goNextDictation} className="btn-primary w-full mt-4 py-2.5">
+                  下一个 <ChevronRight className="w-4 h-4 inline" />
+                </button>
+              )}
             </div>
           </div>
         )}
 
         <div className="text-center mt-6">
-          <button
-            onClick={submitDictation}
-            disabled={!userInput.trim() || !!feedback}
-            className="btn-primary px-8"
-          >
-            <span className="kbd-hint">提交 (Enter)</span>
-            <span className="touch-hint hidden">提交</span>
-          </button>
+          {!feedback && (
+            <button
+              onClick={submitDictation}
+              disabled={!userInput.trim()}
+              className="btn-primary px-8"
+            >
+              <span className="kbd-hint">提交 (Enter)</span>
+              <span className="touch-hint hidden">提交</span>
+            </button>
+          )}
         </div>
 
         <p className="text-center text-xs text-gray-400 mt-4">
           <span className="kbd-hint">
-            <kbd className="px-1.5 py-0.5 bg-gray-100 border rounded">Enter</kbd> 提交 · 错词自动重测直到默写正确
+            <kbd className="px-1.5 py-0.5 bg-gray-100 border rounded">Enter</kbd> 提交 / 下一个
             · <kbd className="px-1.5 py-0.5 bg-gray-100 border rounded">Space</kbd> 朗读
             · <kbd className="px-1.5 py-0.5 bg-gray-100 border rounded">Esc</kbd> 收工
           </span>

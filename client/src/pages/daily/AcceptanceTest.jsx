@@ -37,15 +37,9 @@ export default function AcceptanceTest() {
   useEffect(() => { if (!session) navigate('/daily', { replace: true }); }, [session, navigate]);
   useEffect(() => { if (inputRef.current) inputRef.current.focus(); }, [currentIndex]);
 
-  // 没有错词（漏网之鱼为 0）→ 直接完成
-  useEffect(() => {
-    if (session && initialWords.length === 0 && !submitting) {
-      finish([]);
-    }
-  }, [session, initialWords.length, submitting, finish]);
-
   const currentWord = words[currentIndex];
 
+  // 注意：finish 必须先于下方 useEffect 声明（否则 TDZ: Cannot access 'finish' before initialization）
   const finish = useCallback(async (finalResults) => {
     setSubmitting(true);
     try {
@@ -64,6 +58,13 @@ export default function AcceptanceTest() {
       setSubmitting(false);
     }
   }, [session, elapsed, mainResults, spellingResults, navigate, showToast, plan]);
+
+  // 没有错词（漏网之鱼为 0）→ 直接完成
+  useEffect(() => {
+    if (session && initialWords.length === 0 && !submitting) {
+      finish([]);
+    }
+  }, [session, initialWords.length, submitting, finish]);
 
   const submitAnswer = useCallback(() => {
     if (feedback || !userInput.trim() || submitting) return;
