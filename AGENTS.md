@@ -84,8 +84,9 @@ client/src/
 2. 实现(遵守 §3、§4)
 3. `cd client && npm run build` 必须通过
 4. 人工点检:桌面模式键盘 + 触屏模式(DevTools 设备模拟)各过一遍主流程
-5. commit 格式:`vX.Y: 一句话描述` (历史格式: v5.0-P1、v5.1、v5.2 ...)
-6. push 到 `master` 分支
+5. commit 格式:`VX.Y.Z: 一句话描述` (三段式,如 V7.3.3;历史格式: v5.0-P1、v5.1、v5.2 ...)
+6. 打版本 tag:`git tag VX.Y.Z <commit>` 并 `git push origin VX.Y.Z`(与历史 V2.0.0~V7.3.2 的 tag 惯例一致)
+7. push 到 `master` 分支
 
 ## 6. 环境
 
