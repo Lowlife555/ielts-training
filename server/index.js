@@ -2,13 +2,37 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 require('dotenv').config();
+const { createRateLimiter } = require('./rateLimit');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 
 // Middleware
-app.use(cors());
+// 收敛 CORS：仅允许同源请求与本地开发来源，拒绝任意第三方站点
+function isAllowedOrigin(origin) {
+  if (!origin) return true; // 同源 / curl / 服务端请求
+  try {
+    const hostname = new URL(origin).hostname;
+    return hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '::1';
+  } catch {
+    return false;
+  }
+}
+app.use(cors({
+  origin(origin, cb) {
+    if (isAllowedOrigin(origin)) return cb(null, true);
+    return cb(null, false);
+  },
+}));
 app.use(express.json({ limit: '50mb' }));
+
+// Rate limiting：敏感接口防暴力破解 / 刷 API
+const authLoginLimiter = createRateLimiter({ windowMs: 60 * 1000, max: 10, message: '登录尝试过于频繁，请稍后再试' });
+const registerLimiter = createRateLimiter({ windowMs: 60 * 1000, max: 5, message: '注册请求过于频繁，请稍后再试' });
+const essaySubmitLimiter = createRateLimiter({ windowMs: 60 * 1000, max: 10, message: '作文提交过于频繁，请稍后再试' });
+app.use('/api/auth/login', authLoginLimiter);
+app.use('/api/auth/register', registerLimiter);
+app.use('/api/essays/submit', essaySubmitLimiter);
 
 // Request logging
 app.use((req, res, next) => {

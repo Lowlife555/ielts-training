@@ -10,8 +10,14 @@ function isDefaultUnclaimed(db) {
   return user && user.id === 1 && user.username === 'default' && !user.password_hash;
 }
 
+/** 管理员由环境变量 ADMIN_USERNAME 显式指定，不再"首个注册者自动提权" */
+function isAdminUsername(username) {
+  const adminName = (process.env.ADMIN_USERNAME || '').trim();
+  return !!adminName && username === adminName;
+}
+
 // POST /api/auth/register { username, password }
-// 规则：开放注册；第一个注册者自动成为管理员并继承 default 用户的全部数据
+// 规则：开放注册；管理员由环境变量 ADMIN_USERNAME 指定（首个注册者仅接管 default 用户数据，不再自动提权）
 router.post('/register', (req, res) => {
   const db = getDb();
   const { username, password } = req.body || {};
@@ -20,12 +26,14 @@ router.post('/register', (req, res) => {
   if (!USERNAME_RE.test(username)) return res.status(400).json({ error: '用户名需为 2-20 位字母/数字/下划线/中文' });
   if (String(password).length < 6) return res.status(400).json({ error: '密码至少 6 位' });
 
+  const isAdmin = isAdminUsername(username) ? 1 : 0;
+
   if (isDefaultUnclaimed(db)) {
-    // 首个注册者：接管 default 用户（id=1），数据原地不动
+    // 首个注册者：接管 default 用户（id=1），数据原地不动；管理员身份由 ADMIN_USERNAME 决定
     db.prepare(`
-      UPDATE users SET username = ?, password_hash = ?, is_admin = 1, status = 'active'
+      UPDATE users SET username = ?, password_hash = ?, is_admin = ?, status = 'active'
       WHERE id = 1
-    `).run(username, hashPassword(String(password)));
+    `).run(username, hashPassword(String(password)), isAdmin);
     const user = db.prepare('SELECT id, username, is_admin, is_test FROM users WHERE id = 1').get();
     const token = createSession(user.id);
     return res.json({ token, user: { ...user, isAdmin: !!user.is_admin, isTest: !!user.is_test } });
@@ -36,8 +44,8 @@ router.post('/register', (req, res) => {
 
   const result = db.prepare(`
     INSERT INTO users (username, password_hash, is_admin, status, created_at)
-    VALUES (?, ?, 0, 'active', ?)
-  `).run(username, hashPassword(String(password)), new Date().toISOString());
+    VALUES (?, ?, ?, 'active', ?)
+  `).run(username, hashPassword(String(password)), isAdmin, new Date().toISOString());
 
   const user = db.prepare('SELECT id, username, is_admin, is_test FROM users WHERE id = ?').get(result.lastInsertRowid);
   const token = createSession(user.id);

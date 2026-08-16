@@ -69,12 +69,17 @@ router.get('/start', (req, res) => {
 // Submit quiz answers
 router.post('/quiz', (req, res) => {
   const db = getDb();
+  const userId = req.user.id;
   const { sessionId, answers } = req.body;
   // answers: [{ wordId, userAnswer }]
 
   if (!sessionId || !answers || !Array.isArray(answers)) {
     return res.status(400).json({ error: 'sessionId and answers array required' });
   }
+
+  const session = db.prepare('SELECT id FROM daily_sessions WHERE id = ? AND user_id = ?')
+    .get(sessionId, userId);
+  if (!session) return res.status(404).json({ error: 'Session not found' });
 
   let correctCount = 0;
   const results = [];
@@ -142,11 +147,16 @@ router.post('/quiz', (req, res) => {
 // Submit error correction round
 router.post('/correction', (req, res) => {
   const db = getDb();
+  const userId = req.user.id;
   const { sessionId, answers } = req.body;
 
   if (!sessionId || !answers || !Array.isArray(answers)) {
     return res.status(400).json({ error: 'sessionId and answers array required' });
   }
+
+  const session = db.prepare('SELECT id FROM daily_sessions WHERE id = ? AND user_id = ?')
+    .get(sessionId, userId);
+  if (!session) return res.status(404).json({ error: 'Session not found' });
 
   let correctCount = 0;
   const results = [];
@@ -204,10 +214,11 @@ router.post('/correction', (req, res) => {
 // Get session report
 router.get('/report/:sessionId', (req, res) => {
   const db = getDb();
+  const userId = req.user.id;
 
   const session = db.prepare(`
-    SELECT * FROM daily_sessions WHERE id = ?
-  `).get(req.params.sessionId);
+    SELECT * FROM daily_sessions WHERE id = ? AND user_id = ?
+  `).get(req.params.sessionId, userId);
 
   if (!session) {
     return res.status(404).json({ error: 'Session not found' });
