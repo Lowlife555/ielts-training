@@ -50,16 +50,18 @@ export default function VersionNotice() {
             </ul>
           ))}
           <button
+            type="button"
             onClick={dismiss}
-            className="w-full mt-4 py-2.5 rounded-xl bg-indigo-600 text-white text-sm font-medium hover:bg-indigo-700 transition-colors"
+            className="w-full mt-4 py-2.5 rounded-xl bg-indigo-600 text-white text-sm font-medium hover:bg-indigo-700 transition-colors cursor-pointer"
           >
             知道了，开始使用
           </button>
         </div>
         <button
+          type="button"
           onClick={dismiss}
           aria-label="关闭"
-          className="absolute top-3 right-3 text-white/80 hover:text-white"
+          className="absolute top-3 right-3 text-white/80 hover:text-white cursor-pointer"
         >
           <X className="w-5 h-5" />
         </button>

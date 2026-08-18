@@ -75,8 +75,9 @@ export default function KeyboardHelp() {
             <span className="touch-hint hidden">👆 触屏操作指引</span>
           </h2>
           <button
+            type="button"
             onClick={() => dispatch({ type: 'HIDE_KEYBOARD_HELP' })}
-            className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+            className="p-2 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
             aria-label="关闭"
           >
             <X className="w-5 h-5 text-gray-500" />

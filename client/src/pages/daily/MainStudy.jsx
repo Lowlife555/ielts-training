@@ -1,9 +1,10 @@
-﻿import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { api } from '../../utils/api';
 import { useApp } from '../../context/AppContext';
 import { useKeyboard } from '../../hooks/useKeyboard';
 import { useElapsed } from '../../hooks/useTimer';
+import { useConfirm } from '../../hooks/useConfirm';
 import { speak } from '../../utils/speech';
 import { checkChineseAnswer } from '../../utils/answerCheck';
 import TrainingTimer from '../../components/training/TrainingTimer';
@@ -17,6 +18,7 @@ export default function MainStudy() {
   const navigate = useNavigate();
   const location = useLocation();
   const { showToast } = useApp();
+  const { confirm, dialog } = useConfirm();
   const { settings } = useSettings();
   const session = location.state?.session;
   const plan = location.state?.plan;
@@ -213,7 +215,7 @@ export default function MainStudy() {
 
   const abandon = useCallback(async () => {
     if (abandoning) return;
-    const ok = window.confirm('确定要收工吗？本次进度将保存，欠债规则照常计算。');
+    const ok = await confirm('确定要收工吗？本次进度将保存，欠债规则照常计算。');
     if (!ok) return;
     setAbandoning(true);
     try {
@@ -356,6 +358,7 @@ export default function MainStudy() {
           </span>
           <span className="touch-hint hidden">点卡片翻卡 · 标记会/不会 · 开始背诵</span>
         </p>
+        {dialog}
       </div>
     );
   }
@@ -400,6 +403,7 @@ export default function MainStudy() {
           </span>
           <span className="touch-hint hidden">休息 {restMinutes} 分钟或点按钮继续</span>
         </p>
+        {dialog}
       </div>
     );
   }
@@ -527,6 +531,7 @@ export default function MainStudy() {
           </span>
           <span className="touch-hint hidden">输入中文词义后提交 · 答错自动重测</span>
         </p>
+        {dialog}
       </div>
     );
   }

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { api } from '../../utils/api';
 import { useApp } from '../../context/AppContext';
 import { useAuth } from '../../context/AuthContext';
+import { useConfirm } from '../../hooks/useConfirm';
 import { Shield, RefreshCw, Ban, CheckCircle2, Loader2 } from 'lucide-react';
 
 function fmtDuration(seconds) {
@@ -16,8 +17,16 @@ function fmtDate(iso) {
   return new Date(iso).toLocaleString('zh-CN', { hour12: false }).slice(0, 16);
 }
 
+function generatePassword() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
+  let pwd = '';
+  for (let i = 0; i < 10; i++) pwd += chars[Math.floor(Math.random() * chars.length)];
+  return pwd;
+}
+
 export default function Admin() {
   const { showToast } = useApp();
+  const { confirm, dialog } = useConfirm();
   const { user: me } = useAuth();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -37,13 +46,13 @@ export default function Admin() {
   useEffect(() => { load(); }, []);
 
   const resetPassword = async (u) => {
-    const newPassword = window.prompt(`为「${u.username}」设置新密码（至少 6 位）：`);
-    if (!newPassword) return;
-    if (newPassword.length < 6) { showToast('密码至少 6 位', 'error'); return; }
+    const ok = await confirm(`确定要重置「${u.username}」的密码吗？将生成新的随机密码。`, { danger: true, confirmText: '重置' });
+    if (!ok) return;
+    const newPassword = generatePassword();
     setBusyId(u.id);
     try {
       await api.resetUserPassword(u.id, newPassword);
-      showToast(`已重置「${u.username}」的密码`, 'success');
+      showToast(`已重置「${u.username}」的密码为: ${newPassword}`, 'success');
       load();
     } catch (err) {
       showToast(err.message, 'error');
@@ -54,7 +63,7 @@ export default function Admin() {
 
   const toggleStatus = async (u) => {
     const action = u.status === 'active' ? '禁用' : '启用';
-    if (!window.confirm(`确定要${action}账号「${u.username}」吗？`)) return;
+    if (!(await confirm(`确定要${action}账号「${u.username}」吗？`, { danger: u.status === 'active' }))) return;
     setBusyId(u.id);
     try {
       await api.toggleUserStatus(u.id);
@@ -172,6 +181,7 @@ export default function Admin() {
       </div>
 
       <p className="text-xs text-gray-400 mt-4">共 {users.length} 个账号 · 重置密码会使该用户所有会话立即失效</p>
+      {dialog}
     </div>
   );
 }

@@ -37,7 +37,7 @@ export default function SummaryModal({ summary, onClose }) {
               {summary.listNo ? `List ${summary.listNo}` : '本次训练'} · {summary.createdAt?.slice(0, 10) || ''}
             </div>
           </div>
-          <button onClick={onClose} aria-label="关闭" className="text-white/80 hover:text-white">
+          <button type="button" onClick={onClose} aria-label="关闭" className="text-white/80 hover:text-white cursor-pointer">
             <X className="w-5 h-5" />
           </button>
         </div>

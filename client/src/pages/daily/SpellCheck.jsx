@@ -4,6 +4,7 @@ import { api } from '../../utils/api';
 import { useApp } from '../../context/AppContext';
 import { useKeyboard } from '../../hooks/useKeyboard';
 import { useElapsed } from '../../hooks/useTimer';
+import { useConfirm } from '../../hooks/useConfirm';
 import { speak } from '../../utils/speech';
 import { checkEnglishAnswer } from '../../utils/answerCheck';
 import TrainingTimer from '../../components/training/TrainingTimer';
@@ -16,6 +17,7 @@ export default function SpellCheck() {
   const navigate = useNavigate();
   const location = useLocation();
   const { showToast } = useApp();
+  const { confirm, dialog } = useConfirm();
   const session = location.state?.session;
   const plan = location.state?.plan;
   const dictationStats = location.state?.dictationStats;
@@ -100,7 +102,7 @@ export default function SpellCheck() {
 
   const abandon = useCallback(async () => {
     if (abandoning || submitting) return;
-    const ok = window.confirm('确定要收工吗？本次进度将保存，欠债规则照常计算。');
+    const ok = await confirm('确定要收工吗？本次进度将保存，欠债规则照常计算。');
     if (!ok) return;
     setAbandoning(true);
     try {
@@ -283,6 +285,7 @@ export default function SpellCheck() {
         </span>
         <span className="touch-hint hidden">输入英文拼写后提交</span>
       </p>
+      {dialog}
     </div>
   );
 }

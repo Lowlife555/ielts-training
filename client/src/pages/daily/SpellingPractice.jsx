@@ -4,6 +4,7 @@ import { api } from '../../utils/api';
 import { useApp } from '../../context/AppContext';
 import { useKeyboard } from '../../hooks/useKeyboard';
 import { useElapsed, formatDuration } from '../../hooks/useTimer';
+import { useConfirm } from '../../hooks/useConfirm';
 import TrainingTimer from '../../components/training/TrainingTimer';
 import { CheckCircle, XCircle, Volume2 } from 'lucide-react';
 import { speak } from '../../utils/speech';
@@ -13,6 +14,7 @@ export default function SpellingPractice() {
   const navigate = useNavigate();
   const location = useLocation();
   const { showToast } = useApp();
+  const { confirm, dialog } = useConfirm();
   const session = location.state?.session;
   const plan = location.state?.plan;
   const wrongPool = location.state?.wrongPool || [];
@@ -54,7 +56,7 @@ export default function SpellingPractice() {
 
   const abandon = useCallback(async () => {
     if (abandoning) return;
-    const ok = window.confirm('确定要收工吗？本次进度将保存，欠债规则照常计算。');
+    const ok = await confirm('确定要收工吗？本次进度将保存，欠债规则照常计算。');
     if (!ok) return;
     setAbandoning(true);
     try {
@@ -154,6 +156,7 @@ export default function SpellingPractice() {
         <span className="kbd-hint"><kbd className="px-1.5 py-0.5 bg-gray-100 border rounded">Enter</kbd> 提交 · 答完后自动进入下一题 · <kbd className="px-1.5 py-0.5 bg-gray-100 border rounded">Esc</kbd> 收工</span>
         <span className="touch-hint hidden">输入完成后点提交 · 答完自动进入下一题</span>
       </p>
+      {dialog}
     </div>
   );
 }

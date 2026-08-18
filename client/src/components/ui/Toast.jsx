@@ -24,8 +24,9 @@ export default function Toast() {
         {icons[state.toast.type] || icons.info}
         <span className="text-sm text-gray-800">{state.toast.message}</span>
         <button
+          type="button"
           onClick={() => dispatch({ type: 'HIDE_TOAST' })}
-          className="ml-2 text-gray-400 hover:text-gray-600"
+          className="ml-2 text-gray-400 hover:text-gray-600 cursor-pointer"
         >
           <X className="w-4 h-4" />
         </button>

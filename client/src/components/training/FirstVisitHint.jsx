@@ -17,15 +17,17 @@ export default function FirstVisitHint() {
               试试按 <kbd className="px-1.5 py-0.5 bg-gray-700 border border-gray-600 rounded text-xs text-white">?</kbd> 查看所有快捷键
             </p>
             <button
+              type="button"
               onClick={() => dispatch({ type: 'MARK_FIRST_VISIT' })}
-              className="text-xs text-indigo-400 hover:text-indigo-300 font-medium"
+              className="text-xs text-indigo-400 hover:text-indigo-300 font-medium cursor-pointer"
             >
               知道了
             </button>
           </div>
           <button
+            type="button"
             onClick={() => dispatch({ type: 'MARK_FIRST_VISIT' })}
-            className="text-gray-500 hover:text-gray-300"
+            className="text-gray-500 hover:text-gray-300 cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
