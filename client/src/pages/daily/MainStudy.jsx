@@ -67,6 +67,7 @@ export default function MainStudy() {
 
   const [abandoning, setAbandoning] = useState(false);
   const inputRef = useRef(null);
+  const flipTraceRef = useRef([]); // 翻卡痕迹缓存（开始背诵时批量提交留痕）
 
   const elapsed = useElapsed(session?.startTime);
 
@@ -211,12 +212,24 @@ export default function MainStudy() {
     roundPassedRef.current = new Set();
     setUserInput('');
     setFeedback(null);
+    // 批量提交翻卡痕迹（学习留痕）
+    if (flipTraceRef.current.length) {
+      api.recordTrace({ sessionId: session.sessionId, events: flipTraceRef.current }).catch(() => {});
+      flipTraceRef.current = [];
+    }
     setPhase('dictation');
   };
 
   // ===== 自测（测"不会"词，复用 useDictationSession 错词重测状态机）=====
   const selftest = useDictationSession({
     judge: (input, word) => checkChineseAnswer(input, word.keywords, word.synonyms, word.chineseDefinition, { allowSynonym: true }),
+    onAnswer: (word, isCorrect, answer) => {
+      // 自测留痕（历史可见，但不计入正式成绩）
+      api.recordTrace({
+        sessionId: session.sessionId,
+        events: [{ wordId: word.id ?? word.wordId, eventType: isCorrect ? 'selftest_correct' : 'selftest_wrong', answer }],
+      }).catch(() => {});
+    },
     onComplete: () => {
       showToast('🎉 自测完成！全部"不会"词已消灭', 'success');
       setPhase('wordtable');
@@ -340,6 +353,7 @@ export default function MainStudy() {
                       else next.add(word.wordId);
                       return next;
                     });
+                    flipTraceRef.current.push({ wordId: word.wordId, eventType: 'flip' });
                   }}
                   showMarked={(w) => (
                     <>

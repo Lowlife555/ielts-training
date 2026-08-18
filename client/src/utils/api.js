@@ -146,4 +146,16 @@ export const api = {
     request('/user-kv', { method: 'PUT', body: JSON.stringify(data) }),
   deleteUserKV: (key) =>
     request(`/user-kv/${encodeURIComponent(key)}`, { method: 'DELETE' }),
+
+  // v7.4.0 Trace（学习痕迹 + 学习报告）
+  recordTrace: (data) =>
+    request('/trace', { method: 'POST', body: JSON.stringify(data) }),
+  getTraceToday: (params = {}) => {
+    const query = new URLSearchParams(params).toString();
+    return request(`/trace/today?${query}`);
+  },
+  getTraceReport: (params = {}) => {
+    const query = new URLSearchParams(params).toString();
+    return request(`/trace/report?${query}`);
+  },
 };
