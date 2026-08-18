@@ -1,55 +1,60 @@
-import { useEffect, useCallback } from 'react';
+import { useEffect, useRef } from 'react';
 
 /**
  * Custom hook for keyboard shortcuts.
  * @param {Object} handlers - Map of key to handler function
  * @param {boolean} enabled - Whether keyboard shortcuts are enabled
- * @param {Array} deps - Additional dependencies
+ * @param {Array} deps - 兼容旧签名，已不再需要（handlers 通过 ref 始终取最新值）
+ *
+ * 用 ref 保存最新 handlers，监听器仅在 enabled 变化时重建，
+ * 避免调用方内联 handlers 导致每次渲染都 removeEventListener/addEventListener。
  */
 export function useKeyboard(handlers, enabled = true, deps = []) {
-  const handleKeyDown = useCallback((e) => {
-    if (!enabled) return;
+  const handlersRef = useRef(handlers);
+  handlersRef.current = handlers; // 渲染期间同步最新 handlers，不触发 effect
 
-    // Don't trigger shortcuts when typing in input/textarea (except for specific overrides)
-    const tag = e.target.tagName.toLowerCase();
-
-    // Allow specific handlers to work even in inputs
-    const key = e.key;
-
-    // Build the key combination string
-    let combo = '';
-    if (e.ctrlKey && key !== 'Control') combo += 'Ctrl+';
-    if (e.altKey && key !== 'Alt') combo += 'Alt+';
-    if (e.shiftKey && key !== 'Shift') combo += 'Shift+';
-    combo += key;
-
-    // Check for specific handlers
-    if (handlers[combo]) {
-      e.preventDefault();
-      handlers[combo](e);
-      return;
-    }
-
-    // For single-key shortcuts, don't fire in input fields
-    if (tag === 'input' || tag === 'textarea' || tag === 'select') {
-      // Only allow Escape and specific combos in input fields
-      if (key === 'Escape' && handlers['Escape']) {
-        e.preventDefault();
-        handlers['Escape'](e);
-      }
-      return;
-    }
-
-    if (handlers[key]) {
-      e.preventDefault();
-      handlers[key](e);
-    }
-  }, [handlers, enabled, ...deps]);
+  const enabledRef = useRef(enabled);
+  enabledRef.current = enabled;
 
   useEffect(() => {
     if (!enabled) return;
 
+    const handleKeyDown = (e) => {
+      const current = handlersRef.current;
+      if (!enabledRef.current) return;
+
+      const tag = e.target.tagName.toLowerCase();
+      const key = e.key;
+
+      // 组合键（Ctrl+Enter 等）
+      let combo = '';
+      if (e.ctrlKey && key !== 'Control') combo += 'Ctrl+';
+      if (e.altKey && key !== 'Alt') combo += 'Alt+';
+      if (e.shiftKey && key !== 'Shift') combo += 'Shift+';
+      combo += key;
+
+      if (current[combo]) {
+        e.preventDefault();
+        current[combo](e);
+        return;
+      }
+
+      // 输入框内只允许 Escape（及已被组合键拦截的）
+      if (tag === 'input' || tag === 'textarea' || tag === 'select') {
+        if (key === 'Escape' && current['Escape']) {
+          e.preventDefault();
+          current['Escape'](e);
+        }
+        return;
+      }
+
+      if (current[key]) {
+        e.preventDefault();
+        current[key](e);
+      }
+    };
+
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [handleKeyDown, enabled]);
+  }, [enabled]);
 }
