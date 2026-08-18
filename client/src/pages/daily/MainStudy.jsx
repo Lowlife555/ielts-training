@@ -10,7 +10,8 @@ import { checkChineseAnswer } from '../../utils/answerCheck';
 import TrainingTimer from '../../components/training/TrainingTimer';
 import FlipCard from '../../components/ui/FlipCard';
 import { useSettings } from '../../context/SettingsContext';
-import { Check, X, Play, Coffee, Timer, Volume2, ChevronRight } from 'lucide-react';
+import { useDictationSession } from '../../hooks/useDictationSession';
+import { Check, X, Play, Coffee, Timer, Volume2, ChevronRight, Target } from 'lucide-react';
 
 const TIME_UP_BUFFER = 10 * 60; // 剩余不足 10 分钟不再开始新批次
 
@@ -213,6 +214,29 @@ export default function MainStudy() {
     setPhase('dictation');
   };
 
+  // ===== 自测（测"不会"词，复用 useDictationSession 错词重测状态机）=====
+  const selftest = useDictationSession({
+    judge: (input, word) => checkChineseAnswer(input, word.keywords, word.synonyms, word.chineseDefinition, { allowSynonym: true }),
+    onComplete: () => {
+      showToast('🎉 自测完成！全部"不会"词已消灭', 'success');
+      setPhase('wordtable');
+    },
+  });
+
+  const startSelftest = () => {
+    const notMarked = currentBatch.filter(w => marked[w.wordId] === false);
+    if (notMarked.length === 0) {
+      showToast('本批没有标记"不会"的词', 'info');
+      return;
+    }
+    selftest.start(notMarked);
+    setPhase('selftest');
+  };
+
+  const endSelftest = () => {
+    setPhase('wordtable');
+  };
+
   const abandon = useCallback(async () => {
     if (abandoning) return;
     const ok = await confirm('确定要收工吗？本次进度将保存，欠债规则照常计算。');
@@ -240,13 +264,18 @@ export default function MainStudy() {
         if (feedback) goNextDictation();
         else submitDictation();
       }
+      if (phase === 'selftest') selftest.submit();
       if (phase === 'rest') skipRest();
     },
     ' ': (e) => {
       e.preventDefault();
       if (phase === 'dictation' && currentDictWord) speak(currentDictWord.word);
+      if (phase === 'selftest' && selftest.currentWord) speak(selftest.currentWord.word);
     },
-    'Escape': abandon,
+    'Escape': () => {
+      if (phase === 'selftest') endSelftest();
+      else abandon();
+    },
   }, true, [phase, submitDictation, goNextDictation, feedback, abandon, currentDictWord, skipRest]);
 
   if (!session) return null;
@@ -328,7 +357,16 @@ export default function MainStudy() {
                         <Check className="w-4 h-4" />
                       </button>
                       <button
-                        onClick={(e) => { e.stopPropagation(); setMarked(m => ({ ...m, [word.wordId]: false })); }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setMarked(m => ({ ...m, [word.wordId]: false }));
+                          // 点"不会"后翻回释义面（正面），立即展示答案学习，同时保留红色"不会"标记
+                          setFlippedSet(prev => {
+                            const next = new Set(prev);
+                            next.delete(word.wordId);
+                            return next;
+                          });
+                        }}
                         className={`p-2 rounded-lg transition-colors ${isNotMarked ? 'bg-red-100 text-red-500' : 'text-gray-400 hover:bg-red-50'}`}
                         title="不会 (2)"
                       >
@@ -342,6 +380,15 @@ export default function MainStudy() {
           })}
         </div>
 
+        {currentBatch.some(w => marked[w.wordId] === false) && (
+          <button
+            onClick={startSelftest}
+            className="btn-secondary w-full py-3 flex items-center justify-center gap-2 mb-3"
+          >
+            <Target className="w-5 h-5" />
+            自测"不会"词（{currentBatch.filter(w => marked[w.wordId] === false).length} 个）
+          </button>
+        )}
         <button
           onClick={startDictation}
           className="btn-primary w-full text-lg py-3 flex items-center justify-center gap-2"
@@ -530,6 +577,116 @@ export default function MainStudy() {
             · <kbd className="px-1.5 py-0.5 bg-gray-100 border rounded">Esc</kbd> 收工
           </span>
           <span className="touch-hint hidden">输入中文词义后提交 · 答错自动重测</span>
+        </p>
+        {dialog}
+      </div>
+    );
+  }
+
+  // ===== 自测阶段（测"不会"词，错词循环直到消灭，可退回背诵）=====
+  if (phase === 'selftest') {
+    const sw = selftest.currentWord;
+    const progress = selftest.words.length ? (selftest.currentIndex / selftest.words.length) * 100 : 0;
+    const borderClass = selftest.feedback === 'correct'
+      ? 'border-green-500 animate-pulse-green'
+      : selftest.feedback === 'incorrect'
+      ? 'border-red-500 animate-shake-red'
+      : 'border-gray-200';
+
+    return (
+      <div className="max-w-2xl mx-auto px-4 py-8">
+        <div className="flex items-center justify-between mb-4">
+          <span className="text-sm font-medium text-purple-600">
+            🎯 自测 · 消灭 {selftest.words.length} 个"不会"词
+            {selftest.round > 1 ? ` · 第 ${selftest.round} 轮重测` : ''} · {selftest.currentIndex + 1} / {selftest.words.length}
+          </span>
+          <button onClick={endSelftest} className="btn-secondary px-4 py-1.5 text-sm">
+            ← 返回背诵
+          </button>
+        </div>
+
+        <div className="w-full bg-gray-100 rounded-full h-1.5 mb-8">
+          <div className="bg-purple-500 h-1.5 rounded-full transition-all" style={{ width: `${progress}%` }} />
+        </div>
+
+        {sw && (
+          <div className={`card text-center border-2 transition-all duration-300 ${borderClass}`}>
+            <div className="mb-4">
+              <p className="text-sm text-gray-500 mb-1">请填写该单词的中文释义</p>
+              <div className="flex items-center justify-center gap-3">
+                <button
+                  onClick={() => speak(sw.word)}
+                  className="w-10 h-10 bg-indigo-50 hover:bg-indigo-100 rounded-full flex items-center justify-center transition-colors"
+                  title="朗读 (Space)"
+                >
+                  <Volume2 className="w-5 h-5 text-indigo-600" />
+                </button>
+                <p className="text-4xl font-bold text-gray-900">{sw.word}</p>
+              </div>
+              <span className="text-sm text-gray-400 mt-1 inline-block">
+                {sw.phonetic}
+                {sw.partOfSpeech ? ` · ${sw.partOfSpeech}` : ''}
+              </span>
+            </div>
+
+            <div className="max-w-sm mx-auto">
+              <input
+                type="text"
+                value={selftest.userInput}
+                onChange={(e) => selftest.setUserInput(e.target.value)}
+                placeholder="输入中文词义..."
+                className={`input-field text-center text-xl ${
+                  selftest.feedback === 'correct' ? 'border-green-500 bg-green-50' :
+                  selftest.feedback === 'incorrect' ? 'border-red-500 bg-red-50' : ''
+                }`}
+                autoComplete="off" autoCorrect="off" spellCheck="false"
+                disabled={!!selftest.feedback}
+              />
+              {selftest.feedback && (
+                <div className={`text-center mt-3 ${selftest.feedback === 'correct' ? 'text-green-600' : 'text-red-500'}`}>
+                  {selftest.feedback === 'correct' ? (
+                    <div>
+                      <span className="flex items-center justify-center gap-1 mb-1">
+                        <Check className="w-5 h-5" /> 正确!
+                      </span>
+                      <p className="text-sm text-gray-600 leading-relaxed max-w-md mx-auto">
+                        {Array.isArray(sw.meanings) && sw.meanings.length > 0 ? sw.meanings.join('；') : sw.chineseDefinition}
+                      </p>
+                    </div>
+                  ) : (
+                    <div>
+                      <span className="flex items-center justify-center gap-1">
+                        <X className="w-5 h-5" /> 错误 · 将重测
+                      </span>
+                      <p className="text-sm mt-1">
+                        参考答案: <span className="font-semibold text-green-600">
+                          {Array.isArray(sw.meanings) && sw.meanings.length > 0 ? sw.meanings.join('；') : sw.chineseDefinition}
+                        </span>
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        <div className="text-center mt-6">
+          {!selftest.feedback && (
+            <button onClick={selftest.submit} disabled={!selftest.userInput.trim()} className="btn-primary px-8">
+              <span className="kbd-hint">提交 (Enter)</span>
+              <span className="touch-hint hidden">提交</span>
+            </button>
+          )}
+        </div>
+
+        <p className="text-center text-xs text-gray-400 mt-4">
+          <span className="kbd-hint">
+            <kbd className="px-1.5 py-0.5 bg-gray-100 border rounded">Enter</kbd> 提交
+            · <kbd className="px-1.5 py-0.5 bg-gray-100 border rounded">Space</kbd> 朗读
+            · <kbd className="px-1.5 py-0.5 bg-gray-100 border rounded">Esc</kbd> 返回背诵
+          </span>
+          <span className="touch-hint hidden">输入中文释义后提交 · 错词自动重测直到消灭</span>
         </p>
         {dialog}
       </div>
