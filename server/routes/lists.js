@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { getDb } = require('../db/database');
 const { requireAuth } = require('../auth');
+const { recordAnswer } = require('../services/wordProgress');
 
 router.use(requireAuth);
 
@@ -85,30 +86,7 @@ router.post('/:listNo/dictation', (req, res) => {
   }
 
   const userId = req.user.id;
-  const now = new Date().toISOString().split('T')[0];
-  const existing = db.prepare(
-    'SELECT * FROM user_word_progress WHERE user_id = ? AND word_id = ?'
-  ).get(userId, wordId);
-
-  const correct = isCorrect ? 1 : 0;
-  const incorrect = isCorrect ? 0 : 1;
-
-  if (existing) {
-    const newCorrect = (existing.correct_count || 0) + correct;
-    const newIncorrect = (existing.incorrect_count || 0) + incorrect;
-    const mastered = newCorrect >= 3 ? 1 : 0;
-    db.prepare(`
-      UPDATE user_word_progress
-      SET correct_count = ?, incorrect_count = ?, mastered = ?,
-          last_review_date = ?, next_review_date = date('now', '+' || ? || ' days')
-      WHERE user_id = ? AND word_id = ?
-    `).run(newCorrect, newIncorrect, mastered, now, isCorrect ? 2 : 1, userId, wordId);
-  } else {
-    db.prepare(`
-      INSERT INTO user_word_progress (user_id, word_id, correct_count, incorrect_count, mastered, last_review_date, next_review_date)
-      VALUES (?, ?, ?, ?, ?, ?, date('now', '+' || ? || ' days'))
-    `).run(userId, wordId, correct, incorrect, 0, now, isCorrect ? 2 : 1);
-  }
+  recordAnswer(db, userId, wordId, isCorrect);
 
   res.json({
     wordId,

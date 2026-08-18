@@ -12,9 +12,9 @@ router.get('/', (req, res) => {
   const { topic, page = 1, limit = 20, search } = req.query;
   const offset = (parseInt(page) - 1) * parseInt(limit);
 
-  let query = `SELECT w.*, uwp.mastered, uwp.correct_count, uwp.incorrect_count FROM words w LEFT JOIN user_word_progress uwp ON w.id = uwp.word_id AND uwp.user_id = ${userId} WHERE 1=1`;
+  let query = `SELECT w.*, uwp.mastered, uwp.correct_count, uwp.incorrect_count FROM words w LEFT JOIN user_word_progress uwp ON w.id = uwp.word_id AND uwp.user_id = ? WHERE 1=1`;
   let countQuery = 'SELECT COUNT(*) as total FROM words w WHERE 1=1';
-  const params = [];
+  const params = [userId];
   const countParams = [];
 
   if (topic) {
@@ -56,9 +56,9 @@ router.get('/:id', (req, res) => {
     SELECT w.*, uwp.mastered, uwp.correct_count, uwp.incorrect_count,
            uwp.ease_factor, uwp.interval_days, uwp.repetitions
     FROM words w
-    LEFT JOIN user_word_progress uwp ON w.id = uwp.word_id AND uwp.user_id = ${userId}
+    LEFT JOIN user_word_progress uwp ON w.id = uwp.word_id AND uwp.user_id = ?
     WHERE w.id = ?
-  `).get(req.params.id);
+  `).get(userId, req.params.id);
 
   if (!word) {
     return res.status(404).json({ error: 'Word not found' });

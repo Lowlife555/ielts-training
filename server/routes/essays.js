@@ -14,9 +14,9 @@ router.get('/history', (req, res) => {
     SELECT es.*, wq.question_text, wq.task_type, wq.source
     FROM essay_submissions es
     JOIN writing_questions wq ON es.question_id = wq.id
-    WHERE es.user_id = ${userId}
+    WHERE es.user_id = ?
     ORDER BY es.submitted_at DESC
-  `).all();
+  `).all(userId);
 
   res.json({ submissions });
 });
@@ -30,8 +30,8 @@ router.get('/:id/result', (req, res) => {
     SELECT es.*, wq.question_text, wq.task_type, wq.model_essay
     FROM essay_submissions es
     JOIN writing_questions wq ON es.question_id = wq.id
-    WHERE es.id = ? AND es.user_id = ${userId}
-  `).get(req.params.id);
+    WHERE es.id = ? AND es.user_id = ?
+  `).get(req.params.id, userId);
 
   if (!submission) {
     return res.status(404).json({ error: 'Submission not found' });
@@ -76,8 +76,8 @@ router.post('/submit', async (req, res) => {
   // Create submission record
   const result = db.prepare(`
     INSERT INTO essay_submissions (user_id, question_id, essay_text, word_count, grading_status)
-    VALUES (${userId}, ?, ?, ?, 'processing')
-  `).run(questionId, essayText, wordCount);
+    VALUES (?, ?, ?, ?, 'processing')
+  `).run(userId, questionId, essayText, wordCount);
 
   const submissionId = result.lastInsertRowid;
 

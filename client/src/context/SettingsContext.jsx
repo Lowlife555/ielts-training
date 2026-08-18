@@ -87,11 +87,10 @@ export function SettingsProvider({ children }) {
     setSettings(next); // 乐观更新
     setSpeechConfig({ source: next.voiceSource, accent: next.voiceAccent });
     try {
-      // 写入 KV（新存储）；旧表同步更新保持兼容
+      // 写入 KV（唯一写入路径，旧 user_settings 表仅作迁移期回退读取）
       const toKV = {};
       for (const [k, v] of Object.entries(patch)) toKV[KV_PREFIX + k] = v;
       await Promise.all(Object.entries(toKV).map(([k, v]) => kv.set(k, v)));
-      api.updateSettings(patch).catch(() => { /* 旧表更新失败不影响 KV */ });
       return next;
     } catch (err) {
       // 回滚

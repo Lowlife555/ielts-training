@@ -16,12 +16,12 @@ router.get('/', (req, res) => {
            uwp.correct_count, uwp.incorrect_count
     FROM words w
     INNER JOIN user_word_progress uwp ON w.id = uwp.word_id
-    WHERE uwp.user_id = ${userId}
+    WHERE uwp.user_id = ?
       AND uwp.next_review_date <= ?
       AND uwp.mastered = 0
     ORDER BY uwp.next_review_date ASC
     LIMIT 50
-  `).all(today);
+  `).all(userId, today);
 
   res.json({ words, total: words.length });
 });

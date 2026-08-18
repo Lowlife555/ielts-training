@@ -3,6 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { api } from '../../utils/api';
 import { useApp } from '../../context/AppContext';
 import { useKeyboard } from '../../hooks/useKeyboard';
+import { useDictationSession } from '../../hooks/useDictationSession';
 import { speak } from '../../utils/speech';
 import { checkChineseAnswer } from '../../utils/answerCheck';
 import Loading from '../../components/ui/Loading';
@@ -19,19 +20,24 @@ export default function ListDictation() {
   const navigate = useNavigate();
   const { showToast } = useApp();
   const [words, setWords] = useState([]);
-  const [testWords, setTestWords] = useState([]);
-  const [round, setRound] = useState(1);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [userInput, setUserInput] = useState('');
-  const [results, setResults] = useState([]); // 每词结果（correct=最终，firstTry=首试）
-  const roundPassedRef = useRef(new Set()); // 本轮已答对的词 id（跨轮次累积通过词，用于剔除重测）
-  const [feedback, setFeedback] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedCount, setSelectedCount] = useState(0);
   const [started, setStarted] = useState(false);
   const [finished, setFinished] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
   const inputRef = useRef(null);
+
+  const judge = useCallback((input, word) =>
+    checkChineseAnswer(input, word.keywords, word.synonyms, word.chineseDefinition, { allowSynonym: true }), []);
+  const onAnswer = useCallback((word, isCorrect, answer) => {
+    api.submitDictation(listNo, { wordId: word.id, isCorrect, userAnswer: answer })
+      .catch((err) => console.warn('Failed to save dictation result:', err.message));
+  }, [listNo]);
+  const onComplete = useCallback(() => setFinished(true), []);
+
+  const {
+    words: testWords, round, currentIndex, currentWord,
+    userInput, setUserInput, feedback, results, start, submit,
+  } = useDictationSession({ judge, onAnswer, onComplete });
 
   useEffect(() => {
     api.getListWords(listNo)
@@ -47,79 +53,13 @@ export default function ListDictation() {
   const startTest = () => {
     const count = selectedCount > 0 ? Math.min(selectedCount, words.length) : words.length;
     const pick = words.slice(0, count);
-    setTestWords(pick);
-    setRound(1);
-    setCurrentIndex(0);
-    setResults([]);
-    roundPassedRef.current = new Set();
-    setFeedback(null);
-    setUserInput('');
+    start(pick);
     setFinished(false);
     setStarted(true);
   };
 
-  const currentWord = testWords[currentIndex];
-
-  const submitAnswer = useCallback(() => {
-    if (feedback || !userInput.trim() || submitting || !currentWord) return;
-
-    const isCorrect = checkChineseAnswer(userInput, currentWord.keywords, currentWord.synonyms, currentWord.chineseDefinition, { allowSynonym: true });
-    setFeedback(isCorrect ? 'correct' : 'incorrect');
-
-    // 答对的词记入本轮已通过集合（重测轮次剔除用）
-    if (isCorrect) {
-      roundPassedRef.current.add(currentWord.id);
-    }
-
-    setResults(prev => {
-      const idx = prev.findIndex(r => r.wordId === currentWord.id);
-      let next;
-      if (idx === -1) {
-        next = [...prev, { wordId: currentWord.id, correct: isCorrect, firstTry: isCorrect, answer: userInput.trim() }];
-      } else if (isCorrect) {
-        const copy = [...prev];
-        copy[idx] = { ...copy[idx], correct: true, answer: userInput.trim() };
-        next = copy;
-      } else {
-        next = prev;
-      }
-      return next;
-    });
-
-    api.submitDictation(listNo, {
-      wordId: currentWord.id,
-      isCorrect,
-      userAnswer: userInput.trim(),
-    }).catch((err) => {
-      console.warn('Failed to save dictation result:', err.message);
-    });
-
-    setTimeout(() => {
-      if (currentIndex + 1 >= testWords.length) {
-        // 下一轮只重测本轮未通过的词（已通过的直接剔除）
-        const retryWords = testWords.filter(w => !roundPassedRef.current.has(w.id));
-        if (retryWords.length > 0) {
-          setTestWords(retryWords);
-          setRound(r => r + 1);
-          setCurrentIndex(0);
-          setUserInput('');
-          setFeedback(null);
-          inputRef.current?.focus();
-        } else {
-          setFinished(true);
-          setFeedback(null);
-        }
-      } else {
-        setCurrentIndex(i => i + 1);
-        setUserInput('');
-        setFeedback(null);
-        inputRef.current?.focus();
-      }
-    }, 800);
-  }, [userInput, feedback, currentIndex, currentWord, testWords, submitting, listNo]);
-
   useKeyboard({
-    'Enter': () => { if (started) submitAnswer(); },
+    'Enter': () => { if (started) submit(); },
     'Escape': () => {
       if (finished) navigate(`/lists/${listNo}`);
       else if (started) setStarted(false);
@@ -327,7 +267,7 @@ export default function ListDictation() {
 
       <div className="text-center mt-6">
         <button
-          onClick={submitAnswer}
+          onClick={submit}
           disabled={!userInput.trim() || !!feedback}
           className="btn-primary px-8"
         >

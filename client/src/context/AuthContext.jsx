@@ -56,19 +56,8 @@ export function AuthProvider({ children }) {
     setUser(null);
   }, []);
 
-  const refreshUser = useCallback(() => {
-    if (!localStorage.getItem('ielts_token')) return Promise.resolve(null);
-    return api.getMe()
-      .then(({ user }) => {
-        setUser(user);
-        localStorage.setItem('ielts_user', JSON.stringify(user));
-        return user;
-      })
-      .catch(() => null);
-  }, []);
-
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout, refreshUser }}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
       {children}
     </AuthContext.Provider>
   );

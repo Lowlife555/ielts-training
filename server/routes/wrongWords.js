@@ -14,9 +14,9 @@ router.get('/', (req, res) => {
     SELECT w.*, uwp.correct_count, uwp.incorrect_count, uwp.mastered
     FROM words w
     INNER JOIN user_word_progress uwp ON w.id = uwp.word_id
-    WHERE uwp.user_id = ${userId} AND uwp.incorrect_count > 0
+    WHERE uwp.user_id = ? AND uwp.incorrect_count > 0
     ORDER BY uwp.incorrect_count DESC, w.id
-  `).all();
+  `).all(userId);
 
   res.json({ words, total: words.length });
 });

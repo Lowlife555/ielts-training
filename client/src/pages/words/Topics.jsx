@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../../utils/api';
 import Loading from '../../components/ui/Loading';
 import { useKeyboard } from '../../hooks/useKeyboard';
+import { useFetch } from '../../hooks/useFetch';
 import { BookOpen, TrendingUp } from 'lucide-react';
 
 const topicIcons = {
@@ -11,16 +11,12 @@ const topicIcons = {
 };
 
 export default function Topics() {
-  const [topics, setTopics] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { data, loading } = useFetch(() => api.getTopics(), []);
+  const topics = data || [];
 
   useKeyboard({
     'Escape': () => window.history.back(),
   });
-
-  useEffect(() => {
-    api.getTopics().then(setTopics).finally(() => setLoading(false));
-  }, []);
 
   if (loading) return <Loading text="加载话题..." />;
 

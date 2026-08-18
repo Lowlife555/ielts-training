@@ -37,6 +37,7 @@ if (listsIdx >= 0) {
 const dryRun = args.includes('--dry-run');
 const forceAll = args.includes('--all');
 const petMode = args.includes('--pet');
+const multiMode = args.includes('--multi'); // 只处理多义词（chinese_definition 含分号）
 const sampleIdx = args.findIndex(a => a.startsWith('--sample'));
 const sample = sampleIdx >= 0 ? parseInt(args[sampleIdx + 1]) || 20 : 0;
 
@@ -83,7 +84,8 @@ ${words.map(w => `${w.word}（${w.part_of_speech || '?'}）释义：${w.chinese_
 2. 变体必须是**用户答题时自然可能写出的词**，不要给出书面语生僻词；
 3. 每个变体 2-6 个汉字，不要带标点和词性前缀；
 4. 不要包含与原释义完全相同的字面重复（避免冗余），但要确保至少一个变体是核心义项的常用口语表达；
-5. 只输出一个 JSON 对象，key 为单词，value 为变体数组，不要输出任何其他文字：
+5. 若释义含多个义项（分号分隔），必须为每个义项都生成至少 1-2 个近义变体，覆盖全部义项（如"螺栓；逃跑"→ 变体需同时含"螺钉/螺丝"与"逃离/溜走"）；
+6. 只输出一个 JSON 对象，key 为单词，value 为变体数组，不要输出任何其他文字：
 {"silence":["安静","沉默","肃静","不出声"],"quiet":["安静","平静","轻声","静谧"]}
 
 单词列表：
@@ -140,6 +142,9 @@ async function main() {
       JOIN word_meanings wm ON wm.word_id = w.id
       WHERE w.is_extra = 0
     `;
+    if (multiMode) {
+      query += ` AND (w.chinese_definition LIKE '%;%' OR w.chinese_definition LIKE '%；%')`;
+    }
     if (lists && lists.length > 0) {
       query += ` AND w.list_no IN (${lists.map(() => '?').join(',')})`;
       params.push(...lists);
@@ -180,6 +185,15 @@ async function main() {
 
   // 过滤：默认只处理未处理过的；--all 强制全部
   let todo = forceAll ? words : words.filter(w => !state.processed.has(w.id));
+  // --multi 模式：只处理 synonyms 为 NULL 或空的多义词（不管 checkpoint）
+  if (multiMode) {
+    todo = words.filter(w => {
+      let syn = w.synonyms;
+      if (syn == null) return true;
+      try { syn = JSON.parse(syn); } catch { return true; }
+      return !Array.isArray(syn) || syn.length === 0;
+    });
+  }
   if (todo.length === 0) {
     console.log(petMode ? '全部 PET 词已处理，无需重复（--all 强制重跑）' : '全部 IELTS 词已扩充，无需处理（--all 强制重跑）');
     closeDb();

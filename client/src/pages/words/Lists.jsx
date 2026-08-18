@@ -1,24 +1,17 @@
-import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../../utils/api';
 import Loading from '../../components/ui/Loading';
 import { useKeyboard } from '../../hooks/useKeyboard';
+import { useFetch } from '../../hooks/useFetch';
 import { ArrowLeft, BookOpen, TrendingUp } from 'lucide-react';
 
 export default function Lists() {
-  const [lists, setLists] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { data, loading } = useFetch(() => api.getLists(), []);
+  const lists = data || [];
 
   useKeyboard({
     'Escape': () => window.history.back(),
   });
-
-  useEffect(() => {
-    api.getLists()
-      .then(setLists)
-      .catch(() => setLists([]))
-      .finally(() => setLoading(false));
-  }, []);
 
   if (loading) return <Loading text="加载 List..." />;
 

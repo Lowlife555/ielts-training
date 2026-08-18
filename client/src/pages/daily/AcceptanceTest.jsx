@@ -1,10 +1,11 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { api } from '../../utils/api';
 import { useApp } from '../../context/AppContext';
 import { useKeyboard } from '../../hooks/useKeyboard';
 import { useElapsed } from '../../hooks/useTimer';
 import { useConfirm } from '../../hooks/useConfirm';
+import { useDictationSession } from '../../hooks/useDictationSession';
 import TrainingTimer from '../../components/training/TrainingTimer';
 import { CheckCircle, XCircle, Volume2 } from 'lucide-react';
 import { speak } from '../../utils/speech';
@@ -21,27 +22,16 @@ export default function AcceptanceTest() {
   const mainResults = location.state?.mainResults || [];
   const spellingResults = location.state?.spellingResults || [];
 
-  const initialWords = wrongPool.map(w => ({ wordId: w.wordId, word: w.word, chineseDefinition: w.chineseDefinition, partOfSpeech: w.partOfSpeech }));
+  const initialWords = useMemo(() => wrongPool.map(w => ({ wordId: w.wordId, word: w.word, chineseDefinition: w.chineseDefinition, partOfSpeech: w.partOfSpeech })), [wrongPool]);
 
-  const [words, setWords] = useState(initialWords);
-  const [round, setRound] = useState(1);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [userInput, setUserInput] = useState('');
-  const [results, setResults] = useState([]); // 每词结果（correct=最终，firstTry=首试）
-  const resultsRef = useRef([]);
-  const roundPassedRef = useRef(new Set()); // 本轮已答对的词 id（重测轮次剔除用）
-  const [feedback, setFeedback] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const inputRef = useRef(null);
 
   const elapsed = useElapsed(session?.startTime);
 
   useEffect(() => { if (!session) navigate('/daily', { replace: true }); }, [session, navigate]);
-  useEffect(() => { if (inputRef.current) inputRef.current.focus(); }, [currentIndex]);
 
-  const currentWord = words[currentIndex];
-
-  // 注意：finish 必须先于下方 useEffect 声明（否则 TDZ: Cannot access 'finish' before initialization）
+  // 注意：finish 必须先于 useDictationSession 声明（onComplete 引用它）
   const finish = useCallback(async (finalResults) => {
     setSubmitting(true);
     try {
@@ -61,64 +51,23 @@ export default function AcceptanceTest() {
     }
   }, [session, elapsed, mainResults, spellingResults, navigate, showToast, plan]);
 
+  const {
+    words, round, currentIndex, currentWord,
+    userInput, setUserInput, feedback, results, start, submit,
+  } = useDictationSession({
+    judge: (input, word) => checkEnglishAnswer(input, word.word, { allowMorph: true, allowEdit: false }),
+    onComplete: (finalResults) => finish(finalResults),
+  });
+
+  useEffect(() => { if (session) start(initialWords); }, [session, start]);
+  useEffect(() => { if (inputRef.current) inputRef.current.focus(); }, [currentIndex]);
+
   // 没有错词（漏网之鱼为 0）→ 直接完成
   useEffect(() => {
     if (session && initialWords.length === 0 && !submitting) {
       finish([]);
     }
   }, [session, initialWords.length, submitting, finish]);
-
-  const submitAnswer = useCallback(() => {
-    if (feedback || !userInput.trim() || submitting) return;
-    const isCorrect = checkEnglishAnswer(userInput, currentWord.word, { allowMorph: true, allowEdit: false });
-    setFeedback(isCorrect ? 'correct' : 'incorrect');
-
-    // 答对的词记入本轮已通过集合（重测轮次剔除用）
-    if (isCorrect) {
-      roundPassedRef.current.add(currentWord.wordId);
-    }
-
-    setResults(prev => {
-      const idx = prev.findIndex(r => r.wordId === currentWord.wordId);
-      let next;
-      if (idx === -1) {
-        // 首次尝试：记录首试正确率 firstTry
-        next = [...prev, { wordId: currentWord.wordId, correct: isCorrect, firstTry: isCorrect, answer: userInput.trim() }];
-      } else if (isCorrect) {
-        // 后续轮次拼对：correct 更新为 true（首次成绩保留在 firstTry）
-        const copy = [...prev];
-        copy[idx] = { ...copy[idx], correct: true, answer: userInput.trim() };
-        next = copy;
-      } else {
-        next = prev; // 后续轮次仍拼错：保持原状，继续重测
-      }
-      resultsRef.current = next;
-      return next;
-    });
-
-    setTimeout(() => {
-      if (currentIndex + 1 >= words.length) {
-        // 下一轮只重测本轮未通过的词（已通过的直接剔除）
-        const retryWords = words.filter(w => !roundPassedRef.current.has(w.wordId));
-        if (retryWords.length > 0) {
-          setWords(retryWords);
-          setRound(r => r + 1);
-          setCurrentIndex(0);
-          setUserInput('');
-          setFeedback(null);
-          inputRef.current?.focus();
-        } else {
-          // 本轮全对：验收通过
-          finish(resultsRef.current);
-        }
-      } else {
-        setCurrentIndex(i => i + 1);
-        setUserInput('');
-        setFeedback(null);
-        inputRef.current?.focus();
-      }
-    }, 800);
-  }, [userInput, feedback, currentIndex, currentWord, words, round, submitting, finish]);
 
   const abandon = useCallback(async () => {
     if (submitting) return;
@@ -134,12 +83,12 @@ export default function AcceptanceTest() {
   }, [submitting, session, elapsed, mainResults, showToast, navigate]);
 
   useKeyboard({
-    'Enter': () => submitAnswer(),
+    'Enter': () => submit(),
     'Escape': abandon,
     ' ': (e) => {
       if (feedback && currentWord) { e.preventDefault(); speak(currentWord.word); }
     },
-  }, true, [submitAnswer, abandon, feedback, currentWord]);
+  }, true, [submit, abandon, feedback, currentWord]);
 
   if (!session) return null;
 
@@ -219,7 +168,7 @@ export default function AcceptanceTest() {
       )}
 
       <div className="text-center mt-6">
-        <button onClick={submitAnswer} disabled={!userInput.trim() || !!feedback || submitting} className="btn-primary px-8">
+        <button onClick={submit} disabled={!userInput.trim() || !!feedback || submitting} className="btn-primary px-8">
           <span className="kbd-hint">提交 (Enter)</span>
           <span className="touch-hint hidden">提交</span>
         </button>

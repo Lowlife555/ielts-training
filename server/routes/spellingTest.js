@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { getDb } = require('../db/database');
 const { requireAuth } = require('../auth');
+const { recordAnswer } = require('../services/wordProgress');
 
 router.use(requireAuth);
 
@@ -51,30 +52,8 @@ router.post('/', (req, res) => {
 
   const userId = req.user.id;
 
-  // Update or insert progress
-  const existing = db.prepare(
-    `SELECT * FROM user_word_progress WHERE user_id = ${userId} AND word_id = ?`
-  ).get(wordId);
-
-  const now = new Date().toISOString().split('T')[0];
-
-  if (existing) {
-    const newCorrect = (existing.correct_count || 0) + (isCorrect ? 1 : 0);
-    const newIncorrect = (existing.incorrect_count || 0) + (isCorrect ? 0 : 1);
-    const mastered = newCorrect >= 3 ? 1 : 0;
-
-    db.prepare(`
-      UPDATE user_word_progress
-      SET correct_count = ?, incorrect_count = ?, mastered = ?,
-          last_review_date = ?, next_review_date = date('now', '+' || ? || ' days')
-      WHERE user_id = ${userId} AND word_id = ?
-    `).run(newCorrect, newIncorrect, mastered, now, isCorrect ? 2 : 1, wordId);
-  } else {
-    db.prepare(`
-      INSERT INTO user_word_progress (user_id, word_id, correct_count, incorrect_count, mastered, last_review_date, next_review_date)
-      VALUES (${userId}, ?, ?, ?, ?, ?, date('now', '+' || ? || ' days'))
-    `).run(wordId, isCorrect ? 1 : 0, isCorrect ? 0 : 1, 0, now, isCorrect ? 2 : 1);
-  }
+  // 统一走 wordProgress service（同时消除 ${userId} 字符串拼接）
+  recordAnswer(db, userId, wordId, isCorrect);
 
   res.json({
     wordId,

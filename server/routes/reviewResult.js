@@ -16,8 +16,8 @@ router.post('/', (req, res) => {
   }
 
   const progress = db.prepare(
-    `SELECT * FROM user_word_progress WHERE user_id = ${userId} AND word_id = ?`
-  ).get(wordId);
+    'SELECT * FROM user_word_progress WHERE user_id = ? AND word_id = ?'
+  ).get(userId, wordId);
 
   if (!progress) {
     return res.status(404).json({ error: 'No progress record found for this word' });
@@ -55,9 +55,9 @@ router.post('/', (req, res) => {
     SET ease_factor = ?, interval_days = ?, repetitions = ?,
         correct_count = ?, incorrect_count = ?, mastered = ?,
         last_review_date = ?, next_review_date = date('now', '+' || ? || ' days')
-    WHERE user_id = ${userId} AND word_id = ?
+    WHERE user_id = ? AND word_id = ?
   `).run(ease_factor, interval_days, repetitions, correct_count, incorrect_count,
-    mastered, today, interval_days, wordId);
+    mastered, today, interval_days, userId, wordId);
 
   res.json({
     wordId,

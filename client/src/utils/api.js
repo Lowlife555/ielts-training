@@ -53,7 +53,6 @@ export const api = {
     const query = new URLSearchParams(params).toString();
     return request(`/words?${query}`);
   },
-  getWord: (id) => request(`/words/${id}`),
 
   // Spelling test
   getSpellingTest: (params = {}) => {
@@ -103,7 +102,6 @@ export const api = {
 
   // v4.0 Daily Plan
   getDailyPlan: () => request('/daily-plan'),
-  getDailyPlanStatus: () => request('/daily-plan/status'),
   getResumeInfo: () => request('/daily-plan/resume'),
   setStudySettings: (data) =>
     request('/daily-plan/settings', { method: 'POST', body: JSON.stringify(data) }),
@@ -129,7 +127,6 @@ export const api = {
     const query = new URLSearchParams(params).toString();
     return request(`/training/summaries?${query}`);
   },
-  getTrainingSummary: (id) => request(`/training/summaries/${id}`),
 
   // v7.1 Spell check (daily flow final stage)
   submitSpellCheck: (data) =>

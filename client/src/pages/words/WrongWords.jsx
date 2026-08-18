@@ -1,15 +1,16 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { api } from '../../utils/api';
 import { useKeyboard } from '../../hooks/useKeyboard';
+import { useFetch } from '../../hooks/useFetch';
 import { speak as speakUtil } from '../../utils/speech';
 import Loading from '../../components/ui/Loading';
 import { ArrowLeft, Volume2, BookOpen, AlertCircle } from 'lucide-react';
 
 export default function WrongWords() {
   const navigate = useNavigate();
-  const [words, setWords] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { data, loading } = useFetch(() => api.getWrongWords(), []);
+  const words = data?.words || [];
   const [currentIndex, setCurrentIndex] = useState(0);
 
   useKeyboard({
@@ -23,12 +24,6 @@ export default function WrongWords() {
       }
     },
   }, true, [words, currentIndex]);
-
-  useEffect(() => {
-    api.getWrongWords()
-      .then((data) => setWords(data.words))
-      .finally(() => setLoading(false));
-  }, []);
 
   if (loading) return <Loading text="加载错词本..." />;
 

@@ -39,8 +39,27 @@ export function fallbackKeywords(def) {
  * @param {string[]} [keywords] word_meanings.keywords（可能为 JSON 字符串）
  * @param {string} [chineseDefinition] 兜底释义来源
  */
-/** 单个候选词匹配：单字精确 + 双向包含 + 变体归一化 + 保守字符重叠 */
-function matchCandidate(cleanInput, candidate) {
+// 常见虚词/助词（单字重叠兜底时排除，避免"的/了/和"等误触发）
+const STOP_CHARS = new Set('的得地着了过和与及或而以因为被把很太最也都无不有在是一之其这那们些中上下大小多少更较等即可能会要就才又再还只仅并且但却所已经正从向对于由自到给让使用当像似若虽然但故此另各每某任何什么怎样那里时候'.split(''));
+
+/** 单字重叠：双方至少 2 个汉字，且共享任意一个非虚词汉字（多义词场景兜底，如"逃离"vs"逃跑"共享"逃"） */
+function singleCharOverlap(input, keyword) {
+  if (!input || !keyword || input.length < 2 || keyword.length < 2) return false;
+  for (const ch of input) {
+    if (!STOP_CHARS.has(ch) && keyword.includes(ch)) return true;
+  }
+  return false;
+}
+
+/** 多义词判定：释义含分号（多义项）或含 ≥2 个词性标记（n./v./adj. 等） */
+function isPolysemous(def) {
+  if (!def) return false;
+  const posCount = (String(def).match(/[a-z]+\./gi) || []).length;
+  return /[;；]/.test(def) || posCount >= 2;
+}
+
+/** 单个候选词匹配：单字精确 + 双向包含 + 变体归一化 + 保守字符重叠 + 多义词单字重叠兜底 */
+function matchCandidate(cleanInput, candidate, allowSingleChar = false) {
   const ck = cleanKw(candidate);
   if (!ck) return false;
   if (ck.length === 1) return cleanInput === ck; // 单字仅精确匹配（"糖"不命中"糖水"）
@@ -48,6 +67,7 @@ function matchCandidate(cleanInput, candidate) {
   if (ck.includes(cleanInput) && cleanInput.length >= 2) return true;
   if (variantMatch(cleanInput, ck)) return true;
   if (charOverlapMatch(cleanInput, ck)) return true;
+  if (allowSingleChar && singleCharOverlap(cleanInput, ck)) return true;
   return false;
 }
 
@@ -70,12 +90,14 @@ export function checkAnswer(input, keywords, chineseDefinition, synonyms) {
     kws = fallbackKeywords(chineseDefinition || '');
   }
 
+  // 多义词（bolt 的"螺栓/闪电/逃跑"等多义项）场景放宽：允许单字重叠兜底
+  const allowSingleChar = isPolysemous(chineseDefinition);
   for (const k of kws) {
-    if (matchCandidate(cleanInput, k)) return true;
+    if (matchCandidate(cleanInput, k, allowSingleChar)) return true;
   }
   if (Array.isArray(synonyms)) {
     for (const s of synonyms) {
-      if (matchCandidate(cleanInput, s)) return true;
+      if (matchCandidate(cleanInput, s, allowSingleChar)) return true;
     }
   }
   return false;

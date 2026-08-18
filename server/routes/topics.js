@@ -14,10 +14,10 @@ router.get('/', (req, res) => {
       COUNT(*) as word_count,
       COUNT(DISTINCT CASE WHEN uwp.mastered = 1 THEN w.id END) as mastered_count
     FROM words w
-    LEFT JOIN user_word_progress uwp ON w.id = uwp.word_id AND uwp.user_id = ${userId}
+    LEFT JOIN user_word_progress uwp ON w.id = uwp.word_id AND uwp.user_id = ?
     GROUP BY topic
     ORDER BY topic
-  `).all();
+  `).all(userId);
 
   const topicNames = {
     education: '教育',
