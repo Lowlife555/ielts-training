@@ -14,7 +14,7 @@ const ELLIPSIS = /[.．]{2,}|…{1,}/g;
 const SUFFIX_PARTICLES = /(的|地|得|着|了|过|之|与|和)$/g;
 const POS_PREFIX = /^[a-z]+\.\s*/i;
 
-import { normalizeVariant, variantMatch, charOverlapMatch } from './variantNormalize.js';
+import { variantMatch, charOverlapMatch } from './variantNormalize.js';
 
 function cleanKw(k) {
   return String(k || '')
@@ -39,7 +39,26 @@ export function fallbackKeywords(def) {
  * @param {string[]} [keywords] word_meanings.keywords（可能为 JSON 字符串）
  * @param {string} [chineseDefinition] 兜底释义来源
  */
-export function checkAnswer(input, keywords, chineseDefinition) {
+/** 单个候选词匹配：单字精确 + 双向包含 + 变体归一化 + 保守字符重叠 */
+function matchCandidate(cleanInput, candidate) {
+  const ck = cleanKw(candidate);
+  if (!ck) return false;
+  if (ck.length === 1) return cleanInput === ck; // 单字仅精确匹配（"糖"不命中"糖水"）
+  if (cleanInput.includes(ck)) return true;
+  if (ck.includes(cleanInput) && cleanInput.length >= 2) return true;
+  if (variantMatch(cleanInput, ck)) return true;
+  if (charOverlapMatch(cleanInput, ck)) return true;
+  return false;
+}
+
+/**
+ * 宽松判分：用户输入与任一关键词/近义词双向匹配即算对。
+ * @param {string} input 用户输入的中文释义
+ * @param {string[]} [keywords] word_meanings.keywords（可能为 JSON 字符串）
+ * @param {string} [chineseDefinition] 兜底释义来源
+ * @param {string[]} [synonyms] word_meanings.synonyms（近义词/释义变体，可选）
+ */
+export function checkAnswer(input, keywords, chineseDefinition, synonyms) {
   const cleanInput = cleanKw(input);
   if (!cleanInput) return false;
 
@@ -52,23 +71,12 @@ export function checkAnswer(input, keywords, chineseDefinition) {
   }
 
   for (const k of kws) {
-    const ck = cleanKw(k);
-    if (!ck) continue;
-
-    // 单字关键词：仅精确匹配（如释义"糖"，输入"糖"才对，"糖水"不应命中"糖"的精确义）
-    if (ck.length === 1) {
-      if (cleanInput === ck) return true;
-      continue;
+    if (matchCandidate(cleanInput, k)) return true;
+  }
+  if (Array.isArray(synonyms)) {
+    for (const s of synonyms) {
+      if (matchCandidate(cleanInput, s)) return true;
     }
-    // 双字及以上：双向包含（输入含关键词（"安静的"含"安静"）或关键词含输入（"位于" ⊂ "位于..."→"位于"））
-    if (cleanInput.includes(ck)) return true;
-    if (ck.includes(cleanInput) && cleanInput.length >= 2) return true;
-
-    // V7.3.2: 变体归一化匹配（雇佣↔雇用、帐↔账 等异形词）
-    if (variantMatch(cleanInput, ck)) return true;
-
-    // V7.3.2: 保守字符重叠（共享连续 2 字符，如 "定义"↔"界定" 共享"定"）
-    if (charOverlapMatch(cleanInput, ck)) return true;
   }
   return false;
 }
