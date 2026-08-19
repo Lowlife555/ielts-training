@@ -43,8 +43,8 @@ export default function Home() {
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
       {/* Header */}
-      <div className="text-center mb-12">
-        <h1 className="text-4xl font-bold text-gray-900 mb-3">
+      <div className="text-center mb-12 pt-6">
+        <h1 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-500 bg-clip-text text-transparent mb-3">
           📚 lowlife's IELTS Training
         </h1>
         <p className="text-lg text-gray-500">
