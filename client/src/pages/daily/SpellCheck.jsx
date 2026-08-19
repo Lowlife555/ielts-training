@@ -6,9 +6,11 @@ import { useKeyboard } from '../../hooks/useKeyboard';
 import { useElapsed } from '../../hooks/useTimer';
 import { useConfirm } from '../../hooks/useConfirm';
 import { speak } from '../../utils/speech';
-import { checkEnglishAnswer } from '../../utils/answerCheck';
+import { checkEnglishAnswer, checkChineseAnswer } from '../../utils/answerCheck';
 import TrainingTimer from '../../components/training/TrainingTimer';
-import { Volume2, CheckCircle, XCircle, Target, Home, RotateCcw } from 'lucide-react';
+import FlipCard from '../../components/ui/FlipCard';
+import { useDictationSession } from '../../hooks/useDictationSession';
+import { Volume2, CheckCircle, XCircle, Target, Home, RotateCcw, Check, X, BookOpen } from 'lucide-react';
 
 const CHECK_COUNT = 30;
 const PASS_RATE = 80;
@@ -43,6 +45,10 @@ export default function SpellCheck() {
   const [finished, setFinished] = useState(false);
   const [abandoning, setAbandoning] = useState(false);
   const inputRef = useRef(null);
+  // V7.4.1: 拼写自背 → 自测 → 拼写抽查 三阶段
+  const [stage, setStage] = useState('review'); // review | selftest | test
+  const [reviewMarked, setReviewMarked] = useState({});
+  const [reviewFlipped, setReviewFlipped] = useState(new Set());
 
   const elapsed = useElapsed(session?.startTime);
   const currentWord = words[currentIndex];
@@ -101,6 +107,26 @@ export default function SpellCheck() {
     }
   }, [currentIndex, words, finish]);
 
+  // ===== 拼写自测（测"不会"词，复用 useDictationSession 错词重测）=====
+  const selftest = useDictationSession({
+    judge: (input, word) => checkChineseAnswer(input, word.keywords, word.synonyms, word.chineseDefinition, { allowSynonym: true }),
+    onComplete: () => {
+      showToast('🎉 拼写自测完成！全部"不会"词已消灭', 'success');
+      setStage('test');
+    },
+  });
+
+  const startSelftest = () => {
+    const notMarked = (session?.words || []).filter(w => reviewMarked[w.id ?? w.wordId] === false);
+    if (notMarked.length === 0) {
+      showToast('没有标记"不会"的词，直接开始拼写测试', 'info');
+      setStage('test');
+      return;
+    }
+    selftest.start(notMarked);
+    setStage('selftest');
+  };
+
   const abandon = useCallback(async () => {
     if (abandoning || submitting) return;
     const ok = await confirm('确定要收工吗？本次进度将保存，欠债规则照常计算。');
@@ -123,13 +149,24 @@ export default function SpellCheck() {
 
   useKeyboard({
     'Enter': () => {
-      if (finished && outcome) { goReport(); return; }
-      if (feedback) goNext();
-      else submitAnswer();
+      if (stage === 'test') {
+        if (finished && outcome) { goReport(); return; }
+        if (feedback) goNext();
+        else submitAnswer();
+      }
+      if (stage === 'selftest') { if (selftest.feedback) selftest.goNext(); else selftest.submit(); }
     },
-    ' ': (e) => { e.preventDefault(); if (currentWord && !finished) speak(currentWord.word); },
-    'Escape': () => { if (finished) navigate('/'); else abandon(); },
-  }, true, [submitAnswer, goNext, currentWord, finished, outcome, abandon, navigate]);
+    ' ': (e) => {
+      e.preventDefault();
+      if (stage === 'test' && currentWord && !finished) speak(currentWord.word);
+      if (stage === 'selftest' && selftest.currentWord) speak(selftest.currentWord.word);
+    },
+    'Escape': () => {
+      if (finished) navigate('/');
+      else if (stage === 'selftest') setStage('review');
+      else abandon();
+    },
+  }, true, [stage, submitAnswer, goNext, selftest, currentWord, finished, outcome, abandon, navigate]);
 
   if (!session) return null;
 
@@ -193,6 +230,188 @@ export default function SpellCheck() {
           <span className="kbd-hint">按 <kbd className="px-1.5 py-0.5 bg-gray-100 border border-gray-300 rounded">Enter</kbd> 查看报告</span>
           <span className="touch-hint hidden">拼写抽查完成！</span>
         </p>
+      </div>
+    );
+  }
+
+  // ===== 拼写自背（展示本 list 全部词翻卡）=====
+  if (stage === 'review') {
+    const allWords = session?.words || [];
+    const notMarkedCount = allWords.filter(w => reviewMarked[w.id ?? w.wordId] === false).length;
+    return (
+      <div className="max-w-2xl mx-auto px-4 py-8">
+        <div className="flex items-center justify-between mb-4">
+          <span className="text-sm font-medium text-indigo-600 flex items-center gap-2">
+            <BookOpen className="w-4 h-4" /> 拼写自背 · List {session.listNo} · 共 {allWords.length} 词
+          </span>
+          <TrainingTimer
+            elapsed={elapsed}
+            targetMinutes={plan?.targetMinutes || 60}
+            onAbandon={abandon}
+            onReachedCap={() => showToast('已达今日上限 2 小时，欠债已结清，可以收工', 'success')}
+          />
+        </div>
+
+        <div className="text-center mb-6">
+          <h1 className="text-2xl font-bold text-gray-900 mb-1">拼写自背</h1>
+          <p className="text-sm text-gray-500">
+            先看英文回忆中文释义，重点记拼写 · 点卡片翻卡核对 · 标记会/不会后开始测试
+          </p>
+        </div>
+
+        <div className="space-y-2 mb-6">
+          {allWords.map((w, idx) => {
+            const wid = w.id ?? w.wordId;
+            const isFlipped = reviewFlipped.has(wid);
+            const isMarked = reviewMarked[wid] === true;
+            const isNotMarked = reviewMarked[wid] === false;
+            return (
+              <div key={wid} className={`relative ${isMarked ? 'border-2 border-green-300 rounded-xl' : isNotMarked ? 'border-2 border-red-200 rounded-xl' : ''}`}>
+                <span className="absolute -top-2 left-2 text-[10px] text-gray-400 bg-gray-50 px-1 rounded z-10">{idx + 1}.</span>
+                <FlipCard
+                  word={w}
+                  flipped={isFlipped}
+                  onClick={() => {
+                    setReviewFlipped(prev => {
+                      const next = new Set(prev);
+                      if (next.has(wid)) next.delete(wid);
+                      else next.add(wid);
+                      return next;
+                    });
+                  }}
+                  showMarked={() => (
+                    <>
+                      {isMarked && <span className="text-xs px-1.5 py-0.5 bg-green-100 text-green-700 rounded">会</span>}
+                      {isNotMarked && <span className="text-xs px-1.5 py-0.5 bg-red-100 text-red-500 rounded">不会</span>}
+                    </>
+                  )}
+                  markNode={
+                    <>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); setReviewMarked(m => ({ ...m, [wid]: true })); }}
+                        className={`p-2 rounded-lg transition-colors ${isMarked ? 'bg-green-100 text-green-600' : 'text-gray-400 hover:bg-green-50'}`}
+                        title="会 (1)"
+                      >
+                        <Check className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); setReviewMarked(m => ({ ...m, [wid]: false })); }}
+                        className={`p-2 rounded-lg transition-colors ${isNotMarked ? 'bg-red-100 text-red-500' : 'text-gray-400 hover:bg-red-50'}`}
+                        title="不会 (2)"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </>
+                  }
+                />
+              </div>
+            );
+          })}
+        </div>
+
+        <div className="flex gap-3">
+          {notMarkedCount > 0 && (
+            <button onClick={startSelftest} className="btn-secondary flex-1 py-3 flex items-center justify-center gap-2">
+              <Target className="w-5 h-5" /> 自测"不会"词（{notMarkedCount} 个）
+            </button>
+          )}
+          <button onClick={() => setStage('test')} className="btn-primary flex-1 py-3">
+            开始拼写测试 →
+          </button>
+        </div>
+
+        <p className="text-center text-xs text-gray-400 mt-4">
+          <span className="kbd-hint"><kbd className="px-1.5 py-0.5 bg-gray-100 border rounded">1 / 2</kbd> 会 / 不会 · <kbd className="px-1.5 py-0.5 bg-gray-100 border rounded">Space</kbd> 朗读</span>
+          <span className="touch-hint hidden">点卡片翻卡 · 标记会/不会 · 开始测试</span>
+        </p>
+      </div>
+    );
+  }
+
+  // ===== 拼写自测（测"不会"词，错词循环）=====
+  if (stage === 'selftest') {
+    const sw = selftest.currentWord;
+    const progress = selftest.words.length ? (selftest.currentIndex / selftest.words.length) * 100 : 0;
+    return (
+      <div className="max-w-2xl mx-auto px-4 py-8">
+        <div className="flex items-center justify-between mb-4">
+          <span className="text-sm font-medium text-purple-600">
+            🎯 拼写自测 · 消灭 {selftest.words.length} 个"不会"词
+            {selftest.round > 1 ? ` · 第 ${selftest.round} 轮重测` : ''} · {selftest.currentIndex + 1} / {selftest.words.length}
+          </span>
+          <button onClick={() => setStage('review')} className="btn-secondary px-4 py-1.5 text-sm">
+            ← 返回自背
+          </button>
+        </div>
+
+        <div className="w-full bg-gray-100 rounded-full h-1.5 mb-8">
+          <div className="bg-purple-500 h-1.5 rounded-full transition-all" style={{ width: `${progress}%` }} />
+        </div>
+
+        {sw && (
+          <div className="card text-center">
+            <div className="mb-4">
+              <p className="text-sm text-gray-500 mb-1">请填写该单词的中文释义</p>
+              <div className="flex items-center justify-center gap-3">
+                <button
+                  onClick={() => speak(sw.word)}
+                  className="w-10 h-10 bg-indigo-50 hover:bg-indigo-100 rounded-full flex items-center justify-center transition-colors"
+                  title="朗读 (Space)"
+                >
+                  <Volume2 className="w-5 h-5 text-indigo-600" />
+                </button>
+                <p className="text-4xl font-bold text-gray-900">{sw.word}</p>
+              </div>
+              <span className="text-sm text-gray-400 mt-1 inline-block">
+                {sw.phonetic}
+                {sw.partOfSpeech ? ` · ${sw.partOfSpeech}` : ''}
+              </span>
+            </div>
+
+            <div className="max-w-sm mx-auto">
+              <input
+                type="text"
+                value={selftest.userInput}
+                onChange={(e) => selftest.setUserInput(e.target.value)}
+                placeholder="输入中文词义..."
+                className={`input-field text-center text-xl ${
+                  selftest.feedback === 'correct' ? 'border-green-500 bg-green-50' :
+                  selftest.feedback === 'incorrect' ? 'border-red-500 bg-red-50' : ''
+                }`}
+                autoComplete="off" autoCorrect="off" spellCheck="false"
+                disabled={!!selftest.feedback}
+              />
+              {selftest.feedback && (
+                <div className={`text-center mt-3 ${selftest.feedback === 'correct' ? 'text-green-600' : 'text-red-500'}`}>
+                  {selftest.feedback === 'correct' ? (
+                    <span className="flex items-center justify-center gap-1"><CheckCircle className="w-5 h-5" /> 正确!</span>
+                  ) : (
+                    <span className="flex items-center justify-center gap-1"><XCircle className="w-5 h-5" /> 错误 · 将重测</span>
+                  )}
+                  <div className="mt-2 text-sm text-gray-600">
+                    正确答案: <span className="font-semibold text-green-600">
+                      {Array.isArray(sw.meanings) && sw.meanings.length > 0 ? sw.meanings.join('；') : sw.chineseDefinition}
+                    </span>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        <div className="text-center mt-6">
+          {selftest.feedback ? (
+            <button onClick={selftest.goNext} className="btn-primary px-8">
+              <span className="kbd-hint">下一个 (Enter)</span>
+              <span className="touch-hint hidden">下一个</span>
+            </button>
+          ) : (
+            <button onClick={selftest.submit} disabled={!selftest.userInput.trim()} className="btn-primary px-8">
+              <span className="kbd-hint">提交 (Enter)</span>
+              <span className="touch-hint hidden">提交</span>
+            </button>
+          )}
+        </div>
       </div>
     );
   }
