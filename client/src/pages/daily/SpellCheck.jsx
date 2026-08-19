@@ -89,7 +89,7 @@ export default function SpellCheck() {
     if (feedback || !userInput.trim() || submitting) return;
     const isCorrect = checkEnglishAnswer(userInput, currentWord.word, { allowMorph: true, allowEdit: false });
     setFeedback(isCorrect ? 'correct' : 'incorrect');
-    const newResult = { wordId: currentWord.id, correct: isCorrect, answer: userInput.trim() };
+    const newResult = { wordId: currentWord.id ?? currentWord.wordId, correct: isCorrect, answer: userInput.trim() };
     const nextResults = [...resultsRef.current, newResult];
     setResults(nextResults);
     resultsRef.current = nextResults;
