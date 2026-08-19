@@ -87,3 +87,24 @@
 2. commit message 以 `V X.X.X:` 开头
 3. 更新 README 版本记录表 + 创建版本公告（migrate_vN.js）
 4. 新增用户数据一律走 KV（`useUserKV().set('namespace.key', value)`），无需数据库迁移
+
+---
+
+## 六、V7.4.3 更新内容（2026-08-19）
+
+> 在 V7.4.2 之后（DeepSeek Harness 开发）的补丁版本，修复测验环节 Enter 双触发导致"提交即翻页"。
+
+### 修复
+1. **抽查（SpotCheck）Enter 双触发**：输入框 `onKeyDown` 与全局 `useKeyboard` 同时处理 Enter —— 第一次 Enter 提交后 React 重渲染使输入框卸载，`document.activeElement === inputRef.current` 守卫失效，同一按键内 `goNext()` 再次触发，直接跳到下一个词。
+   - 修复：移除输入框 `onKeyDown` 与 activeElement 守卫，统一由 `useKeyboard` 单一处理（`if (feedback) goNext(); else submitAnswer();`），与 SpellingPractice / SpellCheck / AcceptanceTest / ListDictation 模式一致。
+2. **热身（PetWarmup）同类隐患**：相同双处理器模式（被 700ms 防抖掩盖）。移除 `onKeyDown`、activeElement 守卫及 700ms 防抖，统一手动前进模式，反馈后立即响应 Enter。
+3. **独立拼写测试（SpellingTest）**：移除 `setTimeout(800ms)` 自动翻页，改为提交后停留展示对错与正确答案，点「下一个」/ Enter 手动前进；答对时也展示正确答案。
+4. **词义判定（MeaningTest）**：同上改造；混合模式的拼写题答对时也展示正确答案；拼写输入框提交后禁用。
+
+### 维护
+- 新增 `migrate_v25.js`（V7.4.3 版本公告），已接入 `migrate:all` 与 `setup`
+- README 版本记录补充 V7.4.0 ~ V7.4.3
+
+### 验证
+- `client` 前端生产构建通过（vite build，无错误）
+- 4 个页面行为统一：提交 → 展示答案停留 → 用户手动前进

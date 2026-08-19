@@ -102,22 +102,23 @@ export default function MeaningTest() {
       console.warn('Failed to save meaning result:', err.message);
       showToast('保存进度失败，请检查网络', 'warning');
     });
-
-    setTimeout(() => {
-      if (currentIndex + 1 >= words.length) {
-        setFinished(true);
-        setFeedback(null);
-      } else {
-        setCurrentIndex(prev => prev + 1);
-        setSelectedOptionId(null);
-        setUserInput('');
-        setFeedback(null);
-        if (words[currentIndex + 1]?.type === 'spelling') {
-          inputRef.current?.focus();
-        }
-      }
-    }, 800);
+    // V7.4.3: 不自动翻页，展示答案后由用户点下一个/Enter 前进
   }, [userInput, selectedOptionId, feedback, finished, currentIndex, words, showToast]);
+
+  const goNext = useCallback(() => {
+    if (currentIndex + 1 >= words.length) {
+      setFinished(true);
+      setFeedback(null);
+    } else {
+      setCurrentIndex(prev => prev + 1);
+      setSelectedOptionId(null);
+      setUserInput('');
+      setFeedback(null);
+      if (words[currentIndex + 1]?.type === 'spelling') {
+        inputRef.current?.focus();
+      }
+    }
+  }, [currentIndex, words]);
 
   useKeyboard({
     '1': () => { if (testStarted && !finished && words[currentIndex]?.type === 'meaning' && feedback == null && words[currentIndex]?.options?.[0]) pickOption(0); },
@@ -130,7 +131,8 @@ export default function MeaningTest() {
         navigate('/words');
         return;
       }
-      submitAnswer();
+      if (feedback) goNext();
+      else submitAnswer();
     },
     'Escape': () => {
       if (finished) {
@@ -147,7 +149,7 @@ export default function MeaningTest() {
         speakWord(words[currentIndex].word || words[currentIndex].answer);
       }
     },
-  }, true, [testStarted, finished, submitAnswer, navigate, currentIndex, words, feedback, selectedOptionId]);
+  }, true, [testStarted, finished, submitAnswer, goNext, navigate, currentIndex, words, feedback, selectedOptionId]);
 
   useEffect(() => {
     if (testStarted && !finished && words[currentIndex]?.type === 'spelling') {
@@ -398,15 +400,21 @@ export default function MeaningTest() {
               autoComplete="off"
               autoCorrect="off"
               spellCheck="false"
+              disabled={!!feedback}
             />
             {feedback && (
               <div className={`text-center mt-3 animate-fade-in ${
                 feedback === 'correct' ? 'text-green-600' : 'text-red-500'
               }`}>
                 {feedback === 'correct' ? (
-                  <span className="flex items-center justify-center gap-1">
-                    <CheckCircle className="w-5 h-5" /> 正确!
-                  </span>
+                  <div>
+                    <span className="flex items-center justify-center gap-1">
+                      <CheckCircle className="w-5 h-5" /> 正确!
+                    </span>
+                    <p className="text-sm mt-1">
+                      正确答案: <span className="font-semibold text-green-600">{currentWord.answer}</span>
+                    </p>
+                  </div>
                 ) : (
                   <div>
                     <span className="flex items-center justify-center gap-1">
@@ -424,14 +432,21 @@ export default function MeaningTest() {
       </div>
 
       <div className="text-center mt-6">
-        <button
-          onClick={submitAnswer}
-          className="btn-primary px-8"
-          disabled={currentWord.type === 'meaning' ? selectedOptionId == null : !userInput.trim()}
-        >
-          <span className="kbd-hint">提交 (Enter)</span>
-          <span className="touch-hint hidden">提交</span>
-        </button>
+        {feedback ? (
+          <button onClick={goNext} className="btn-primary px-8">
+            <span className="kbd-hint">下一个 (Enter)</span>
+            <span className="touch-hint hidden">下一个</span>
+          </button>
+        ) : (
+          <button
+            onClick={submitAnswer}
+            className="btn-primary px-8"
+            disabled={currentWord.type === 'meaning' ? selectedOptionId == null : !userInput.trim()}
+          >
+            <span className="kbd-hint">提交 (Enter)</span>
+            <span className="touch-hint hidden">提交</span>
+          </button>
+        )}
       </div>
 
       <p className="text-center text-xs text-gray-400 mt-4">
@@ -439,18 +454,18 @@ export default function MeaningTest() {
           {currentWord.type === 'meaning' ? (
             <><kbd className="px-1.5 py-0.5 bg-gray-100 border border-gray-300 rounded">1</kbd>-
               <kbd className="px-1.5 py-0.5 bg-gray-100 border border-gray-300 rounded">4</kbd> 选择释义
-              · <kbd className="px-1.5 py-0.5 bg-gray-100 border border-gray-300 rounded">Enter</kbd> 提交
+              · <kbd className="px-1.5 py-0.5 bg-gray-100 border border-gray-300 rounded">Enter</kbd> 提交/下一个
               · <kbd className="px-1.5 py-0.5 bg-gray-100 border border-gray-300 rounded">空格</kbd> 朗读
               · <kbd className="px-1.5 py-0.5 bg-gray-100 border border-gray-300 rounded">Esc</kbd> 退出
             </>
           ) : (
-            <><kbd className="px-1.5 py-0.5 bg-gray-100 border border-gray-300 rounded">Enter</kbd> 提交答案
+            <><kbd className="px-1.5 py-0.5 bg-gray-100 border border-gray-300 rounded">Enter</kbd> 提交/下一个
               · <kbd className="px-1.5 py-0.5 bg-gray-100 border border-gray-300 rounded">空格</kbd> 朗读
               · <kbd className="px-1.5 py-0.5 bg-gray-100 border border-gray-300 rounded">Esc</kbd> 退出测试
             </>
           )}
         </span>
-        <span className="touch-hint hidden">点选释义后提交 · 答错会重测</span>
+        <span className="touch-hint hidden">点选释义后提交 · 查看答案后点下一个</span>
       </p>
     </div>
   );

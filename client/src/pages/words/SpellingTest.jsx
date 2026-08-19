@@ -70,20 +70,20 @@ export default function SpellingTest() {
       console.warn('Failed to save spelling result:', err.message);
       showToast('保存进度失败，请检查网络', 'warning');
     });
-
-    // After animation, move to next
-    setTimeout(() => {
-      if (currentIndex + 1 >= words.length) {
-        setFinished(true);
-        setFeedback(null);
-      } else {
-        setCurrentIndex(prev => prev + 1);
-        setUserInput('');
-        setFeedback(null);
-        inputRef.current?.focus();
-      }
-    }, 800);
+    // V7.4.3: 不自动翻页，展示答案后由用户点下一个/Enter 前进
   }, [userInput, feedback, finished, currentIndex, words]);
+
+  const goNext = useCallback(() => {
+    if (currentIndex + 1 >= words.length) {
+      setFinished(true);
+      setFeedback(null);
+    } else {
+      setCurrentIndex(prev => prev + 1);
+      setUserInput('');
+      setFeedback(null);
+      inputRef.current?.focus();
+    }
+  }, [currentIndex, words.length]);
 
   useKeyboard({
     'Enter': () => {
@@ -92,7 +92,8 @@ export default function SpellingTest() {
         navigate('/words');
         return;
       }
-      submitAnswer();
+      if (feedback) goNext();
+      else submitAnswer();
     },
     'Escape': () => {
       if (finished) {
@@ -109,7 +110,7 @@ export default function SpellingTest() {
         speakWord(words[currentIndex].answer);
       }
     },
-  }, true, [testStarted, finished, submitAnswer, navigate, currentIndex, words, testMode, speakWord]);
+  }, true, [testStarted, finished, submitAnswer, goNext, feedback, navigate, currentIndex, words, testMode, speakWord]);
 
   // Auto-focus input
   useEffect(() => {
@@ -303,6 +304,7 @@ export default function SpellingTest() {
             autoComplete="off"
             autoCorrect="off"
             spellCheck="false"
+            disabled={!!feedback}
           />
 
           {/* Feedback */}
@@ -311,9 +313,14 @@ export default function SpellingTest() {
               feedback === 'correct' ? 'text-green-600' : 'text-red-500'
             }`}>
               {feedback === 'correct' ? (
-                <span className="flex items-center justify-center gap-1">
-                  <CheckCircle className="w-5 h-5" /> 正确!
-                </span>
+                <div>
+                  <span className="flex items-center justify-center gap-1">
+                    <CheckCircle className="w-5 h-5" /> 正确!
+                  </span>
+                  <p className="text-sm mt-1">
+                    正确答案: <span className="font-semibold text-green-600">{currentWord.answer}</span>
+                  </p>
+                </div>
               ) : (
                 <div>
                   <span className="flex items-center justify-center gap-1">
@@ -331,19 +338,26 @@ export default function SpellingTest() {
 
       {/* Submit button */}
       <div className="text-center mt-6">
-        <button onClick={submitAnswer} className="btn-primary px-8" disabled={!userInput.trim()}>
-          <span className="kbd-hint">提交 (Enter)</span>
-          <span className="touch-hint hidden">提交</span>
-        </button>
+        {feedback ? (
+          <button onClick={goNext} className="btn-primary px-8">
+            <span className="kbd-hint">下一个 (Enter)</span>
+            <span className="touch-hint hidden">下一个</span>
+          </button>
+        ) : (
+          <button onClick={submitAnswer} className="btn-primary px-8" disabled={!userInput.trim()}>
+            <span className="kbd-hint">提交 (Enter)</span>
+            <span className="touch-hint hidden">提交</span>
+          </button>
+        )}
       </div>
 
       {/* Keyboard hint */}
       <p className="text-center text-xs text-gray-400 mt-4">
         <span className="kbd-hint">
-          <kbd className="px-1.5 py-0.5 bg-gray-100 border border-gray-300 rounded">Enter</kbd> 提交答案
+          <kbd className="px-1.5 py-0.5 bg-gray-100 border border-gray-300 rounded">Enter</kbd> 提交 / 下一个
           · <kbd className="px-1.5 py-0.5 bg-gray-100 border border-gray-300 rounded">Esc</kbd> 退出测试
         </span>
-        <span className="touch-hint hidden">输入后点提交 · 答错会重测</span>
+        <span className="touch-hint hidden">输入后点提交 · 查看答案后点下一个</span>
       </p>
     </div>
   );

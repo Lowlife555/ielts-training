@@ -115,7 +115,6 @@ export default function SpotCheck() {
   useKeyboard({
     'Enter': () => {
       if (finished && outcome) { continueToSpellCheck(); return; }
-      if (document.activeElement === inputRef.current) return; // 输入框聚焦由 input.onKeyDown 处理
       if (!feedback) submitAnswer();
       else goNext();
     },
@@ -231,7 +230,6 @@ export default function SpotCheck() {
                 type="text"
                 value={userInput}
                 onChange={(e) => setUserInput(e.target.value)}
-                onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); submitAnswer(); } }}
                 placeholder="输入中文释义..."
                 className="input-field text-center text-xl py-3"
                 autoComplete="off"

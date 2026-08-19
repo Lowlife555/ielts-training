@@ -26,7 +26,6 @@ export default function PetWarmup() {
   const [starting, setStarting] = useState(false);
   const inputRef = useRef(null);
   const submitLockRef = useRef(false); // 防止 Enter 双触发重复提交
-  const feedbackShownAtRef = useRef(0); // 反馈显示时间戳（防止提交后立即 Enter 跳过）
 
   const words = plan?.petWarmupWords || [];
   const currentWord = words[currentIndex];
@@ -74,7 +73,6 @@ export default function PetWarmup() {
       isCorrect = checkChineseAnswer(userInput, currentWord.keywords, currentWord.synonyms, currentWord.chineseDefinition, { allowSynonym: true });
     }
     setFeedback(isCorrect ? 'correct' : 'incorrect');
-    feedbackShownAtRef.current = Date.now();
     submitLockRef.current = false;
     // 不自动跳转：停留展示对错与答案，由用户主动前进
   }, [userInput, feedback, currentWord, isCeMode]);
@@ -90,14 +88,8 @@ export default function PetWarmup() {
 
   useKeyboard({
     'Enter': () => {
-      // 输入框聚焦时 Enter 由 input.onKeyDown 处理（避免双触发提交）
-      if (document.activeElement === inputRef.current) return;
       if (!feedback) submitAnswer();
-      else {
-        // 反馈刚显示 700ms 内忽略 Enter，避免提交后连按/长按瞬间跳过导致看不到反馈
-        if (Date.now() - feedbackShownAtRef.current < 700) return;
-        goNext();
-      }
+      else goNext();
     },
     'ArrowRight': goNext,
     'ArrowLeft': prev,
@@ -178,7 +170,6 @@ export default function PetWarmup() {
                 type="text"
                 value={userInput}
                 onChange={(e) => setUserInput(e.target.value)}
-                onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); submitAnswer(); } }}
                 placeholder={isCeMode ? '输入英文单词' : '输入中文释义'}
                 className="input-field text-center text-lg py-3"
                 autoComplete="off"

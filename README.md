@@ -1,7 +1,7 @@
 # 📚 IELTS 6.5 智能备考训练网站
 
 > 基于 **React + Express + SQLite** 的雅思（IELTS）6.5 分目标备考平台
-> 当前版本：**V7.3.1** · GitHub：`https://github.com/Lowlife555/ielts-training`
+> 当前版本：**V7.4.3** · GitHub：`https://github.com/Lowlife555/ielts-training`
 
 ---
 
@@ -194,6 +194,10 @@
 | V7.2.3 | 2026-08-12 | opencode (deepseek-v4-flash-free) | 修复翻卡背面滚动条 + 翻卡正反两面读音 + 版本命名规范确立 |
 | V7.2.4 | 2026-08-12 | opencode (deepseek-v4-flash-free) | 判分优化：拼写容错（词形+编辑距离≤1）+ 近义词库（IELTS 2318/PET 1720 全量）+ PET 词库修复 + 场景分级 |
 | V7.3.1 | 2026-08-14 | opencode (deepseek-v4-flash-free) | 默写对错手动前进+答对完整释义 + 抽查改输入判分 + 修复验收页崩溃(拼写无法提交) + 训练结算弹窗/历史日历页 + 断点续训 + 简报完成态/待重背清单 |
+| V7.4.0 | 2026-08-18 | DeepSeek Harness | 学习留痕 + 学习报告（study_events 表）+ 翻卡交互优化（点不会翻回释义面）+ 背诵界面自测功能（测不会词/错词循环/可退回） |
+| V7.4.1 | 2026-08-18 | DeepSeek Harness | 拼写自背+自测（全 List 翻卡会/不会标记）+ 全部测试环节改手动前进 + 苹果风页面美化 + 修复拼写抽查卡死 |
+| V7.4.2 | 2026-08-19 | DeepSeek Harness | 记忆进度系统：单词级进度快照双写（localStorage+服务器 DB）、全环节覆盖、打断精确恢复/手动退出回环节起点 |
+| V7.4.3 | 2026-08-19 | opencode (deepseek-v4-flash-free) | 修复抽查按 Enter 直接跳下一词 + 热身双 Enter 触发隐患 + 独立拼写/词义判定改手动前进（答对也展示答案） |
 
 ---
 
@@ -565,4 +569,4 @@ powershell -File deploy.ps1
 
 ---
 
-*文档维护：随版本持续更新 · 最近更新 2026-08-14 (V7.3.1)*
+*文档维护：随版本持续更新 · 最近更新 2026-08-19 (V7.4.3)*
