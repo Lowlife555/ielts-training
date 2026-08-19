@@ -11,6 +11,7 @@ import TrainingTimer from '../../components/training/TrainingTimer';
 import FlipCard from '../../components/ui/FlipCard';
 import { useSettings } from '../../context/SettingsContext';
 import { useDictationSession } from '../../hooks/useDictationSession';
+import { useProgressSync, clearLocalSnapshot, saveLocalSnapshot } from '../../hooks/useProgressSync';
 import { Check, X, Play, Coffee, Timer, Volume2, ChevronRight, Target } from 'lucide-react';
 
 const TIME_UP_BUFFER = 10 * 60; // 剩余不足 10 分钟不再开始新批次
@@ -23,6 +24,7 @@ export default function MainStudy() {
   const { settings } = useSettings();
   const session = location.state?.session;
   const plan = location.state?.plan;
+  const resumeSnap = location.state?.resumeSnapshot; // V7.4.2 单词级断点恢复快照
   const batchSize = session?.batchSize || location.state?.batchSize || 30;
   const restMinutes = settings?.restMinutes || 5;
 
@@ -37,21 +39,21 @@ export default function MainStudy() {
     return out;
   }, [allWords, batchSize]);
 
-  const [phase, setPhase] = useState('wordtable'); // wordtable | dictation | rest
-  // V7.3.1: 支持断点续训——从 resumeFrom 指定的批次开始
+  const [phase, setPhase] = useState(resumeSnap?.stage || 'wordtable'); // wordtable | dictation | rest | selftest
+  // V7.3.1/V7.4.2: 支持断点续训——从 resumeFrom/快照指定的批次开始
   const [batchIndex, setBatchIndex] = useState(() => {
-    const r = location.state?.resumeFrom;
+    const r = resumeSnap?.batchIndex ?? location.state?.resumeFrom;
     return typeof r === 'number' && r > 0 ? r : 0;
   });
   const currentBatch = batches[batchIndex] || [];
   const [completedBatches, setCompletedBatches] = useState(() => {
-    const r = location.state?.resumeFrom;
+    const r = resumeSnap?.completedBatches ?? location.state?.resumeFrom;
     return typeof r === 'number' && r > 0 ? r : 0;
   });
 
   // 单词表状态
-  const [flippedSet, setFlippedSet] = useState(new Set()); // 已翻到背面(隐藏释义)的单词
-  const [marked, setMarked] = useState({});
+  const [flippedSet, setFlippedSet] = useState(() => new Set(resumeSnap?.flipped || [])); // 已翻到背面(隐藏释义)的单词
+  const [marked, setMarked] = useState(() => resumeSnap?.marked || {});
 
   // 默写状态
   const [dictWords, setDictWords] = useState([]);
@@ -124,6 +126,7 @@ export default function MainStudy() {
     // V7.3.1: 记录已完成批次（供断点续训）
     setCompletedBatches(b => Math.max(b, batchIndex + 1));
     if (batchIndex + 1 >= batches.length || timeUp) {
+      clearLocalSnapshot(); // 本环节完成，进入下一环节（各自有独立快照）
       goCheck();
     } else {
       setPhase('rest');
@@ -250,6 +253,62 @@ export default function MainStudy() {
     setPhase('wordtable');
   };
 
+  // V7.4.2: 进度快照（单词级双写：localStorage + 服务器），版本更新打断后精确恢复
+  const snapshot = useMemo(() => {
+    if (!session) return null;
+    const base = {
+      stage: phase,
+      listNo: session.listNo,
+      batchIndex,
+      completedBatches,
+      marked,
+      flipped: [...flippedSet],
+    };
+    if (phase === 'dictation') {
+      return {
+        ...base,
+        currentIndex,
+        round,
+        wrongPool: dictWords.filter(w => !roundPassedRef.current.has(w.wordId)).map(w => w.wordId),
+      };
+    }
+    if (phase === 'selftest') {
+      return {
+        ...base,
+        selftestWords: selftest.words.map(w => w.id ?? w.wordId),
+        selftestIndex: selftest.currentIndex,
+        selftestRound: selftest.round,
+      };
+    }
+    return base;
+  }, [phase, session, batchIndex, completedBatches, marked, flippedSet, currentIndex, round, dictWords, selftest]);
+
+  useProgressSync(session?.sessionId, snapshot);
+
+  // V7.4.2: 恢复默写/自测的单词级状态（打断后精确继续）
+  const resumeAppliedRef = useRef(false);
+  useEffect(() => {
+    if (!resumeSnap || resumeAppliedRef.current) return;
+    resumeAppliedRef.current = true;
+    if (resumeSnap.stage === 'dictation' && Array.isArray(resumeSnap.wrongPool) && resumeSnap.wrongPool.length > 0) {
+      const wrongIds = new Set(resumeSnap.wrongPool);
+      const wrongWords = currentBatch.filter(w => wrongIds.has(w.wordId));
+      if (wrongWords.length > 0) {
+        setDictWords(wrongWords);
+        setRound(resumeSnap.round || 1);
+        setCurrentIndex(resumeSnap.currentIndex || 0);
+        roundPassedRef.current = new Set(currentBatch.filter(w => !wrongIds.has(w.wordId)).map(w => w.wordId));
+      }
+    }
+    if (resumeSnap.stage === 'selftest' && Array.isArray(resumeSnap.selftestWords) && resumeSnap.selftestWords.length > 0) {
+      const ids = new Set(resumeSnap.selftestWords);
+      const words = currentBatch.filter(w => ids.has(w.wordId));
+      if (words.length > 0) {
+        selftest.start(words, { round: resumeSnap.selftestRound || 1, index: resumeSnap.selftestIndex || 0 });
+      }
+    }
+  }, [resumeSnap]);
+
   const abandon = useCallback(async () => {
     if (abandoning) return;
     const ok = await confirm('确定要收工吗？本次进度将保存，欠债规则照常计算。');
@@ -263,6 +322,18 @@ export default function MainStudy() {
         completedBatches,
       });
       showToast('已收工，进度已保存', 'info');
+      // V7.4.2: 手动退出 → 快照回环节起点（下次从单词卡界面开始，而非精确单词）
+      const exitSnap = {
+        sessionId: session.sessionId,
+        stage: 'wordtable',
+        listNo: session.listNo,
+        batchIndex,
+        completedBatches,
+        marked,
+        flipped: [],
+      };
+      saveLocalSnapshot(exitSnap);
+      api.saveProgress({ sessionId: session.sessionId, snapshot: exitSnap }).catch(() => {});
       navigate('/');
     } catch (err) {
       showToast('收工失败: ' + err.message, 'error');

@@ -6,6 +6,7 @@ import { useKeyboard } from '../../hooks/useKeyboard';
 import { useElapsed } from '../../hooks/useTimer';
 import { useConfirm } from '../../hooks/useConfirm';
 import { useDictationSession } from '../../hooks/useDictationSession';
+import { useProgressSync, clearLocalSnapshot } from '../../hooks/useProgressSync';
 import TrainingTimer from '../../components/training/TrainingTimer';
 import { CheckCircle, XCircle, Volume2 } from 'lucide-react';
 import { speak } from '../../utils/speech';
@@ -21,11 +22,13 @@ export default function AcceptanceTest() {
   const wrongPool = location.state?.wrongPool || [];
   const mainResults = location.state?.mainResults || [];
   const spellingResults = location.state?.spellingResults || [];
+  const resumeSnap = location.state?.resumeSnapshot; // V7.4.2 单词级断点恢复快照
 
   const initialWords = useMemo(() => wrongPool.map(w => ({ wordId: w.wordId, word: w.word, chineseDefinition: w.chineseDefinition, partOfSpeech: w.partOfSpeech })), [wrongPool]);
 
   const [submitting, setSubmitting] = useState(false);
   const inputRef = useRef(null);
+  const resumedRef = useRef(false); // V7.4.2: 已按快照恢复验收词 → 跳过"无错词直接完成"
 
   const elapsed = useElapsed(session?.startTime);
 
@@ -42,6 +45,7 @@ export default function AcceptanceTest() {
         spellingResults,
         acceptanceResults: finalResults,
       });
+      clearLocalSnapshot(); // V7.4.2: 本环节完成，快照清空
       showToast(report.completed ? '🎉 验收通过，今日任务完成!' : '验收完成', 'success');
       navigate('/daily/report', { state: { report, plan } });
     } catch (err) {
@@ -60,11 +64,39 @@ export default function AcceptanceTest() {
   });
 
   useEffect(() => { if (session) start(initialWords); }, [session, start]);
+
+  // V7.4.2: 进度快照（单词级双写：localStorage + 服务器），打断后精确恢复
+  const snapshot = useMemo(() => {
+    if (!session) return null;
+    return { stage: 'acceptance', listNo: session.listNo, currentIndex, round, words: words.map(w => w.wordId) };
+  }, [session, currentIndex, round, words]);
+
+  useProgressSync(session?.sessionId, snapshot);
+
+  // V7.4.2: 恢复验收的单词级状态（打断后精确继续；词对象从 initialWords/wrongPool 找，兜底 session.words）
+  // 必须位于自动 start 之后（覆盖其重置）、"无错词直接完成" effect 之前（避免误触发完成）
+  const resumeAppliedRef = useRef(false);
+  useEffect(() => {
+    if (!resumeSnap || resumeAppliedRef.current) return;
+    resumeAppliedRef.current = true;
+    if (resumeSnap.stage === 'acceptance' && Array.isArray(resumeSnap.words) && resumeSnap.words.length > 0) {
+      const ids = new Set(resumeSnap.words);
+      let ws = initialWords.filter(w => ids.has(w.wordId));
+      if (ws.length === 0 && Array.isArray(session?.words)) {
+        ws = session.words.filter(w => ids.has(w.wordId ?? w.id));
+      }
+      if (ws.length > 0) {
+        start(ws, { round: resumeSnap.round || 1, index: resumeSnap.currentIndex || 0 });
+        resumedRef.current = true;
+      }
+    }
+  }, [resumeSnap]);
+
   useEffect(() => { if (inputRef.current) inputRef.current.focus(); }, [currentIndex]);
 
   // 没有错词（漏网之鱼为 0）→ 直接完成
   useEffect(() => {
-    if (session && initialWords.length === 0 && !submitting) {
+    if (session && initialWords.length === 0 && !submitting && !resumedRef.current) {
       finish([]);
     }
   }, [session, initialWords.length, submitting, finish]);

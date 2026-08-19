@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { api } from '../../utils/api';
 import { useApp } from '../../context/AppContext';
@@ -10,6 +10,7 @@ import { checkEnglishAnswer, checkChineseAnswer } from '../../utils/answerCheck'
 import TrainingTimer from '../../components/training/TrainingTimer';
 import FlipCard from '../../components/ui/FlipCard';
 import { useDictationSession } from '../../hooks/useDictationSession';
+import { useProgressSync, clearLocalSnapshot } from '../../hooks/useProgressSync';
 import { Volume2, CheckCircle, XCircle, Target, Home, RotateCcw, Check, X, BookOpen } from 'lucide-react';
 
 const CHECK_COUNT = 30;
@@ -25,6 +26,7 @@ export default function SpellCheck() {
   const dictationStats = location.state?.dictationStats;
   const spotCheckAccuracy = location.state?.spotCheckAccuracy;
   const restedSeconds = location.state?.restedSeconds || 0;
+  const resumeSnap = location.state?.resumeSnapshot; // V7.4.2 单词级断点恢复快照
 
   // 今天背过的全部词 = session.words,随机抽 30 词(不足取全部)
   const [words, setWords] = useState(() => {
@@ -76,6 +78,7 @@ export default function SpellCheck() {
         results: finalResults,
       });
       setOutcome(res);
+      clearLocalSnapshot(); // V7.4.2: 本环节完成，快照清空
       showToast(res.passed ? '🎉 拼写抽查通过，今日训练完成!' : '拼写抽查未达标，List 已标记待重背', res.passed ? 'success' : 'warning');
     } catch (err) {
       showToast('提交失败: ' + err.message, 'error');
@@ -146,6 +149,54 @@ export default function SpellCheck() {
       setAbandoning(false);
     }
   }, [abandoning, submitting, session, elapsed, restedSeconds, showToast, navigate]);
+
+  // V7.4.2: 进度快照（单词级双写：localStorage + 服务器），打断后精确恢复
+  const snapshot = useMemo(() => {
+    if (!session) return null;
+    return {
+      stage: 'spellcheck',
+      listNo: session.listNo,
+      subStage: stage,
+      currentIndex,
+      results,
+      testWords: words.map(w => w.id ?? w.wordId),
+      round: selftest.round,
+      selftestWords: selftest.words.map(w => w.id ?? w.wordId),
+      selftestIndex: selftest.currentIndex,
+      reviewMarked,
+      reviewFlipped: [...reviewFlipped],
+    };
+  }, [session, stage, currentIndex, results, selftest, reviewMarked, reviewFlipped]);
+
+  useProgressSync(session?.sessionId, snapshot);
+
+  // V7.4.2: 恢复拼写抽查的单词级状态（打断后精确继续）
+  const resumeAppliedRef = useRef(false);
+  useEffect(() => {
+    if (!resumeSnap || resumeAppliedRef.current) return;
+    resumeAppliedRef.current = true;
+    if (resumeSnap.subStage) setStage(resumeSnap.subStage);
+    if (resumeSnap.reviewMarked) setReviewMarked(resumeSnap.reviewMarked);
+    if (Array.isArray(resumeSnap.reviewFlipped)) setReviewFlipped(new Set(resumeSnap.reviewFlipped));
+    if (resumeSnap.subStage === 'test') {
+      // 用快照的测试词序列恢复（而非重新随机抽 30 词），实现精确单词级恢复
+      if (Array.isArray(resumeSnap.testWords) && resumeSnap.testWords.length > 0) {
+        const ids = new Set(resumeSnap.testWords);
+        const tw = (session?.words || []).filter(w => ids.has(w.id ?? w.wordId));
+        if (tw.length > 0) setWords(tw);
+      }
+      if (typeof resumeSnap.currentIndex === 'number') setCurrentIndex(resumeSnap.currentIndex);
+      if (Array.isArray(resumeSnap.results)) {
+        setResults(resumeSnap.results);
+        resultsRef.current = resumeSnap.results;
+      }
+    }
+    if (resumeSnap.subStage === 'selftest' && Array.isArray(resumeSnap.selftestWords) && resumeSnap.selftestWords.length > 0) {
+      const ids = new Set(resumeSnap.selftestWords);
+      const sw = (session?.words || []).filter(w => ids.has(w.id ?? w.wordId));
+      if (sw.length > 0) selftest.start(sw, { round: resumeSnap.round || 1, index: resumeSnap.selftestIndex || 0 });
+    }
+  }, [resumeSnap]);
 
   useKeyboard({
     'Enter': () => {

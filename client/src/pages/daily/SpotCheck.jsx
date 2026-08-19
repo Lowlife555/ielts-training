@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { api } from '../../utils/api';
 import { useApp } from '../../context/AppContext';
@@ -9,6 +9,7 @@ import { useTouch } from '../../context/TouchContext';
 import TrainingTimer from '../../components/training/TrainingTimer';
 import { speak } from '../../utils/speech';
 import { checkChineseAnswer } from '../../utils/answerCheck';
+import { useProgressSync, clearLocalSnapshot } from '../../hooks/useProgressSync';
 import { Volume2, CheckCircle, XCircle, Target, ChevronRight, ChevronLeft } from 'lucide-react';
 
 /**
@@ -25,6 +26,7 @@ export default function SpotCheck() {
   const plan = location.state?.plan;
   const wrongPool = location.state?.wrongPool || [];
   const mainResults = location.state?.mainResults || [];
+  const resumeSnap = location.state?.resumeSnapshot; // V7.4.2 单词级断点恢复快照
 
   const words = plan?.spotCheckList?.words || [];
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -69,6 +71,7 @@ export default function SpotCheck() {
     try {
       const res = await api.submitSpotCheck({ listNo: plan.spotCheckList.listNo, results: finalResults });
       setOutcome(res);
+      clearLocalSnapshot(); // V7.4.2: 本环节完成，快照清空
       showToast(res.passed ? '抽查通过!' : '抽查未达标，已标记待重背', res.passed ? 'success' : 'warning');
     } catch (err) {
       showToast('提交失败: ' + err.message, 'error');
@@ -89,6 +92,25 @@ export default function SpotCheck() {
       showToast('收工失败: ' + err.message, 'error');
     }
   }, [session, elapsed, showToast, navigate]);
+
+  // V7.4.2: 进度快照（单词级双写：localStorage + 服务器），打断后从当前词精确继续
+  const snapshot = useMemo(() => {
+    if (!session || !plan?.spotCheckList) return null;
+    return { stage: 'spotcheck', listNo: plan.spotCheckList.listNo, currentIndex, results };
+  }, [session, plan, currentIndex, results]);
+
+  useProgressSync(session?.sessionId, snapshot);
+
+  // V7.4.2: 恢复抽查的单词级状态（打断后精确继续）
+  const resumeAppliedRef = useRef(false);
+  useEffect(() => {
+    if (!resumeSnap || resumeAppliedRef.current) return;
+    resumeAppliedRef.current = true;
+    if (resumeSnap.stage === 'spotcheck') {
+      if (typeof resumeSnap.currentIndex === 'number') setCurrentIndex(resumeSnap.currentIndex);
+      if (Array.isArray(resumeSnap.results)) setResults(resumeSnap.results);
+    }
+  }, [resumeSnap]);
 
   useKeyboard({
     'Enter': () => {

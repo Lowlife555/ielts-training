@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { api } from '../../utils/api';
 import { useApp } from '../../context/AppContext';
@@ -9,6 +9,7 @@ import TrainingTimer from '../../components/training/TrainingTimer';
 import { CheckCircle, XCircle, Volume2 } from 'lucide-react';
 import { speak } from '../../utils/speech';
 import { checkEnglishAnswer } from '../../utils/answerCheck';
+import { useProgressSync, clearLocalSnapshot } from '../../hooks/useProgressSync';
 
 export default function SpellingPractice() {
   const navigate = useNavigate();
@@ -19,6 +20,7 @@ export default function SpellingPractice() {
   const plan = location.state?.plan;
   const wrongPool = location.state?.wrongPool || [];
   const mainResults = location.state?.mainResults || [];
+  const resumeSnap = location.state?.resumeSnapshot; // V7.4.2 单词级断点恢复快照
 
   const words = session?.spellingWords || [];
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -46,6 +48,7 @@ export default function SpellingPractice() {
 
   const goNext = useCallback(() => {
     if (currentIndex + 1 >= words.length) {
+      clearLocalSnapshot(); // V7.4.2: 本环节完成，进入下一环节（各自有独立快照）
       navigate('/daily/acceptance', { state: { session, plan, wrongPool, mainResults, spellingResults } });
     } else {
       setCurrentIndex(i => i + 1);
@@ -70,6 +73,25 @@ export default function SpellingPractice() {
       setAbandoning(false);
     }
   }, [abandoning, session, elapsed, mainResults, showToast, navigate]);
+
+  // V7.4.2: 进度快照（单词级双写：localStorage + 服务器），打断后从当前词精确继续
+  const snapshot = useMemo(() => {
+    if (!session) return null;
+    return { stage: 'spelling', listNo: session.listNo, currentIndex, spellingResults };
+  }, [session, currentIndex, spellingResults]);
+
+  useProgressSync(session?.sessionId, snapshot);
+
+  // V7.4.2: 恢复拼写练习的单词级状态（打断后精确继续）
+  const resumeAppliedRef = useRef(false);
+  useEffect(() => {
+    if (!resumeSnap || resumeAppliedRef.current) return;
+    resumeAppliedRef.current = true;
+    if (resumeSnap.stage === 'spelling') {
+      if (typeof resumeSnap.currentIndex === 'number') setCurrentIndex(resumeSnap.currentIndex);
+      if (Array.isArray(resumeSnap.spellingResults)) setSpellingResults(resumeSnap.spellingResults);
+    }
+  }, [resumeSnap]);
 
   useKeyboard({
     'Enter': () => { if (feedback) goNext(); else submitAnswer(); },

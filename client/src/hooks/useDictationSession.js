@@ -24,15 +24,15 @@ export function useDictationSession({ judge, onAnswer, onComplete }) {
   const roundPassedRef = useRef(new Set());
   const resultsRef = useRef([]);
 
-  const start = useCallback((ws) => {
+  const start = useCallback((ws, opts = {}) => {
     setWords(ws);
-    setRound(1);
-    setCurrentIndex(0);
+    setRound(opts.round || 1);
+    setCurrentIndex(opts.index || 0);
     setUserInput('');
     setFeedback(null);
-    roundPassedRef.current = new Set();
-    resultsRef.current = [];
-    setResults([]);
+    roundPassedRef.current = new Set(opts.passed || []);
+    resultsRef.current = opts.results || [];
+    setResults(opts.results || []);
   }, []);
 
   const currentWord = words[currentIndex];

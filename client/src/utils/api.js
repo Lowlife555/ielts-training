@@ -158,4 +158,9 @@ export const api = {
     const query = new URLSearchParams(params).toString();
     return request(`/trace/report?${query}`);
   },
+
+  // v7.4.2 Progress snapshot（记忆进度：单词级断点续训）
+  saveProgress: (data) =>
+    request('/progress', { method: 'POST', body: JSON.stringify(data) }),
+  getProgress: () => request('/progress/current'),
 };

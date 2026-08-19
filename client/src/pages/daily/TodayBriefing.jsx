@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../../utils/api';
 import { useKeyboard } from '../../hooks/useKeyboard';
+import { loadLocalSnapshot } from '../../hooks/useProgressSync';
 import { useApp } from '../../context/AppContext';
 import { useAuth } from '../../context/AuthContext';
 import { ArrowLeft, Play, Clock, Flame, BookOpen, RefreshCw, Target, FlaskConical, ListOrdered, Layers } from 'lucide-react';
@@ -111,6 +112,7 @@ export default function TodayBriefing() {
   const [testBusy, setTestBusy] = useState(false);
   const [batchSize, setBatchSize] = useState(30);
   const [resumeInfo, setResumeInfo] = useState(null);
+  const [progressSnap, setProgressSnap] = useState(null); // V7.4.2 单词级进度快照
 
   useEffect(() => {
     api.getDailyPlan()
@@ -120,6 +122,15 @@ export default function TodayBriefing() {
     // V7.3.1: 断点续训信息
     api.getResumeInfo()
       .then(data => setResumeInfo(data.resume))
+      .catch(() => {});
+    // V7.4.2: 单词级进度快照（localStorage 优先，服务器兜底）
+    const local = loadLocalSnapshot();
+    if (local && local.sessionId) {
+      setProgressSnap(local);
+      return;
+    }
+    api.getProgress()
+      .then(data => { if (data.resume) setProgressSnap({ sessionId: data.resume.sessionId, ...data.resume.snapshot }); })
       .catch(() => {});
   }, []);
 
@@ -145,6 +156,27 @@ export default function TodayBriefing() {
   };
 
   const startNow = () => navigate('/daily/warmup', { state: { plan, batchSize } });
+
+  // V7.4.2: 单词级断点恢复（打断后精确继续；快照 stage 决定跳转环节）
+  const continueFromSnap = async () => {
+    if (!progressSnap) return;
+    setTestBusy(true);
+    try {
+      const listNo = progressSnap.listNo || plan?.todayList?.listNo;
+      const session = await api.startTraining({ listNo, targetMinutes: plan?.targetMinutes || 60, debtMinutes: 0 });
+      const stage = progressSnap.stage;
+      const target = stage === 'spelling' ? '/daily/spelling'
+        : stage === 'spellcheck' ? '/daily/spellcheck'
+        : stage === 'spotcheck' ? '/daily/spotcheck'
+        : stage === 'acceptance' ? '/daily/acceptance'
+        : '/daily/study';
+      navigate(target, { state: { session, plan, resumeSnapshot: progressSnap } });
+    } catch (err) {
+      showToast('续训失败: ' + err.message, 'error');
+    } finally {
+      setTestBusy(false);
+    }
+  };
 
   // ===== 测试面板（admin_test 专属）：任意 List 任意环节直接进入 =====
   const testSession = async (listNo) => {
@@ -247,6 +279,20 @@ export default function TodayBriefing() {
             <button onClick={() => navigate('/daily/report', { state: { report: { durationSeconds: plan.today?.trainedSeconds || 0, dictationAccuracy: null, spellingAccuracy: null, spotCheckAccuracy: null, completed: true }, plan, passed: true } })} className="btn-primary !py-2 !px-4 text-sm">
               查看结算
             </button>
+          </div>
+        )}
+
+        {/* 单词级断点恢复横幅（V7.4.2：版本更新打断后精确继续） */}
+        {progressSnap && !plan.today?.completed && (
+          <div className="bg-purple-50 border border-purple-200 rounded-xl p-4 mb-6 flex items-center gap-3">
+            <span className="text-3xl">🎯</span>
+            <div className="flex-1">
+              <div className="font-bold text-purple-700">
+                上次训练中断于 {progressSnap.stage === 'wordtable' ? '单词卡' : progressSnap.stage === 'dictation' ? '默写' : progressSnap.stage === 'rest' ? '休息' : progressSnap.stage === 'selftest' ? '自测' : progressSnap.stage} 环节
+              </div>
+              <div className="text-xs text-purple-600">单词级记忆已保存，将从打断处继续</div>
+            </div>
+            <button onClick={continueFromSnap} disabled={testBusy} className="btn-primary !py-2 !px-3 text-sm">继续训练</button>
           </div>
         )}
 

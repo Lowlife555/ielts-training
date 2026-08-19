@@ -1,13 +1,17 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import { api } from '../../utils/api';
 import { useApp } from '../../context/AppContext';
 import { useKeyboard } from '../../hooks/useKeyboard';
 import { useDictationSession } from '../../hooks/useDictationSession';
+import { useProgressSync, clearLocalSnapshot, loadLocalSnapshot } from '../../hooks/useProgressSync';
 import { speak } from '../../utils/speech';
 import { checkChineseAnswer } from '../../utils/answerCheck';
 import Loading from '../../components/ui/Loading';
 import { ArrowLeft, Volume2, CheckCircle, XCircle, RotateCcw, Trophy } from 'lucide-react';
+
+// 独立测试用单独的 localStorage 槽，避免覆盖每日流程快照
+const LISTDICT_LS_KEY = 'ielts_progress_listdictation';
 
 const COUNT_OPTIONS = [
   { value: 0, label: '全部' },
@@ -18,6 +22,7 @@ const COUNT_OPTIONS = [
 export default function ListDictation() {
   const { listNo } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const { showToast } = useApp();
   const [words, setWords] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -25,6 +30,8 @@ export default function ListDictation() {
   const [started, setStarted] = useState(false);
   const [finished, setFinished] = useState(false);
   const inputRef = useRef(null);
+  // V7.4.2: 单词级断点（location.state 优先，localStorage 兜底；消费一次防重复）
+  const resumeSnapRef = useRef(location.state?.resumeSnapshot || loadLocalSnapshot(LISTDICT_LS_KEY) || null);
 
   const judge = useCallback((input, word) =>
     checkChineseAnswer(input, word.keywords, word.synonyms, word.chineseDefinition, { allowSynonym: true }), []);
@@ -32,7 +39,10 @@ export default function ListDictation() {
     api.submitDictation(listNo, { wordId: word.id, isCorrect, userAnswer: answer })
       .catch((err) => console.warn('Failed to save dictation result:', err.message));
   }, [listNo]);
-  const onComplete = useCallback(() => setFinished(true), []);
+  const onComplete = useCallback(() => {
+    clearLocalSnapshot(); // V7.4.2: 默写完成 → 清空快照
+    setFinished(true);
+  }, []);
 
   const {
     words: testWords, round, currentIndex, currentWord,
@@ -53,10 +63,32 @@ export default function ListDictation() {
   const startTest = () => {
     const count = selectedCount > 0 ? Math.min(selectedCount, words.length) : words.length;
     const pick = words.slice(0, count);
+    // V7.4.2: 单词级断点恢复（同 List 的 listdictation 快照才恢复；消费一次）
+    const snap = resumeSnapRef.current;
+    if (snap && snap.stage === 'listdictation' && Number(snap.listNo) === Number(listNo)
+      && Array.isArray(snap.testWords) && snap.testWords.length > 0) {
+      const ids = new Set(snap.testWords);
+      const resumeWords = pick.filter(w => ids.has(w.id));
+      if (resumeWords.length > 0) {
+        start(resumeWords, { round: snap.round || 1, index: snap.currentIndex || 0 });
+        resumeSnapRef.current = null;
+        setFinished(false);
+        setStarted(true);
+        return;
+      }
+    }
     start(pick);
     setFinished(false);
     setStarted(true);
   };
+
+  // V7.4.2: 进度快照（单词级双写；独立练习无真实会话，服务器写会 404 被忽略，localStorage 生效）
+  const snapshot = useMemo(() => {
+    if (!started || finished) return null;
+    return { stage: 'listdictation', listNo: Number(listNo), currentIndex, round, testWords: testWords.map(w => w.id) };
+  }, [started, finished, listNo, currentIndex, round, testWords]);
+
+  useProgressSync(`listdictation-${listNo}`, snapshot, LISTDICT_LS_KEY);
 
   useKeyboard({
     'Enter': () => { if (started) { if (feedback) goNext(); else submit(); } },
