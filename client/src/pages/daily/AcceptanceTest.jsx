@@ -53,7 +53,7 @@ export default function AcceptanceTest() {
 
   const {
     words, round, currentIndex, currentWord,
-    userInput, setUserInput, feedback, results, start, submit,
+    userInput, setUserInput, feedback, results, start, submit, goNext,
   } = useDictationSession({
     judge: (input, word) => checkEnglishAnswer(input, word.word, { allowMorph: true, allowEdit: false }),
     onComplete: (finalResults) => finish(finalResults),
@@ -83,7 +83,7 @@ export default function AcceptanceTest() {
   }, [submitting, session, elapsed, mainResults, showToast, navigate]);
 
   useKeyboard({
-    'Enter': () => submit(),
+    'Enter': () => { if (feedback) goNext(); else submit(); },
     'Escape': abandon,
     ' ': (e) => {
       if (feedback && currentWord) { e.preventDefault(); speak(currentWord.word); }
@@ -153,14 +153,15 @@ export default function AcceptanceTest() {
                 {feedback === 'correct' ? (
                   <span className="flex items-center justify-center gap-1"><CheckCircle className="w-5 h-5" /> 正确!</span>
                 ) : (
-                  <div>
-                    <span className="flex items-center justify-center gap-1"><XCircle className="w-5 h-5" /> 错误 · 将重测</span>
-                    <p className="text-sm mt-1">正确答案: <span className="font-semibold text-green-600">{currentWord.word}</span></p>
-                    <button onClick={() => speak(currentWord.word)} className="mt-1 text-xs text-indigo-500 hover:underline flex items-center gap-1 mx-auto">
-                      <Volume2 className="w-3 h-3" /> 听发音
-                    </button>
-                  </div>
+                  <span className="flex items-center justify-center gap-1"><XCircle className="w-5 h-5" /> 错误 · 将重测</span>
                 )}
+                {/* V7.4.1: 无论对错都展示正确答案，答对但不确定时也能再记忆 */}
+                <div className="mt-2">
+                  <p className="text-sm">正确答案: <span className="font-semibold text-green-600">{currentWord.word}</span></p>
+                  <button onClick={() => speak(currentWord.word)} className="mt-1 text-xs text-indigo-500 hover:underline flex items-center gap-1 mx-auto">
+                    <Volume2 className="w-3 h-3" /> 听发音
+                  </button>
+                </div>
               </div>
             )}
           </div>
@@ -168,15 +169,22 @@ export default function AcceptanceTest() {
       )}
 
       <div className="text-center mt-6">
-        <button onClick={submit} disabled={!userInput.trim() || !!feedback || submitting} className="btn-primary px-8">
-          <span className="kbd-hint">提交 (Enter)</span>
-          <span className="touch-hint hidden">提交</span>
-        </button>
+        {feedback ? (
+          <button onClick={goNext} className="btn-primary px-8">
+            <span className="kbd-hint">下一个 (Enter)</span>
+            <span className="touch-hint hidden">下一个</span>
+          </button>
+        ) : (
+          <button onClick={submit} disabled={!userInput.trim() || submitting} className="btn-primary px-8">
+            <span className="kbd-hint">提交 (Enter)</span>
+            <span className="touch-hint hidden">提交</span>
+          </button>
+        )}
       </div>
 
       <p className="text-center text-xs text-gray-400 mt-4">
-        <span className="kbd-hint"><kbd className="px-1.5 py-0.5 bg-gray-100 border rounded">Enter</kbd> 提交 · 错词自动重测直到全部正确</span>
-        <span className="touch-hint hidden">拼对为止 · 错词自动重测直到全部正确</span>
+        <span className="kbd-hint"><kbd className="px-1.5 py-0.5 bg-gray-100 border rounded">Enter</kbd> 提交 / 下一个 · 查看答案后点下一个</span>
+        <span className="touch-hint hidden">拼对为止 · 查看答案后点下一个</span>
       </p>
       {dialog}
     </div>

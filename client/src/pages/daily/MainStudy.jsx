@@ -277,7 +277,7 @@ export default function MainStudy() {
         if (feedback) goNextDictation();
         else submitDictation();
       }
-      if (phase === 'selftest') selftest.submit();
+      if (phase === 'selftest') { if (selftest.feedback) selftest.goNext(); else selftest.submit(); }
       if (phase === 'rest') skipRest();
     },
     ' ': (e) => {
@@ -659,26 +659,20 @@ export default function MainStudy() {
               {selftest.feedback && (
                 <div className={`text-center mt-3 ${selftest.feedback === 'correct' ? 'text-green-600' : 'text-red-500'}`}>
                   {selftest.feedback === 'correct' ? (
-                    <div>
-                      <span className="flex items-center justify-center gap-1 mb-1">
-                        <Check className="w-5 h-5" /> 正确!
-                      </span>
-                      <p className="text-sm text-gray-600 leading-relaxed max-w-md mx-auto">
-                        {Array.isArray(sw.meanings) && sw.meanings.length > 0 ? sw.meanings.join('；') : sw.chineseDefinition}
-                      </p>
-                    </div>
+                    <span className="flex items-center justify-center gap-1">
+                      <Check className="w-5 h-5" /> 正确!
+                    </span>
                   ) : (
-                    <div>
-                      <span className="flex items-center justify-center gap-1">
-                        <X className="w-5 h-5" /> 错误 · 将重测
-                      </span>
-                      <p className="text-sm mt-1">
-                        参考答案: <span className="font-semibold text-green-600">
-                          {Array.isArray(sw.meanings) && sw.meanings.length > 0 ? sw.meanings.join('；') : sw.chineseDefinition}
-                        </span>
-                      </p>
-                    </div>
+                    <span className="flex items-center justify-center gap-1">
+                      <X className="w-5 h-5" /> 错误 · 将重测
+                    </span>
                   )}
+                  {/* V7.4.1: 无论对错都展示正确答案，答对但不确定时也能再记忆 */}
+                  <div className="mt-2 text-sm text-gray-600 leading-relaxed max-w-md mx-auto">
+                    正确答案: <span className="font-semibold text-green-600">
+                      {Array.isArray(sw.meanings) && sw.meanings.length > 0 ? sw.meanings.join('；') : sw.chineseDefinition}
+                    </span>
+                  </div>
                 </div>
               )}
             </div>
@@ -686,7 +680,12 @@ export default function MainStudy() {
         )}
 
         <div className="text-center mt-6">
-          {!selftest.feedback && (
+          {selftest.feedback ? (
+            <button onClick={selftest.goNext} className="btn-primary px-8">
+              <span className="kbd-hint">下一个 (Enter)</span>
+              <span className="touch-hint hidden">下一个</span>
+            </button>
+          ) : (
             <button onClick={selftest.submit} disabled={!selftest.userInput.trim()} className="btn-primary px-8">
               <span className="kbd-hint">提交 (Enter)</span>
               <span className="touch-hint hidden">提交</span>
@@ -696,11 +695,11 @@ export default function MainStudy() {
 
         <p className="text-center text-xs text-gray-400 mt-4">
           <span className="kbd-hint">
-            <kbd className="px-1.5 py-0.5 bg-gray-100 border rounded">Enter</kbd> 提交
+            <kbd className="px-1.5 py-0.5 bg-gray-100 border rounded">Enter</kbd> 提交 / 下一个
             · <kbd className="px-1.5 py-0.5 bg-gray-100 border rounded">Space</kbd> 朗读
             · <kbd className="px-1.5 py-0.5 bg-gray-100 border rounded">Esc</kbd> 返回背诵
           </span>
-          <span className="touch-hint hidden">输入中文释义后提交 · 错词自动重测直到消灭</span>
+          <span className="touch-hint hidden">输入中文释义后提交 · 查看答案后点下一个</span>
         </p>
         {dialog}
       </div>

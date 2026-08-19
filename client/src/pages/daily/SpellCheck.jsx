@@ -87,18 +87,19 @@ export default function SpellCheck() {
     const nextResults = [...resultsRef.current, newResult];
     setResults(nextResults);
     resultsRef.current = nextResults;
+    // V7.4.1: 不自动前进，展示答案后由用户点下一个/Enter
+  }, [feedback, userInput, currentWord, submitting]);
 
-    setTimeout(() => {
-      if (currentIndex + 1 >= words.length) {
-        finish(nextResults);
-      } else {
-        setCurrentIndex(i => i + 1);
-        setUserInput('');
-        setFeedback(null);
-        inputRef.current?.focus();
-      }
-    }, 800);
-  }, [userInput, feedback, currentIndex, currentWord, words, submitting, finish]);
+  const goNext = useCallback(() => {
+    if (currentIndex + 1 >= words.length) {
+      finish(resultsRef.current);
+    } else {
+      setCurrentIndex(i => i + 1);
+      setUserInput('');
+      setFeedback(null);
+      inputRef.current?.focus();
+    }
+  }, [currentIndex, words, finish]);
 
   const abandon = useCallback(async () => {
     if (abandoning || submitting) return;
@@ -121,10 +122,14 @@ export default function SpellCheck() {
   }, [abandoning, submitting, session, elapsed, restedSeconds, showToast, navigate]);
 
   useKeyboard({
-    'Enter': () => { if (finished && outcome) goReport(); else submitAnswer(); },
+    'Enter': () => {
+      if (finished && outcome) { goReport(); return; }
+      if (feedback) goNext();
+      else submitAnswer();
+    },
     ' ': (e) => { e.preventDefault(); if (currentWord && !finished) speak(currentWord.word); },
     'Escape': () => { if (finished) navigate('/'); else abandon(); },
-  }, true, [submitAnswer, currentWord, finished, outcome, abandon, navigate]);
+  }, true, [submitAnswer, goNext, currentWord, finished, outcome, abandon, navigate]);
 
   if (!session) return null;
 
@@ -251,15 +256,14 @@ export default function SpellCheck() {
                     <CheckCircle className="w-5 h-5" /> 正确!
                   </span>
                 ) : (
-                  <div>
-                    <span className="flex items-center justify-center gap-1">
-                      <XCircle className="w-5 h-5" /> 错误
-                    </span>
-                    <p className="text-sm mt-1">
-                      正确答案: <span className="font-semibold text-green-600">{currentWord.word}</span>
-                    </p>
-                  </div>
+                  <span className="flex items-center justify-center gap-1">
+                    <XCircle className="w-5 h-5" /> 错误
+                  </span>
                 )}
+                {/* V7.4.1: 无论对错都展示正确答案，答对但不确定时也能再记忆 */}
+                <div className="mt-2 text-sm">
+                  正确答案: <span className="font-semibold text-green-600">{currentWord.word}</span>
+                </div>
               </div>
             )}
           </div>
@@ -267,14 +271,21 @@ export default function SpellCheck() {
       )}
 
       <div className="text-center mt-6">
-        <button
-          onClick={submitAnswer}
-          disabled={!userInput.trim() || !!feedback || submitting}
-          className="btn-primary px-8"
-        >
-          <span className="kbd-hint">提交 (Enter)</span>
-          <span className="touch-hint hidden">提交</span>
-        </button>
+        {feedback ? (
+          <button onClick={goNext} className="btn-primary px-8">
+            <span className="kbd-hint">下一个 (Enter)</span>
+            <span className="touch-hint hidden">下一个</span>
+          </button>
+        ) : (
+          <button
+            onClick={submitAnswer}
+            disabled={!userInput.trim() || submitting}
+            className="btn-primary px-8"
+          >
+            <span className="kbd-hint">提交 (Enter)</span>
+            <span className="touch-hint hidden">提交</span>
+          </button>
+        )}
       </div>
 
       <p className="text-center text-xs text-gray-400 mt-4">

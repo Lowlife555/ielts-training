@@ -41,18 +41,19 @@ export default function SpellingPractice() {
     setFeedback(isCorrect ? 'correct' : 'incorrect');
     const newResults = [...spellingResults, { wordId: currentWord.wordId, correct: isCorrect, answer: userInput.trim() }];
     setSpellingResults(newResults);
+    // V7.4.1: 不自动前进，展示答案后由用户点下一个/Enter
+  }, [feedback, userInput, currentWord, spellingResults]);
 
-    setTimeout(() => {
-      if (currentIndex + 1 >= words.length) {
-        navigate('/daily/acceptance', { state: { session, plan, wrongPool, mainResults, spellingResults: newResults } });
-      } else {
-        setCurrentIndex(i => i + 1);
-        setUserInput('');
-        setFeedback(null);
-        inputRef.current?.focus();
-      }
-    }, 800);
-  }, [userInput, feedback, currentIndex, currentWord, words.length, spellingResults, navigate, session, plan, wrongPool, mainResults]);
+  const goNext = useCallback(() => {
+    if (currentIndex + 1 >= words.length) {
+      navigate('/daily/acceptance', { state: { session, plan, wrongPool, mainResults, spellingResults } });
+    } else {
+      setCurrentIndex(i => i + 1);
+      setUserInput('');
+      setFeedback(null);
+      inputRef.current?.focus();
+    }
+  }, [currentIndex, words.length, navigate, session, plan, wrongPool, mainResults, spellingResults]);
 
   const abandon = useCallback(async () => {
     if (abandoning) return;
@@ -71,12 +72,12 @@ export default function SpellingPractice() {
   }, [abandoning, session, elapsed, mainResults, showToast, navigate]);
 
   useKeyboard({
-    'Enter': () => submitAnswer(),
+    'Enter': () => { if (feedback) goNext(); else submitAnswer(); },
     'Escape': abandon,
     ' ': (e) => {
       if (feedback && currentWord) { e.preventDefault(); speak(currentWord.word); }
     },
-  }, true, [submitAnswer, abandon, feedback, currentWord]);
+  }, true, [submitAnswer, goNext, abandon, feedback, currentWord]);
 
   if (!session) return null;
 
@@ -131,14 +132,15 @@ export default function SpellingPractice() {
                 {feedback === 'correct' ? (
                   <span className="flex items-center justify-center gap-1"><CheckCircle className="w-5 h-5" /> 正确!</span>
                 ) : (
-                  <div>
-                    <span className="flex items-center justify-center gap-1"><XCircle className="w-5 h-5" /> 错误</span>
-                    <p className="text-sm mt-1">正确答案: <span className="font-semibold text-green-600">{currentWord.word}</span></p>
-                    <button onClick={() => speak(currentWord.word)} className="mt-1 text-xs text-indigo-500 hover:underline flex items-center gap-1 mx-auto">
-                      <Volume2 className="w-3 h-3" /> 听发音
-                    </button>
-                  </div>
+                  <span className="flex items-center justify-center gap-1"><XCircle className="w-5 h-5" /> 错误</span>
                 )}
+                {/* V7.4.1: 无论对错都展示正确答案，答对但不确定时也能再记忆 */}
+                <div className="mt-2">
+                  <p className="text-sm">正确答案: <span className="font-semibold text-green-600">{currentWord.word}</span></p>
+                  <button onClick={() => speak(currentWord.word)} className="mt-1 text-xs text-indigo-500 hover:underline flex items-center gap-1 mx-auto">
+                    <Volume2 className="w-3 h-3" /> 听发音
+                  </button>
+                </div>
               </div>
             )}
           </div>
@@ -146,15 +148,22 @@ export default function SpellingPractice() {
       )}
 
       <div className="text-center mt-6">
-        <button onClick={submitAnswer} disabled={!userInput.trim() || !!feedback} className="btn-primary px-8">
-          <span className="kbd-hint">提交 (Enter)</span>
-          <span className="touch-hint hidden">提交</span>
-        </button>
+        {feedback ? (
+          <button onClick={goNext} className="btn-primary px-8">
+            <span className="kbd-hint">下一个 (Enter)</span>
+            <span className="touch-hint hidden">下一个</span>
+          </button>
+        ) : (
+          <button onClick={submitAnswer} disabled={!userInput.trim()} className="btn-primary px-8">
+            <span className="kbd-hint">提交 (Enter)</span>
+            <span className="touch-hint hidden">提交</span>
+          </button>
+        )}
       </div>
 
       <p className="text-center text-xs text-gray-400 mt-4">
-        <span className="kbd-hint"><kbd className="px-1.5 py-0.5 bg-gray-100 border rounded">Enter</kbd> 提交 · 答完后自动进入下一题 · <kbd className="px-1.5 py-0.5 bg-gray-100 border rounded">Esc</kbd> 收工</span>
-        <span className="touch-hint hidden">输入完成后点提交 · 答完自动进入下一题</span>
+        <span className="kbd-hint"><kbd className="px-1.5 py-0.5 bg-gray-100 border rounded">Enter</kbd> 提交 / 下一个 · 查看答案后点下一个 · <kbd className="px-1.5 py-0.5 bg-gray-100 border rounded">Esc</kbd> 收工</span>
+        <span className="touch-hint hidden">输入完成后点提交 · 查看答案后点下一个</span>
       </p>
       {dialog}
     </div>

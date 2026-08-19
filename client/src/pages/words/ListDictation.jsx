@@ -36,7 +36,7 @@ export default function ListDictation() {
 
   const {
     words: testWords, round, currentIndex, currentWord,
-    userInput, setUserInput, feedback, results, start, submit,
+    userInput, setUserInput, feedback, results, start, submit, goNext,
   } = useDictationSession({ judge, onAnswer, onComplete });
 
   useEffect(() => {
@@ -59,7 +59,7 @@ export default function ListDictation() {
   };
 
   useKeyboard({
-    'Enter': () => { if (started) submit(); },
+    'Enter': () => { if (started) { if (feedback) goNext(); else submit(); } },
     'Escape': () => {
       if (finished) navigate(`/lists/${listNo}`);
       else if (started) setStarted(false);
@@ -71,7 +71,7 @@ export default function ListDictation() {
         speak(currentWord.word);
       }
     },
-  }, true, [started, finished, submitAnswer, navigate, currentWord, listNo]);
+  }, true, [started, finished, submit, goNext, navigate, currentWord, listNo]);
 
   if (loading) return <Loading text="加载题目..." />;
 
@@ -247,42 +247,48 @@ export default function ListDictation() {
                   <CheckCircle className="w-5 h-5" /> 正确!
                 </span>
               ) : (
-                <div>
-                  <span className="flex items-center justify-center gap-1">
-                    <XCircle className="w-5 h-5" /> 错误 · 将重测
-                  </span>
-                  <p className="text-sm mt-1">
-                    参考答案: <span className="font-semibold text-green-600">
-                      {Array.isArray(currentWord.meanings) && currentWord.meanings.length > 0
-                        ? currentWord.meanings.join('；')
-                        : currentWord.chineseDefinition}
-                    </span>
-                  </p>
-                </div>
+                <span className="flex items-center justify-center gap-1">
+                  <XCircle className="w-5 h-5" /> 错误 · 将重测
+                </span>
               )}
+              {/* V7.4.1: 无论对错都展示正确答案，答对但不确定时也能再记忆 */}
+              <div className="mt-2 text-sm text-gray-600">
+                正确答案: <span className="font-semibold text-green-600">
+                  {Array.isArray(currentWord.meanings) && currentWord.meanings.length > 0
+                    ? currentWord.meanings.join('；')
+                    : currentWord.chineseDefinition}
+                </span>
+              </div>
             </div>
           )}
         </div>
       </div>
 
       <div className="text-center mt-6">
-        <button
-          onClick={submit}
-          disabled={!userInput.trim() || !!feedback}
-          className="btn-primary px-8"
-        >
-          <span className="kbd-hint">提交 (Enter)</span>
-          <span className="touch-hint hidden">提交</span>
-        </button>
+        {feedback ? (
+          <button onClick={goNext} className="btn-primary px-8">
+            <span className="kbd-hint">下一个 (Enter)</span>
+            <span className="touch-hint hidden">下一个</span>
+          </button>
+        ) : (
+          <button
+            onClick={submit}
+            disabled={!userInput.trim()}
+            className="btn-primary px-8"
+          >
+            <span className="kbd-hint">提交 (Enter)</span>
+            <span className="touch-hint hidden">提交</span>
+          </button>
+        )}
       </div>
 
       <p className="text-center text-xs text-gray-400 mt-4">
         <span className="kbd-hint">
-          <kbd className="px-1.5 py-0.5 bg-gray-100 border border-gray-300 rounded">Enter</kbd> 提交 · 错词自动重测直到默写正确
+          <kbd className="px-1.5 py-0.5 bg-gray-100 border border-gray-300 rounded">Enter</kbd> 提交 / 下一个
           · <kbd className="px-1.5 py-0.5 bg-gray-100 border border-gray-300 rounded">Space</kbd> 朗读
           · <kbd className="px-1.5 py-0.5 bg-gray-100 border border-gray-300 rounded">Esc</kbd> 退出
         </span>
-        <span className="touch-hint hidden">输入中文词义后提交 · 答错自动重测直到默写正确</span>
+        <span className="touch-hint hidden">输入中文词义后提交 · 查看答案后点下一个</span>
       </p>
     </div>
   );
