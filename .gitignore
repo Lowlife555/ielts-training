@@ -33,3 +33,6 @@ server/db/*_checkpoint.json
 server/db/synonym_checkpoint.json
 # iDesign/OpenPencil 会话产物
 design/
+# 调研/一次性临时脚本
+_tmp*
+

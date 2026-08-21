@@ -44,15 +44,23 @@ router.post('/start', (req, res) => {
   const sessionId = result.lastInsertRowid;
 
   // 中译英拼写词：20%（约 20 词，不足 20 词取全部）
+  // V7.4.5 选词分层：① 真题考过拼写的词 ② 牛津 5000 常用词 ③ List 剩余词随机补足
+  // （保证每天 ≥20 词，同时避免生僻词/真题不考拼写的词优先出现）
   const spellingCount = Math.min(
     Math.max(Math.ceil(listWords.length * 0.2), SPELLING_MIN_COUNT),
     listWords.length
   );
   const spellingWords = db.prepare(`
-    SELECT id, word, phonetic, part_of_speech, chinese_definition
-    FROM words
-    WHERE is_extra = 0 AND list_no = ?
-    ORDER BY RANDOM()
+    SELECT w.id, w.word, w.phonetic, w.part_of_speech, w.chinese_definition
+    FROM words w
+    WHERE w.is_extra = 0 AND w.list_no = ?
+    ORDER BY
+      CASE
+        WHEN EXISTS (SELECT 1 FROM zhenti_spelling_words z WHERE z.word = lower(w.word)) THEN 0
+        WHEN EXISTS (SELECT 1 FROM oxford_words o WHERE o.word = lower(w.word)) THEN 1
+        ELSE 2
+      END,
+      RANDOM()
     LIMIT ?
   `).all(listNo, spellingCount);
 
