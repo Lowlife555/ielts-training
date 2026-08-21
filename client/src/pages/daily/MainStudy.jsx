@@ -85,20 +85,19 @@ export default function MainStudy() {
     if (phase === 'dictation') inputRef.current?.focus();
   }, [phase, currentIndex, dictWords.length]);
 
-  // 休息倒计时
+  // 休息倒计时（V7.4.2: 改为时间戳差值，避免浏览器后台节流 setInterval 导致倒计时变慢）
   useEffect(() => {
     if (!restRunning || phase !== 'rest') return;
+    const endAt = Date.now() + restLeft * 1000;
     const timer = setInterval(() => {
-      setRestLeft(prev => {
-        if (prev <= 1) {
-          clearInterval(timer);
-          setRestRunning(false);
-          nextAfterRest();
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
+      const remain = Math.max(0, Math.round((endAt - Date.now()) / 1000));
+      setRestLeft(remain);
+      if (remain <= 0) {
+        clearInterval(timer);
+        setRestRunning(false);
+        nextAfterRest();
+      }
+    }, 250);
     return () => clearInterval(timer);
   }, [restRunning, phase]);
 
