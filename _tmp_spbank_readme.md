@@ -1,0 +1,2229 @@
+# IELTS Listening Spelling Word Bank - Merged from 3 PDFs
+
+**Format:** Word (**part of speech**) - short English meaning.
+
+**Parts of speech:** n. = noun/proper noun, v. = verb, adj. = adjective, adv. = adverb. For multi-word answers, I used phrase labels such as **n. phrase** or **v. phrase**.
+
+**Total after removing duplicates:** 2032 entries.
+**Deduplication rule:** I merged the three PDFs and removed repeated duplicates. I kept useful spelling variants when IELTS may test them separately, such as singular/plural forms, UK/US spelling, or confusing pairs like **week / weak** and **west / waste**.
+
+## Days of the Week
+
+- Friday (**adj.**) - day name.
+- Monday (**adj.**) - a day name.
+- Saturday (**adj.**) - a day name.
+- Sunday (**adj.**) - a day name.
+- Thursday (**adj.**) - a day name.
+- Tuesday (**adj.**) - a day name.
+- Wednesday (**adj.**) - day name.
+- Weekdays (**n.**) - Monday to Friday.
+- Weekend (**n.**) - a day name.
+
+## Months of the Year
+
+- April (**n.**) - a month name.
+- August (**n.**) - a month name.
+- December (**n.**) - month name.
+- February (**adj.**) - month name.
+- January (**adj.**) - a month name.
+- July (**adv.**) - month name.
+- June (**n.**) - a month name.
+- March (**n.**) - a month name.
+- May (**adj.**) - month name.
+- November (**n.**) - month name.
+- October (**n.**) - month name.
+- September (**n.**) - a month name.
+
+## Numbers
+
+- Eight (**n.**) - a number word.
+- Five (**adj.**) - a number word.
+- Four (**n.**) - a number word.
+- Hundred (**adj.**) - a number word.
+- Nine (**n.**) - a number word.
+- One (**n.**) - a number word.
+- Seven (**adj.**) - a number word.
+- Six (**n.**) - a number word.
+- Ten (**adj.**) - a number word.
+- Thousand (**n.**) - number 1000.
+- Three (**n.**) - a number word.
+- Two (**n.**) - a number word.
+
+## Colours
+
+- Beige (**n.**) - a colour or shade.
+- Black (**n.**) - a colour or shade.
+- Blue (**n.**) - a colour or shade.
+- Charcoal (**adj.**) - a colour or shade.
+- Coral (**adj.**) - a colour or shade.
+- Cream (**n.**) - a colour or shade.
+- Cyan (**n.**) - a colour or shade.
+- Gold (**n.**) - a colour or shade.
+- Green (**adj.**) - colour.
+- Grey (**adj.**) - a colour or shade.
+- Indigo (**n.**) - a colour or shade.
+- Lavender (**n.**) - a colour or shade.
+- Maroon (**n.**) - a colour or shade.
+- Mauve (**n.**) - a colour or shade.
+- Mustard (**n.**) - a colour or shade.
+- Olive (**adj.**) - a colour or shade.
+- Orange (**n.**) - a colour or shade.
+- Peach (**n.**) - a colour or shade.
+- Pink (**n.**) - a colour or shade.
+- Purple (**n.**) - a colour or shade.
+- Red (**adj.**) - a colour or shade.
+- Rust (**n.**) - a colour or shade.
+- Silver (**n.**) - grey-white metal/colour.
+- Tan (**n.**) - a colour or shade.
+- Teal (**adj.**) - a colour or shade.
+- Violet (**n.**) - a colour or shade.
+- White (**n.**) - a colour or shade.
+- Yellow (**n.**) - colour.
+
+## Subjects
+
+- Accounting (**n.**) - an academic subject or study field.
+- Agriculture (**n.**) - an academic subject or study field.
+- Anthropology (**adj.**) - an academic subject or study field.
+- Archaeology (**adj.**) - an academic subject or study field.
+- Architecture (**n.**) - an academic subject or study field.
+- Arts (**n.**) - an academic subject or study field.
+- Biology (**adj.**) - an academic subject or study field.
+- Business Management (**n. phrase**) - an academic subject or study field.
+- Chemistry (**adj.**) - an academic subject or study field.
+- Commerce (**n.**) - an academic subject or study field.
+- Computer Science (**n. phrase**) - an academic subject or study field.
+- Creative Arts (**n. phrase**) - an academic subject or study field.
+- Criminology (**adj.**) - an academic subject or study field.
+- Economics (**n.**) - study of economy.
+- Engineering (**n.**) - an academic subject or study field.
+- Finance (**n.**) - money management.
+- Geography (**adj.**) - study of places/earth.
+- History (**adj.**) - study of the past.
+- Humanities (**n.**) - an academic subject or study field.
+- IT (**n.**) - an academic subject or study field.
+- Journal (**adj.**) - an academic subject or study field.
+- Law (**n.**) - system of rules.
+- Literature (**n.**) - an academic subject or study field.
+- Logic (**adj.**) - an academic subject or study field.
+- Mathematics (**n.**) - study of numbers.
+- MBA (**n.**) - an academic subject or study field.
+- MBBS (**n.**) - an academic subject or study field.
+- Performing Arts (**n. phrase**) - an academic subject or study field.
+- Philosophy (**adj.**) - an academic subject or study field.
+- Physical Education (**n. phrase**) - an academic subject or study field.
+- Politics (**n.**) - government/public affairs.
+- Psychology (**adj.**) - an academic subject or study field.
+- Science (**n.**) - an academic subject or study field.
+- Sociology (**adj.**) - an academic subject or study field.
+- Statistics (**n.**) - numerical data/study.
+- Victimology (**adj.**) - an academic subject or study field.
+- Visual Arts (**n. phrase**) - an academic subject or study field.
+
+## Studying at College/University
+
+- Admission (**n.**) - entry or acceptance.
+- Advanced (**adj.**) - a college/university study term.
+- Assessment (**adj.**) - evaluation or test.
+- Attendance (**n.**) - being present.
+- Bachelor’s Degree (**n. phrase**) - a college/university study term.
+- Background (**n.**) - a college/university study term.
+- Book (**n.**) - a college/university study term.
+- Campus (**n.**) - a college/university study term.
+- Canteen (**adj.**) - a college/university study term.
+- Certificate (**n.**) - a college/university study term.
+- Classroom (**n.**) - room for lessons.
+- College (**n.**) - higher education institution.
+- Commencement (**adj.**) - a college/university study term.
+- Compound (**n.**) - a college/university study term.
+- Computer Centre (**n. phrase**) - a college/university study term.
+- Computer Laboratory (**n. phrase**) - a college/university study term.
+- Course Outline (**n. phrase**) - a college/university study term.
+- Deadline (**n.**) - a college/university study term.
+- Department (**adj.**) - section of an organization.
+- Dictionary (**adj.**) - a college/university study term.
+- Dining (**n.**) - eating a meal.
+- Dining Room (**n. phrase**) - a college/university study term.
+- Diploma (**n.**) - a college/university study term.
+- Dissertation (**n.**) - a college/university study term.
+- Eraser (**n.**) - a college/university study term.
+- Experience (**n.**) - knowledge from doing/seeing.
+- Experiment (**adj.**) - scientific test.
+- Extra Background (**n. phrase**) - a college/university study term.
+- Facilities (**n.**) - useful services/equipment.
+- Faculty (**adj.**) - a college/university study term.
+- Feedback (**n.**) - comments about performance.
+- Foreign Students (**n. phrase**) - a college/university study term.
+- Give a Talk (**v. phrase**) - a college/university study term.
+- Group Discussion (**n. phrase**) - a college/university study term.
+- Guidelines (**n.**) - a college/university study term.
+- Handout (**n.**) - a college/university study term.
+- Higher Education (**n. phrase**) - a college/university study term.
+- Homestay (**adj.**) - a college/university study term.
+- Intermediate (**n.**) - middle level.
+- International (**adj.**) - a college/university study term.
+- International Student (**n. phrase**) - a college/university study term.
+- Introduction (**n.**) - a college/university study term.
+- Introductory (**adj.**) - a college/university study term.
+- Knowledge (**n.**) - a college/university study term.
+- Laptop (**n.**) - portable computer.
+- Leaflet (**n.**) - a college/university study term.
+- Lecture (**n.**) - a college/university study term.
+- Lecturers (**n.**) - a college/university study term.
+- Library (**adj.**) - a college/university study term.
+- Main Hall (**n. phrase**) - a college/university study term.
+- Media room (**n. phrase**) - a college/university study term.
+- Module (**n.**) - course unit.
+- Notes (**n.**) - a college/university study term.
+- Outcomes (**n.**) - a college/university study term.
+- Outreach (**n.**) - a college/university study term.
+- Overseas (**n.**) - a college/university study term.
+- Overseas Students (**n. phrase**) - a college/university study term.
+- Passport (**n.**) - official travel ID.
+- Pencil (**n.**) - writing tool.
+- PG (postgraduate) (**n.**) - a college/university study term.
+- Photocopy (**adj.**) - a college/university study term.
+- Placement Test (**n. phrase**) - a college/university study term.
+- Post-Secondary (**n. phrase**) - a college/university study term.
+- Primary (**adj.**) - first/basic level.
+- Principal (**adj.**) - a college/university study term.
+- Printer (**n.**) - machine that prints.
+- Printing (**n.**) - a college/university study term.
+- Profile (**n.**) - a college/university study term.
+- Programmes (**n.**) - a college/university study term.
+- Proofreading (**n.**) - a college/university study term.
+- Pupils (**n.**) - a college/university study term.
+- Reference (**n.**) - source or recommendation.
+- Registrar’s Office (**n. phrase**) - a college/university study term.
+- Report Writing (**n. phrase**) - a college/university study term.
+- Research (**n.**) - careful investigation.
+- Research Paper (**n. phrase**) - a college/university study term.
+- Resources Room (**n. phrase**) - a college/university study term.
+- Results (**n.**) - a college/university study term.
+- Reunion (**n.**) - a college/university study term.
+- Schedule (**n.**) - a college/university study term.
+- School Reunion (**n. phrase**) - a college/university study term.
+- Secondary (**adj.**) - second level.
+- Seminar (**n.**) - a college/university study term.
+- Shelves (**n.**) - a college/university study term.
+- Specialist (**n.**) - a college/university study term.
+- Speech (**n.**) - formal talk.
+- Staff (**n.**) - employees/group of workers.
+- Stationery Items (**n. phrase**) - a college/university study term.
+- Student Advisor (**n. phrase**) - a college/university study term.
+- Student Retention (**n. phrase**) - a college/university study term.
+- Student support services (**n. phrase**) - a college/university study term.
+- Study Abroad (**v. phrase**) - a college/university study term.
+- Study Room (**v. phrase**) - a college/university study term.
+- Supervisor (**n.**) - a college/university study term.
+- Syllabus (**n.**) - a college/university study term.
+- Tasks (**n.**) - a college/university study term.
+- Teamwork (**n.**) - a college/university study term.
+- Textbook (**n.**) - a college/university study term.
+- Topic (**adj.**) - a college/university study term.
+- Tutor (**n.**) - private teacher.
+- UG (undergraduate) (**n.**) - a college/university study term.
+- University (**adj.**) - higher education institution.
+- Vocabulary (**adj.**) - set of words.
+- Written Work (**n. phrase**) - a college/university study term.
+
+## School
+
+- Alumni (**n.**) - a school or study term.
+- Alumnus (**n.**) - a school or study term.
+- Bachelor (**n.**) - a school or study term.
+- Be Addicted to the Book (**v. phrase**) - a school or study term.
+- Biography (**adj.**) - a school or study term.
+- Book Review (**n. phrase**) - a school or study term.
+- Curriculum (**n.**) - a school or study term.
+- Dean (**n.**) - a school or study term.
+- Doctoral Candidate (**n. phrase**) - a school or study term.
+- Drop-out (**v. phrase**) - a school or study term.
+- Editorial (**adj.**) - a school or study term.
+- Enrol in (**v. phrase**) - a school or study term.
+- Enrolment (**adj.**) - a school or study term.
+- Extra Copy (**n. phrase**) - a school or study term.
+- Freshman (**n.**) - a school or study term.
+- Future Students (**n. phrase**) - a school or study term.
+- Get Through a Novel (**v. phrase**) - a school or study term.
+- Makeup Exam (**n. phrase**) - a school or study term.
+- Master (**n.**) - a school or study term.
+- Novel (**n.**) - a school or study term.
+- Out of Print (**n. phrase**) - a school or study term.
+- Paperback Edition (**n. phrase**) - a school or study term.
+- Physics (**n.**) - study of matter/energy.
+- Plough Through (**v. phrase**) - a school or study term.
+- Post Doctorate (**n. phrase**) - a school or study term.
+- Rank (**n.**) - a school or study term.
+- Read (**v.**) - a school or study term.
+- Registration (**n.**) - a school or study term.
+- Sign up for (**v. phrase**) - a school or study term.
+- Sophomore (**n.**) - a school or study term.
+- Speech Contest (**n. phrase**) - a school or study term.
+- Student (**adj.**) - a school or study term.
+- Write Extensively (**v. phrase**) - a school or study term.
+
+## Library
+
+- Atheneum (**n.**) - a library/study term.
+- Back Issue (**n. phrase**) - a library/study term.
+- Book Reservation (**n. phrase**) - a library/study term.
+- Book Room (**n. phrase**) - a library/study term.
+- Catalogue (**n.**) - list of products/items.
+- Check out (**v. phrase**) - a library/study term.
+- Copier (**n.**) - a library/study term.
+- Current Issue (**n. phrase**) - a library/study term.
+- Elective (**adj.**) - a library/study term.
+- Fine (**n.**) - a library/study term.
+- Index (**n.**) - a library/study term.
+- Information Desk (**n. phrase**) - a library/study term.
+- Keyword (**n.**) - a library/study term.
+- Latest Number (**n. phrase**) - a library/study term.
+- Librarian (**n.**) - a library/study term.
+- Library Card (**n. phrase**) - a library/study term.
+- Magazine (**n.**) - periodical publication.
+- Media Centre (**n. phrase**) - a library/study term.
+- Overdue (**n.**) - a library/study term.
+- Periodical Room (**n. phrase**) - a library/study term.
+- Put on Reserve (**v. phrase**) - a library/study term.
+- Reading Room (**n. phrase**) - a library/study term.
+- Return (**v.**) - come/go back.
+- Shelf (**n.**) - a library/study term.
+- Storage (**n.**) - space for keeping things.
+- Study Lounge (**v. phrase**) - a library/study term.
+- The Stacks (**n. phrase**) - a library/study term.
+- Volume (**n.**) - a library/study term.
+- Writing Permission (**n. phrase**) - a library/study term.
+
+## Work & Job
+
+- Accountant (**adj.**) - a job, role, or work term.
+- Address (**n.**) - place/contact details.
+- Architect (**n.**) - a job, role, or work term.
+- Assistant (**adj.**) - a job, role, or work term.
+- Associate (**n.**) - a job, role, or work term.
+- Capacity (**adj.**) - a job, role, or work term.
+- Captain (**n.**) - a job, role, or work term.
+- Career (**n.**) - a job, role, or work term.
+- Cashier (**n.**) - a job, role, or work term.
+- Chief Executive Officer (**n. phrase**) - a job, role, or work term.
+- Clerk (**n.**) - a job, role, or work term.
+- Craftsman (**n.**) - a job, role, or work term.
+- Creator (**n.**) - a job, role, or work term.
+- Curriculum Vitae (**n. phrase**) - a job, role, or work term.
+- Data Analyst (**n. phrase**) - a job, role, or work term.
+- Decorator (**n.**) - a job, role, or work term.
+- Designer (**n.**) - a job, role, or work term.
+- Determination (**n.**) - a job, role, or work term.
+- Director (**n.**) - person in charge.
+- Employ (**v.**) - a job, role, or work term.
+- Engagement (**adj.**) - a job, role, or work term.
+- Engineer (**n.**) - person who designs/builds systems.
+- Executive (**adj.**) - a job, role, or work term.
+- Flight Attendant (**n. phrase**) - a job, role, or work term.
+- Freelance (**n.**) - a job, role, or work term.
+- Guard (**n.**) - a job, role, or work term.
+- Junior Post (**n. phrase**) - a job, role, or work term.
+- Lecturer (**n.**) - a job, role, or work term.
+- Mail (**n.**) - a job, role, or work term.
+- Mail Address (**n. phrase**) - a job, role, or work term.
+- Menial Jobs (**n. phrase**) - a job, role, or work term.
+- Occupation (**n.**) - a job, role, or work term.
+- Office Assistant (**n. phrase**) - a job, role, or work term.
+- Office Space (**n. phrase**) - a job, role, or work term.
+- Pilot (**n.**) - person who flies aircraft.
+- Place (**n.**) - a job, role, or work term.
+- Practice (**v.**) - repeated training or custom.
+- Profession (**n.**) - a job, role, or work term.
+- Professional Experience (**n. phrase**) - a job, role, or work term.
+- Professor (**n.**) - a job, role, or work term.
+- Psychologist (**n.**) - a job, role, or work term.
+- Pursuit (**n.**) - a job, role, or work term.
+- Receptionist (**n.**) - front-desk worker.
+- Resume (**n.**) - a job, role, or work term.
+- Secretary (**adj.**) - a job, role, or work term.
+- Security (**adj.**) - safety/protection.
+- Security guard (**n. phrase**) - a job, role, or work term.
+- Senior Role (**n. phrase**) - a job, role, or work term.
+- Service (**n.**) - a job, role, or work term.
+- Situation (**n.**) - a job, role, or work term.
+- Skills Required (**n. phrase**) - a job, role, or work term.
+- Software Developer (**n. phrase**) - a job, role, or work term.
+- Spot (**n.**) - a job, role, or work term.
+- Success (**n.**) - a job, role, or work term.
+- Teacher (**n.**) - a job, role, or work term.
+- Vacancy (**adj.**) - a job, role, or work term.
+- Volunteer (**n.**) - a job, role, or work term.
+- Waiter (**n.**) - a job, role, or work term.
+- Waitress (**n.**) - a job, role, or work term.
+- Work Experience (**n. phrase**) - a job, role, or work term.
+
+## Workplaces
+
+- Ability (**adj.**) - skill or capacity.
+- Achievement (**adj.**) - success or accomplishment.
+- Application Letter (**n. phrase**) - a workplace or employment term.
+- Appointment (**adj.**) - arranged meeting time.
+- Awards (**n.**) - a workplace or employment term.
+- Bid (**n.**) - a workplace or employment term.
+- Blaze a Trail (**v. phrase**) - a workplace or employment term.
+- Branch (**n.**) - part of a tree/organization.
+- Clinic (**adj.**) - a workplace or employment term.
+- Colleague (**n.**) - person you work with.
+- Conferences (**n.**) - a workplace or employment term.
+- Confidence (**n.**) - belief in ability.
+- Confident (**adj.**) - a workplace or employment term.
+- Confidential (**adj.**) - a workplace or employment term.
+- Consulting Firm (**n. phrase**) - a workplace or employment term.
+- Continuous Exploration (**n. phrase**) - a workplace or employment term.
+- Contribution (**n.**) - a workplace or employment term.
+- Cooperation (**n.**) - a workplace or employment term.
+- Dentist (**n.**) - tooth doctor.
+- Determined (**adj.**) - a workplace or employment term.
+- Diligent (**adj.**) - a workplace or employment term.
+- Do Odd Jobs Consult (**n. phrase**) - a workplace or employment term.
+- Employee (**n.**) - a workplace or employment term.
+- Employer (**n.**) - person/company giving work.
+- Employment (**adj.**) - having work/job.
+- Fire (**n.**) - burning flames.
+- Fired (**adj.**) - a workplace or employment term.
+- Forgetful (**adj.**) - a workplace or employment term.
+- Get Along with (**v. phrase**) - a workplace or employment term.
+- Hard-Working (**n. phrase**) - a workplace or employment term.
+- Have No Match for (**v. phrase**) - a workplace or employment term.
+- Hire (**v.**) - a workplace or employment term.
+- Impression (**n.**) - a workplace or employment term.
+- Inexperienced (**adj.**) - a workplace or employment term.
+- Inquiry (**adj.**) - a workplace or employment term.
+- Internship (**n.**) - a workplace or employment term.
+- Job Hunting (**n. phrase**) - a workplace or employment term.
+- Job-Hopping (**n. phrase**) - a workplace or employment term.
+- Layoff (**n.**) - a workplace or employment term.
+- Legend (**n.**) - a workplace or employment term.
+- Manager (**n.**) - person in charge.
+- Meeting (**n.**) - planned discussion.
+- Mission (**n.**) - a workplace or employment term.
+- Opening (**n.**) - a workplace or employment term.
+- Perseverance (**n.**) - a workplace or employment term.
+- Personality (**adj.**) - character traits.
+- Pioneer (**n.**) - a workplace or employment term.
+- Pressure (**n.**) - a workplace or employment term.
+- Proposal (**adj.**) - a workplace or employment term.
+- Reception (**n.**) - a workplace or employment term.
+- Recognition (**n.**) - a workplace or employment term.
+- Rejection (**n.**) - a workplace or employment term.
+- Showroom (**n.**) - place displaying products.
+- Skill Set (**n. phrase**) - a workplace or employment term.
+- Staff Selection (**n. phrase**) - a workplace or employment term.
+- Stress (**n.**) - mental pressure.
+- Symbol (**n.**) - a workplace or employment term.
+- Team Leaders (**n. phrase**) - a workplace or employment term.
+- Technical Cooperation (**n. phrase**) - a workplace or employment term.
+- Transaction (**n.**) - a workplace or employment term.
+- Transfer (**v.**) - a workplace or employment term.
+- Tribute (**n.**) - a workplace or employment term.
+- Turn Down (**v. phrase**) - a workplace or employment term.
+- Unemployed (**adj.**) - without a job.
+- Unemployment (**adj.**) - a workplace or employment term.
+- Vision (**n.**) - ability to see or future idea.
+- Wage (**n.**) - a workplace or employment term.
+- Want Ads (**n. phrase**) - a workplace or employment term.
+- Wear out (**v. phrase**) - a workplace or employment term.
+- Workaholic (**adj.**) - a workplace or employment term.
+- Workload (**n.**) - a workplace or employment term.
+- Workshop (**n.**) - room/event for practical work.
+
+## Health
+
+- Anaesthetist (**n.**) - a health, food, or body-related term.
+- Anti-Inflammatory (**n. phrase**) - a health, food, or body-related term.
+- Balanced Diet (**n. phrase**) - a health, food, or body-related term.
+- Beans (**n.**) - a health, food, or body-related term.
+- Beef (**n.**) - meat from cattle.
+- Biopsy (**adj.**) - a health, food, or body-related term.
+- Blackcurrant (**adj.**) - a health, food, or body-related term.
+- Body Mass Index (**n. phrase**) - a health, food, or body-related term.
+- Bread (**n.**) - a health, food, or body-related term.
+- Carbohydrates (**n.**) - a health, food, or body-related term.
+- Cereals (**n.**) - a health, food, or body-related term.
+- Cheese (**n.**) - food made from milk.
+- Chicken (**adj.**) - a health, food, or body-related term.
+- Chilly (**adv.**) - a health, food, or body-related term.
+- Citrus Fruits (**n. phrase**) - a health, food, or body-related term.
+- Consultant (**adj.**) - a health, food, or body-related term.
+- Disease (**n.**) - illness.
+- Doctors (**n.**) - a health, food, or body-related term.
+- Egg Yolk (**n. phrase**) - a health, food, or body-related term.
+- Eggs (**n.**) - food laid by birds.
+- Feel Under the Weather (**v. phrase**) - a health, food, or body-related term.
+- Fit as a Fiddle (**n. phrase**) - a health, food, or body-related term.
+- Fitness (**n.**) - physical health.
+- Food (**n.**) - a health, food, or body-related term.
+- Food Pyramid (**n. phrase**) - a health, food, or body-related term.
+- Fruit (**n.**) - a health, food, or body-related term.
+- Fruits (**n.**) - a health, food, or body-related term.
+- Green Pepper (**n. phrase**) - a health, food, or body-related term.
+- Healthcare (**n.**) - a health, food, or body-related term.
+- Healthiness (**n.**) - a health, food, or body-related term.
+- Hospital (**adj.**) - place for medical care.
+- Hypotension (**n.**) - a health, food, or body-related term.
+- In a Fit State (**n. phrase**) - a health, food, or body-related term.
+- In Good Shape (**n. phrase**) - a health, food, or body-related term.
+- In Poor Shape (**n. phrase**) - a health, food, or body-related term.
+- Infirmary (**adj.**) - a health, food, or body-related term.
+- Keep-fit (**v. phrase**) - a health, food, or body-related term.
+- Liver (**n.**) - a health, food, or body-related term.
+- Lose Weight (**v. phrase**) - a health, food, or body-related term.
+- Mango (**n.**) - a health, food, or body-related term.
+- Meal (**adj.**) - a health, food, or body-related term.
+- Meat (**n.**) - animal flesh used as food.
+- Medicine (**n.**) - a health, food, or body-related term.
+- Milk (**n.**) - a health, food, or body-related term.
+- Minerals (**n.**) - a health, food, or body-related term.
+- Mutton (**n.**) - a health, food, or body-related term.
+- Nursery (**adj.**) - place for young children/plants.
+- Nursing (**n.**) - a health, food, or body-related term.
+- Nursing Care (**n. phrase**) - care by nurses.
+- Nuts (**n.**) - a health, food, or body-related term.
+- On Diet (**n. phrase**) - a health, food, or body-related term.
+- Out of Shape (**n. phrase**) - a health, food, or body-related term.
+- Outdoor Activities (**n. phrase**) - a health, food, or body-related term.
+- Overweight (**n.**) - a health, food, or body-related term.
+- Pasta (**n.**) - a health, food, or body-related term.
+- Physical Exercise (**n. phrase**) - a health, food, or body-related term.
+- Physician (**n.**) - a health, food, or body-related term.
+- Pineapple (**n.**) - a health, food, or body-related term.
+- Pizza (**n.**) - a health, food, or body-related term.
+- Pork (**n.**) - a health, food, or body-related term.
+- Potatoes (**n.**) - a health, food, or body-related term.
+- Protein (**n.**) - body-building nutrient.
+- Put on Weight (**v. phrase**) - a health, food, or body-related term.
+- Regular Exercise (**n. phrase**) - a health, food, or body-related term.
+- Remedy (**adj.**) - a health, food, or body-related term.
+- Rice (**n.**) - a health, food, or body-related term.
+- Robustness (**n.**) - a health, food, or body-related term.
+- Salad Bar (**n. phrase**) - a health, food, or body-related term.
+- Sap (**n.**) - a health, food, or body-related term.
+- Seafood (**n.**) - food from the sea.
+- Soundness (**n.**) - a health, food, or body-related term.
+- Surgeon (**n.**) - a health, food, or body-related term.
+- Tai-Chi (**n. phrase**) - a health, food, or body-related term.
+- Tomatoes (**n.**) - a health, food, or body-related term.
+- Treatment (**adj.**) - a health, food, or body-related term.
+- Vegetables (**n.**) - a health, food, or body-related term.
+- Vegetarian (**n.**) - person who does not eat meat.
+- Verdure (**n.**) - a health, food, or body-related term.
+- Vitamin (**n.**) - nutrient needed in small amounts.
+- Watch Your Diet (**v. phrase**) - a health, food, or body-related term.
+- Well-Being (**n. phrase**) - a health, food, or body-related term.
+- Wellness (**n.**) - a health, food, or body-related term.
+- Workout (**n.**) - a health, food, or body-related term.
+- Yoga (**n.**) - exercise/meditation practice.
+- Yoghurt (**n.**) - a health, food, or body-related term.
+- Zinc (**n.**) - a health, food, or body-related term.
+
+## Nature
+
+- Hill (**n.**) - a nature or landscape term.
+- Jungle (**n.**) - a nature or landscape term.
+- Landslides (**n.**) - a nature or landscape term.
+- Mountain (**n.**) - large natural high land.
+
+## Nature & Animal Kingdom
+
+- Amphibian (**n.**) - a nature, plant, or animal term.
+- Animal (**adj.**) - a nature, plant, or animal term.
+- Avalanche (**n.**) - a nature, plant, or animal term.
+- Bark (**n.**) - a nature, plant, or animal term.
+- Beach (**n.**) - a nature, plant, or animal term.
+- Birds (**n.**) - a nature, plant, or animal term.
+- Bush (**n.**) - a nature, plant, or animal term.
+- Canyon (**n.**) - a nature, plant, or animal term.
+- Catastrophe (**n.**) - a nature, plant, or animal term.
+- Cave (**n.**) - a nature, plant, or animal term.
+- Cliff (**n.**) - a nature, plant, or animal term.
+- Cluster (**n.**) - a nature, plant, or animal term.
+- Coast (**n.**) - a nature, plant, or animal term.
+- Core (**n.**) - a nature, plant, or animal term.
+- Countryside (**n.**) - a nature, plant, or animal term.
+- Dam (**n.**) - a nature, plant, or animal term.
+- Desert (**n.**) - dry sandy area.
+- Desertification (**n.**) - a nature, plant, or animal term.
+- Disaster (**n.**) - a nature, plant, or animal term.
+- Earth (**n.**) - a nature, plant, or animal term.
+- Earthquake (**n.**) - a nature, plant, or animal term.
+- Environment (**adj.**) - natural surroundings.
+- Family (**adv.**) - parents/children/relatives.
+- Fertiliser (**n.**) - substance helping plants grow.
+- Field (**n.**) - a nature, plant, or animal term.
+- Fish (**n.**) - a nature, plant, or animal term.
+- Flood (**n.**) - a nature, plant, or animal term.
+- Flower (**n.**) - plant bloom.
+- Footbridge (**n.**) - bridge for pedestrians.
+- Forest (**n.**) - large area of trees.
+- Genus (**n.**) - a nature, plant, or animal term.
+- Grass (**n.**) - green plant covering ground.
+- Hill Station (**n. phrase**) - a nature, plant, or animal term.
+- Hurricane (**n.**) - a nature, plant, or animal term.
+- Insects (**n.**) - a nature, plant, or animal term.
+- Island (**n.**) - land surrounded by water.
+- Lake (**n.**) - large body of water.
+- Landscape (**n.**) - a nature, plant, or animal term.
+- Lion (**n.**) - large wild cat.
+- Livestock (**n.**) - a nature, plant, or animal term.
+- Mammals (**n.**) - warm-blooded animals with milk.
+- Meadow (**n.**) - a nature, plant, or animal term.
+- Mountains (**n.**) - a nature, plant, or animal term.
+- Mud (**n.**) - wet soil.
+- Natural Calamity (**n. phrase**) - a nature, plant, or animal term.
+- Oasis (**n.**) - a nature, plant, or animal term.
+- Ocean (**n.**) - very large sea.
+- Octopus (**n.**) - a nature, plant, or animal term.
+- Path (**n.**) - a nature, plant, or animal term.
+- Peninsula (**n.**) - a nature, plant, or animal term.
+- Planet (**n.**) - a nature, plant, or animal term.
+- Pond (**n.**) - a nature, plant, or animal term.
+- Reef (**n.**) - a nature, plant, or animal term.
+- Reptile (**n.**) - a nature, plant, or animal term.
+- River (**n.**) - natural water flow.
+- Sand Trees (**n. phrase**) - a nature, plant, or animal term.
+- Sea (**n.**) - large body of salt water.
+- Seabirds (**n.**) - a nature, plant, or animal term.
+- Stem Roots (**n. phrase**) - a nature, plant, or animal term.
+- Storm (**n.**) - a nature, plant, or animal term.
+- Tiger (**n.**) - large striped cat.
+- Town (**n.**) - a nature, plant, or animal term.
+- Trunk (**n.**) - a nature, plant, or animal term.
+- Tsunami (**n.**) - a nature, plant, or animal term.
+- Twig (**n.**) - a nature, plant, or animal term.
+- Typhoon (**n.**) - a nature, plant, or animal term.
+- Valley (**adj.**) - a nature, plant, or animal term.
+- Village (**n.**) - small community.
+- Volcano (**n.**) - a nature, plant, or animal term.
+- Waterfall (**n.**) - water falling from height.
+- Wave (**n.**) - a nature, plant, or animal term.
+- Wild (**n.**) - a nature, plant, or animal term.
+- Wildlife (**n.**) - a nature, plant, or animal term.
+
+## Animal
+
+- Birds of Prey (**n. phrase**) - an animal-classification term.
+- Cetacean (**n.**) - an animal-classification term.
+- Class (**n.**) - an animal-classification term.
+- Creature (**n.**) - an animal-classification term.
+- Order (**n.**) - an animal-classification term.
+- Penguin (**n.**) - an animal-classification term.
+- Phylum (**n.**) - an animal-classification term.
+- Poultry and Game (**n. phrase**) - an animal-classification term.
+- Primates (**n.**) - an animal-classification term.
+- Rodents (**n.**) - an animal-classification term.
+- Species (**n.**) - an animal-classification term.
+- Whale (**n.**) - large sea mammal.
+
+## Environment
+
+- Acid Rain (**n. phrase**) - an environment or climate term.
+- Afforestation (**n.**) - an environment or climate term.
+- Atmosphere (**n.**) - an environment or climate term.
+- Biodegradable (**adj.**) - an environment or climate term.
+- Biodiversity (**adj.**) - an environment or climate term.
+- Biogas (**n.**) - an environment or climate term.
+- Burning Fossil (**n. phrase**) - an environment or climate term.
+- Burning Fossil Fuels (**n. phrase**) - an environment or climate term.
+- Carbon dioxide (**n. phrase**) - an environment or climate term.
+- Carbon Monoxide (**n. phrase**) - an environment or climate term.
+- Carcinogen (**adj.**) - an environment or climate term.
+- Cattle (**n.**) - cows/bulls as livestock.
+- Chemical-Free (**n. phrase**) - an environment or climate term.
+- Climate (**n.**) - an environment or climate term.
+- Coal (**adj.**) - black fuel from the ground.
+- Contaminated (**adj.**) - an environment or climate term.
+- Deforestation (**n.**) - an environment or climate term.
+- Degradation (**n.**) - an environment or climate term.
+- Drought (**n.**) - an environment or climate term.
+- Effect (**n.**) - an environment or climate term.
+- Energy Source (**n. phrase**) - an environment or climate term.
+- Environmentally friendly (**adv.**) - an environment or climate term.
+- Exhaust Fumes (**n. phrase**) - an environment or climate term.
+- Firewood (**n.**) - wood used for fuel.
+- Fossil Fuels (**n. phrase**) - an environment or climate term.
+- Fumes (**n.**) - an environment or climate term.
+- Global Warming (**n. phrase**) - an environment or climate term.
+- Greenhouse Effect (**n. phrase**) - an environment or climate term.
+- Greenhouse Gas (**n. phrase**) - an environment or climate term.
+- Hydroelectric Power (**n. phrase**) - an environment or climate term.
+- Landfill (**n.**) - an environment or climate term.
+- Nitrogen (**adj.**) - an environment or climate term.
+- Nitrogen Oxide (**n. phrase**) - an environment or climate term.
+- Ocean Currents (**n. phrase**) - an environment or climate term.
+- Oxygen (**adj.**) - gas needed for breathing.
+- Pollution (**n.**) - harmful contamination.
+- Power Plants (**n. phrase**) - an environment or climate term.
+- Reliable (**adj.**) - able to be trusted.
+- Renewable (**adj.**) - an environment or climate term.
+- Sea Level (**n. phrase**) - an environment or climate term.
+- Sea Level Rise (**n. phrase**) - an environment or climate term.
+- Smog (**n.**) - an environment or climate term.
+- Soil Conditioner (**n. phrase**) - an environment or climate term.
+- Solar Panels (**n. phrase**) - an environment or climate term.
+- Solar Power (**n. phrase**) - an environment or climate term.
+- Source of Energy (**n. phrase**) - an environment or climate term.
+- Vegetation (**n.**) - an environment or climate term.
+- Wind Turbine (**n. phrase**) - an environment or climate term.
+
+## Marketing
+
+- Bankrupt (**n.**) - a business/marketing term.
+- Best Quality (**n. phrase**) - a business/marketing term.
+- Business Card (**n. phrase**) - a business/marketing term.
+- Business Training (**n. phrase**) - a business/marketing term.
+- Cataloguing (**n.**) - a business/marketing term.
+- Circulation (**n.**) - a business/marketing term.
+- Collapse (**n.**) - a business/marketing term.
+- Collecting Data (**n. phrase**) - a business/marketing term.
+- Competition (**n.**) - contest.
+- Competitor (**n.**) - a business/marketing term.
+- Cyberspace (**n.**) - a business/marketing term.
+- Display (**adj.**) - a business/marketing term.
+- Downfall (**n.**) - a business/marketing term.
+- Economic Crisis (**n. phrase**) - a business/marketing term.
+- Entertainment (**adj.**) - fun/performances/media.
+- Entertainment industry (**n. phrase**) - a business/marketing term.
+- Financier Surplus (**n. phrase**) - a business/marketing term.
+- Hacker (**n.**) - a business/marketing term.
+- Industry (**adj.**) - business/production sector.
+- Interview (**n.**) - formal meeting/questions.
+- Leadership (**n.**) - ability to lead.
+- Leadership Strategy (**n. phrase**) - a business/marketing term.
+- Loss (**n.**) - a business/marketing term.
+- Manufacture (**n.**) - a business/marketing term.
+- Margin (**n.**) - a business/marketing term.
+- Marketing (**n.**) - a business/marketing term.
+- Marriage (**n.**) - a business/marketing term.
+- Mass Media (**n. phrase**) - a business/marketing term.
+- Merchandise (**n.**) - a business/marketing term.
+- Monetisation (**n.**) - a business/marketing term.
+- Multimedia (**n.**) - a business/marketing term.
+- Newsletter (**n.**) - regular information bulletin.
+- Newspaper Offer (**n. phrase**) - a business/marketing term.
+- Percentage (**n.**) - a business/marketing term.
+- Poll (**n.**) - a business/marketing term.
+- Potential (**adj.**) - a business/marketing term.
+- Products (**n.**) - a business/marketing term.
+- Profit (**n.**) - a business/marketing term.
+- Profit Margin (**n. phrase**) - a business/marketing term.
+- Questionnaire (**n.**) - form with questions.
+- Recruitment (**adj.**) - a business/marketing term.
+- Research Analysis (**n. phrase**) - a business/marketing term.
+- Research Method (**n. phrase**) - a business/marketing term.
+- Risk Management (**n. phrase**) - a business/marketing term.
+- Server (**n.**) - a business/marketing term.
+- Special Discounts (**n. phrase**) - a business/marketing term.
+- Special Offer (**n. phrase**) - a business/marketing term.
+- Strategies (**n.**) - a business/marketing term.
+- Survey (**adj.**) - a business/marketing term.
+- Survey Poll (**n. phrase**) - a business/marketing term.
+- Tendency (**adj.**) - a business/marketing term.
+- Trainee (**n.**) - a business/marketing term.
+- Training (**n.**) - learning skills.
+- TV Programme (**n. phrase**) - a business/marketing term.
+
+## Architecture & Buildings
+
+- Castle (**n.**) - large old fortified building.
+- Dome (**n.**) - rounded roof.
+- Fort (**n.**) - a building or architecture term.
+- Glasshouse (**n.**) - a building or architecture term.
+- Hut (**n.**) - a building or architecture term.
+- Lighthouse (**n.**) - a building or architecture term.
+- Log Cabin (**n. phrase**) - a building or architecture term.
+- Palace (**n.**) - a building or architecture term.
+- Pyramid (**n.**) - a building or architecture term.
+- Sculpture (**n.**) - a building or architecture term.
+- Skyscraper (**n.**) - a building or architecture term.
+
+## Homes
+
+- A Block of Flats (**n. phrase**) - a house/home term.
+- Abode (**n.**) - a house/home term.
+- Apartment (**adj.**) - a house/home term.
+- Apartment Building (**n. phrase**) - a house/home term.
+- Auburn (**n.**) - a house/home term.
+- Basement (**adj.**) - a house/home term.
+- Bathroom (**n.**) - room with toilet/bath.
+- Bedroom (**n.**) - a house/home term.
+- Bungalow (**n.**) - a house/home term.
+- Burglar (**n.**) - a house/home term.
+- Cabin (**n.**) - a house/home term.
+- Chimney (**adj.**) - a house/home term.
+- Coffee Table (**n. phrase**) - a house/home term.
+- Condominium (**n.**) - a house/home term.
+- Date (**n.**) - a house/home term.
+- Diggins (**n.**) - a house/home term.
+- Dollhouse (**n.**) - a house/home term.
+- Dormitory (**adj.**) - a house/home term.
+- Downtown (**n.**) - a house/home term.
+- Duplex (**n.**) - a house/home term.
+- Dwell (**n.**) - a house/home term.
+- Dwelling (**n.**) - a house/home term.
+- Economical (**adj.**) - a house/home term.
+- Edifice (**n.**) - a house/home term.
+- Entrance (**n.**) - a house/home term.
+- Fireside (**n.**) - a house/home term.
+- Flat (**n.**) - a house/home term.
+- Frugal (**adj.**) - a house/home term.
+- Ground Floor (**n. phrase**) - a house/home term.
+- Guesthouse (**n.**) - a house/home term.
+- Habitation (**n.**) - a house/home term.
+- Hallway (**adj.**) - a house/home term.
+- Hearthstone (**n.**) - a house/home term.
+- Hospitable (**adj.**) - a house/home term.
+- Hospitality (**adj.**) - a house/home term.
+- House-Warming Party (**n. phrase**) - a house/home term.
+- Houseboat (**n.**) - a house/home term.
+- Household (**n.**) - a house/home term.
+- Household Costs (**n. phrase**) - a house/home term.
+- Housework (**n.**) - a house/home term.
+- Housing (**n.**) - a house/home term.
+- Insurance (**n.**) - financial protection policy.
+- Keep an Eye on (**v. phrase**) - a house/home term.
+- Kitchen (**adj.**) - room for cooking.
+- Landlady (**adj.**) - a house/home term.
+- Landlord (**n.**) - a house/home term.
+- Lease (**n.**) - a house/home term.
+- Maisonette (**n.**) - a house/home term.
+- Microwave (**n.**) - a house/home term.
+- Mobile Home (**n. phrase**) - a house/home term.
+- Neighbourhood (**n.**) - a house/home term.
+- Oven (**adj.**) - a house/home term.
+- Penthouse (**n.**) - a house/home term.
+- Rent (**adj.**) - a house/home term.
+- Residence (**n.**) - a house/home term.
+- Row House (**n. phrase**) - a house/home term.
+- Semi-Detached House (**n. phrase**) - a house/home term.
+- Sideway (**adj.**) - a house/home term.
+- Sofa (**n.**) - a house/home term.
+- Spare Room (**n. phrase**) - a house/home term.
+- Story (**adj.**) - a house/home term.
+- Suburb (**n.**) - a house/home term.
+- Tenant (**adj.**) - a house/home term.
+- Terrace (**n.**) - a house/home term.
+- Terraced House (**n. phrase**) - a house/home term.
+- Thatched Cottage (**n. phrase**) - a house/home term.
+- Townhouse (**n.**) - a house/home term.
+- Vacuum Cleaner (**n. phrase**) - a house/home term.
+
+## City
+
+- Avenue (**n.**) - a city/location term.
+- Baby Crib (**n. phrase**) - a city/location term.
+- Bridge (**n.**) - structure over water/road.
+- Car Park (**n. phrase**) - a city/location term.
+- Central Station (**n. phrase**) - a city/location term.
+- Cities (**n.**) - large towns.
+- City Centre (**n. phrase**) - central part of a city.
+- Crack (**n.**) - a city/location term.
+- Embassy (**adj.**) - a city/location term.
+- Fridge / Refrigerator (**n. phrase**) - related spelling variants or connected forms.
+- Furnace (**n.**) - a city/location term.
+- Garden (**adj.**) - area for plants.
+- Hang up (**v. phrase**) - a city/location term.
+- Heater (**n.**) - a city/location term.
+- Hold on (**v. phrase**) - a city/location term.
+- Lane (**n.**) - a city/location term.
+- Leak (**n.**) - a city/location term.
+- Leisure Time (**n. phrase**) - a city/location term.
+- Long-Distance Call (**n. phrase**) - a city/location term.
+- Maintenance (**n.**) - a city/location term.
+- Multiple Glazing (**n. phrase**) - a city/location term.
+- Pay Phone (**n. phrase**) - a city/location term.
+- Pipe (**n.**) - a city/location term.
+- Plumber (**n.**) - a city/location term.
+- Road System (**n. phrase**) - a city/location term.
+- Sideboard (**n.**) - a city/location term.
+- Street (**n.**) - a city/location term.
+- Take a Message (**v. phrase**) - a city/location term.
+- Telephone Booth (**n. phrase**) - a city/location term.
+- Temple (**n.**) - religious building.
+- Unfurnished (**adj.**) - a city/location term.
+
+## Transportation
+
+- Aircraft (**n.**) - a transport/travel term.
+- Airport (**n.**) - place where planes arrive and leave.
+- Airship (**n.**) - a transport/travel term.
+- Automobile (**n.**) - a transport/travel term.
+- Boat (**n.**) - a transport/travel term.
+- Bus (**n.**) - a transport/travel term.
+- Cabin Cruiser (**n. phrase**) - a transport/travel term.
+- Canal Boat (**n. phrase**) - a transport/travel term.
+- Canoe (**n.**) - a transport/travel term.
+- Car (**n.**) - a transport/travel term.
+- Cargo (**n.**) - a transport/travel term.
+- Cargo Plane (**n. phrase**) - a transport/travel term.
+- Container (**n.**) - a transport/travel term.
+- Container Ship (**n. phrase**) - a transport/travel term.
+- Crew (**n.**) - team working together.
+- Dinghy Sailing (**n. phrase**) - a transport/travel term.
+- Ferry (**adj.**) - boat carrying people/vehicles.
+- Gondola (**n.**) - a transport/travel term.
+- Helicopter (**n.**) - aircraft with rotating blades.
+- Hire a Car (**v. phrase**) - a transport/travel term.
+- Hot-Air Balloon (**n. phrase**) - a transport/travel term.
+- Hovercraft (**n.**) - a transport/travel term.
+- Hydrofoil (**n.**) - a transport/travel term.
+- Kayak (**n.**) - a transport/travel term.
+- Lifeboat (**n.**) - a transport/travel term.
+- Liner (**n.**) - a transport/travel term.
+- Narrowboat (**n.**) - a transport/travel term.
+- Paddle Steamer (**n. phrase**) - a transport/travel term.
+- Passenger (**n.**) - a transport/travel term.
+- Platform (**n.**) - raised area/station area.
+- Punt (**n.**) - a transport/travel term.
+- Rowboat (**n.**) - a transport/travel term.
+- Rowing Boat (**n. phrase**) - a transport/travel term.
+- Sailboat (**n.**) - a transport/travel term.
+- Seaplane (**n.**) - a transport/travel term.
+- Ship (**n.**) - a transport/travel term.
+- Shipment (**adj.**) - a transport/travel term.
+- Train (**v.**) - rail vehicle or teach.
+
+## Vehicles
+
+- Air Conditioner (**n. phrase**) - a vehicle or transport term.
+- Auto Rickshaw (**n. phrase**) - a vehicle or transport term.
+- Breakdown Truck (**n. phrase**) - a vehicle or transport term.
+- Cab (**n.**) - a vehicle or transport term.
+- Camper (**n.**) - a vehicle or transport term.
+- Caravan (**n.**) - a vehicle or transport term.
+- Coach (**n.**) - a vehicle or transport term.
+- College Bus (**n. phrase**) - a vehicle or transport term.
+- Double-Decker Bus (**n. phrase**) - a vehicle or transport term.
+- Drop by (**v. phrase**) - a vehicle or transport term.
+- Forklift Truck (**n. phrase**) - a vehicle or transport term.
+- Freight Train (**n. phrase**) - a vehicle or transport term.
+- Goods Train (**n. phrase**) - a vehicle or transport term.
+- Install (**v.**) - a vehicle or transport term.
+- Jeep (**n.**) - a vehicle or transport term.
+- Lorry (**adj.**) - a vehicle or transport term.
+- Minibus (**n.**) - a vehicle or transport term.
+- Pickup (**n.**) - a vehicle or transport term.
+- School (**n.**) - a vehicle or transport term.
+- School Bus (**n. phrase**) - a vehicle or transport term.
+- Single-Decker (**n. phrase**) - a vehicle or transport term.
+- Sink (**n.**) - a vehicle or transport term.
+- Steam train (**n. phrase**) - a vehicle or transport term.
+- Subway (**adj.**) - a vehicle or transport term.
+- Tanker (**n.**) - a vehicle or transport term.
+- Taxi (**n.**) - car for hire.
+- Tow Truck (**n. phrase**) - a vehicle or transport term.
+- Tractor (**n.**) - a vehicle or transport term.
+- Tram (**n.**) - a vehicle or transport term.
+- Transportation (**n.**) - movement of people/goods.
+- Transporter (**n.**) - a vehicle or transport term.
+- Truck (**n.**) - a vehicle or transport term.
+- Underground (**n.**) - a vehicle or transport term.
+- Van (**n.**) - a vehicle or transport term.
+- Vehicle (**n.**) - a vehicle or transport term.
+
+## Places
+
+- Accommodation (**n.**) - place to live or stay.
+- Assembly (**adv.**) - a place or public facility.
+- Bookshop (**n.**) - shop that sells books.
+- Cafe (**n.**) - a place or public facility.
+- Cafeteria (**n.**) - a place or public facility.
+- Central Hall (**n. phrase**) - a place or public facility.
+- City Council (**n. phrase**) - a place or public facility.
+- Conversation Club (**n. phrase**) - a place or public facility.
+- Cottage (**n.**) - small house.
+- Dance Studio (**n. phrase**) - a place or public facility.
+- Home (**n.**) - a place or public facility.
+- Kindergarten (**adj.**) - a place or public facility.
+- Local library (**n. phrase**) - a place or public facility.
+- Park (**n.**) - a place or public facility.
+- Parliament (**adj.**) - a place or public facility.
+- Restaurant (**adj.**) - place to eat meals.
+- Resting Area (**n. phrase**) - a place or public facility.
+- Sports Centre (**n. phrase**) - a place or public facility.
+- Swimming Pool (**n. phrase**) - a place or public facility.
+
+## Money
+
+- Advancement (**adj.**) - a money, banking, or finance term.
+- Annual Fee (**n. phrase**) - a money, banking, or finance term.
+- Annuity (**adj.**) - a money, banking, or finance term.
+- Bank Statement (**n. phrase**) - a money, banking, or finance term.
+- Budget Deficit (**n. phrase**) - a money, banking, or finance term.
+- Cash (**n.**) - a money, banking, or finance term.
+- Cash Flow (**n. phrase**) - a money, banking, or finance term.
+- Cheque (**n.**) - a money, banking, or finance term.
+- Client (**adj.**) - a money, banking, or finance term.
+- Counterfeit Money (**n. phrase**) - a money, banking, or finance term.
+- Coupon (**n.**) - a money, banking, or finance term.
+- Credit (**n.**) - borrowed money or recognition.
+- Credit Card (**n. phrase**) - a money, banking, or finance term.
+- Current Account (**n. phrase**) - a money, banking, or finance term.
+- Debit (**n.**) - a money, banking, or finance term.
+- Debit Card (**n. phrase**) - a money, banking, or finance term.
+- Debt (**n.**) - a money, banking, or finance term.
+- Deficit (**n.**) - a money, banking, or finance term.
+- Deposit (**n.**) - money paid in advance.
+- Distribution Costs (**n. phrase**) - a money, banking, or finance term.
+- Duty-Free Store (**n. phrase**) - a money, banking, or finance term.
+- Exchequer (**n.**) - a money, banking, or finance term.
+- Family Finances (**n. phrase**) - a money, banking, or finance term.
+- Finance Department (**n. phrase**) - a money, banking, or finance term.
+- Financial Management (**n. phrase**) - a money, banking, or finance term.
+- Free Money (**n. phrase**) - a money, banking, or finance term.
+- Grace Period (**n. phrase**) - a money, banking, or finance term.
+- In Advance (**adv. phrase**) - a money, banking, or finance term.
+- Income (**n.**) - a money, banking, or finance term.
+- Inflation (**n.**) - a money, banking, or finance term.
+- Interest (**n.**) - a money, banking, or finance term.
+- Interest Rate (**n. phrase**) - a money, banking, or finance term.
+- Interest-Free Credit (**n. phrase**) - a money, banking, or finance term.
+- Low Risk (**n. phrase**) - a money, banking, or finance term.
+- Low-Risk Investment (**n. phrase**) - a money, banking, or finance term.
+- Management (**adj.**) - organising and controlling work.
+- MasterCard (**n.**) - a money, banking, or finance term.
+- Money (**adj.**) - currency/cash.
+- Money Management (**n. phrase**) - a money, banking, or finance term.
+- Monthly Membership (**n. phrase**) - a money, banking, or finance term.
+- Mortgage (**n.**) - a money, banking, or finance term.
+- Non-Refundable (**n. phrase**) - a money, banking, or finance term.
+- Partial Refund (**n. phrase**) - a money, banking, or finance term.
+- Paytm (**n.**) - a money, banking, or finance term.
+- Poverty (**adj.**) - being poor.
+- Public Money (**n. phrase**) - a money, banking, or finance term.
+- Purchase (**n.**) - a money, banking, or finance term.
+- Retail (**n.**) - a money, banking, or finance term.
+- Retail Voucher (**n. phrase**) - a money, banking, or finance term.
+- Student Account (**n. phrase**) - a money, banking, or finance term.
+- Student’s Account (**n. phrase**) - a money, banking, or finance term.
+- Taxpayers (**n.**) - a money, banking, or finance term.
+- Taxpayers’ Money (**n. phrase**) - a money, banking, or finance term.
+- Tuition Fees (**n. phrase**) - money paid for education.
+- UPI (**n.**) - a money, banking, or finance term.
+- VISA (**n.**) - a money, banking, or finance term.
+- Voucher (**n.**) - a money, banking, or finance term.
+- Withdraw (**v.**) - a money, banking, or finance term.
+
+## Rating and Qualities
+
+- Aspect (**adj.**) - a quality/rating description.
+- Budget (**adj.**) - a quality/rating description.
+- Character (**adj.**) - a quality/rating description.
+- Cheap (**adj.**) - low in price.
+- Coloured (**adj.**) - a quality/rating description.
+- Condition (**adj.**) - a quality/rating description.
+- Dangerous (**adj.**) - not safe.
+- Disappointed (**adj.**) - a quality/rating description.
+- Disappointment (**adj.**) - a quality/rating description.
+- Efficient (**adj.**) - working well without waste.
+- Excellent (**adj.**) - a quality/rating description.
+- Exclusive (**adj.**) - a quality/rating description.
+- Expensive (**adj.**) - high in price.
+- First-Rate (**adj. phrase**) - a quality/rating description.
+- Five-Star (**adj. phrase**) - a quality/rating description.
+- Kind (**adj.**) - a quality/rating description.
+- Luxurious (**adj.**) - a quality/rating description.
+- Offers (**adj.**) - a quality/rating description.
+- Poor (**adj.**) - a quality/rating description.
+- Poor Quality (**adj. phrase**) - a quality/rating description.
+- Prime (**adj.**) - a quality/rating description.
+- Quality (**adj.**) - standard of how good something is.
+- Quantity (**adj.**) - a quality/rating description.
+- Reasonable (**adj.**) - fair or sensible.
+- Recommended (**adj.**) - suggested as good.
+- Rich (**adj.**) - a quality/rating description.
+- Safe (**adj.**) - a quality/rating description.
+- Satisfactory (**adj.**) - good enough.
+- Satisfied (**adj.**) - a quality/rating description.
+- Spotted (**adj.**) - a quality/rating description.
+- Striped (**adj.**) - a quality/rating description.
+- Strongly Recommended (**adj. phrase**) - a quality/rating description.
+- Superior (**adj.**) - a quality/rating description.
+- Top-Notch (**adj. phrase**) - a quality/rating description.
+- Topflight (**adj.**) - a quality/rating description.
+
+## Touring
+
+- Advance Booking (**n. phrase**) - a travel/tourism term.
+- Aquarium (**n.**) - a travel/tourism term.
+- Arrival (**adj.**) - a travel/tourism term.
+- Book the Ticket (**n. phrase**) - a travel/tourism term.
+- Cancellation (**n.**) - a travel/tourism term.
+- Check in (**v. phrase**) - a travel/tourism term.
+- Culture (**n.**) - way of life/arts.
+- Departure (**n.**) - a travel/tourism term.
+- Destination (**n.**) - place you go to.
+- Double Occupancy (**n. phrase**) - a travel/tourism term.
+- Excursion (**n.**) - a travel/tourism term.
+- Express Fast (**n. phrase**) - a travel/tourism term.
+- Expressway (**adj.**) - a travel/tourism term.
+- Flight Number (**n. phrase**) - a travel/tourism term.
+- Freeway (**adj.**) - a travel/tourism term.
+- Guest (**n.**) - visitor.
+- Guide (**n.**) - a travel/tourism term.
+- High-Speed (**n. phrase**) - a travel/tourism term.
+- Hostel (**n.**) - cheap shared accommodation.
+- Memorable (**adj.**) - a travel/tourism term.
+- Motel (**n.**) - a travel/tourism term.
+- Nearby Tourist Attractions (**n. phrase**) - a travel/tourism term.
+- Office (**n.**) - place for administrative work.
+- Picnic (**adj.**) - a travel/tourism term.
+- Reservation (**n.**) - booking.
+- Resort (**n.**) - a travel/tourism term.
+- Rooms and Accommodations (**n. phrase**) - a travel/tourism term.
+- Roundtrip (**n.**) - a travel/tourism term.
+- Scenic (**adj.**) - a travel/tourism term.
+- Single Double-Bedded Room (**n. phrase**) - a travel/tourism term.
+- Skiing (**n.**) - a travel/tourism term.
+- Souvenir (**n.**) - a travel/tourism term.
+- Spots (**n.**) - a travel/tourism term.
+- Streetcar (**n.**) - a travel/tourism term.
+- Suite (**n.**) - a travel/tourism term.
+- Ticket Fee (**n. phrase**) - a travel/tourism term.
+- Ticket Office (**n. phrase**) - place selling tickets.
+- Tour (**n.**) - a travel/tourism term.
+- Tourist Attraction (**n. phrase**) - a travel/tourism term.
+- Tourist Guided Tour (**n. phrase**) - a travel/tourism term.
+- Travel Agency (**n. phrase**) - a travel/tourism term.
+- Trip (**n.**) - short journey.
+- Tube (**n.**) - underground train/tunnel or pipe.
+- View (**n.**) - a travel/tourism term.
+
+## Hobbies
+
+- Archery (**adj.**) - a hobby or leisure activity.
+- Billiards (**n.**) - a hobby or leisure activity.
+- Bowls (**n.**) - a hobby or leisure activity.
+- Carrom (**n.**) - a hobby or leisure activity.
+- Caving (**n.**) - a hobby or leisure activity.
+- Chess (**n.**) - a hobby or leisure activity.
+- Climbing (**n.**) - a hobby or leisure activity.
+- Crafting (**n.**) - a hobby or leisure activity.
+- Cycling (**n.**) - riding a bicycle.
+- Dart (**n.**) - a hobby or leisure activity.
+- Embroidery (**adj.**) - a hobby or leisure activity.
+- Gardening (**n.**) - growing plants.
+- Golf (**n.**) - a hobby or leisure activity.
+- Ice Skating (**n. phrase**) - a hobby or leisure activity.
+- Musician (**n.**) - a hobby or leisure activity.
+- Orienteering (**n.**) - a hobby or leisure activity.
+- Painting (**n.**) - a hobby or leisure activity.
+- Parachute (**n.**) - a hobby or leisure activity.
+- Photography (**adj.**) - a hobby or leisure activity.
+- Pottery (**adj.**) - a hobby or leisure activity.
+- Scuba Diving (**n. phrase**) - a hobby or leisure activity.
+- Sculpting (**n.**) - a hobby or leisure activity.
+- Skateboarding (**n.**) - a hobby or leisure activity.
+- Snorkeling (**n.**) - a hobby or leisure activity.
+- Snorkelling (**n.**) - a hobby or leisure activity.
+- Spelunking (**n.**) - a hobby or leisure activity.
+- Stamp Collection (**n. phrase**) - a hobby or leisure activity.
+- Woodcarving (**n.**) - a hobby or leisure activity.
+
+## Sports
+
+- Abseiling (**n.**) - a sport, exercise, or game term.
+- American Football (**n. phrase**) - a sport, exercise, or game term.
+- Athlete (**n.**) - a sport, exercise, or game term.
+- Badminton (**n.**) - a sport, exercise, or game term.
+- Barbell (**n.**) - a sport, exercise, or game term.
+- Baseball (**n.**) - a sport, exercise, or game term.
+- Basketball (**n.**) - a sport, exercise, or game term.
+- Bodyboarding (**n.**) - a sport, exercise, or game term.
+- Bullet Squads (**n. phrase**) - a sport, exercise, or game term.
+- Bungee Jumping (**n. phrase**) - a sport, exercise, or game term.
+- Canoeing (**n.**) - a sport, exercise, or game term.
+- Championship (**n.**) - a sport, exercise, or game term.
+- Court (**n.**) - a sport, exercise, or game term.
+- Cricket (**n.**) - a sport, exercise, or game term.
+- Cricket Match (**n. phrase**) - a sport, exercise, or game term.
+- Discus (**n.**) - a sport, exercise, or game term.
+- Going Dutch (**n. phrase**) - a sport, exercise, or game term.
+- Draw (**n.**) - a sport, exercise, or game term.
+- Extreme sports (**n. phrase**) - a sport, exercise, or game term.
+- Field Court (**n. phrase**) - a sport, exercise, or game term.
+- Goals (**n.**) - a sport, exercise, or game term.
+- Gym (**n.**) - a sport, exercise, or game term.
+- Gym Workout (**n. phrase**) - a sport, exercise, or game term.
+- Gymnasium (**n.**) - a sport, exercise, or game term.
+- Hammer (**n.**) - a sport, exercise, or game term.
+- Hang-Gliding (**v. phrase**) - a sport, exercise, or game term.
+- High Jump (**n. phrase**) - a sport, exercise, or game term.
+- Hockey (**adj.**) - a sport, exercise, or game term.
+- Horse Racing (**n. phrase**) - a sport, exercise, or game term.
+- Javelin (**n.**) - a sport, exercise, or game term.
+- Jet-Skiing (**n. phrase**) - a sport, exercise, or game term.
+- Jogging (**n.**) - a sport, exercise, or game term.
+- Judo (**n.**) - a sport, exercise, or game term.
+- Kitesurfing (**n.**) - a sport, exercise, or game term.
+- Mountain Biking (**n. phrase**) - a sport, exercise, or game term.
+- Paragliding (**n.**) - a sport, exercise, or game term.
+- Ping-Pong (**n. phrase**) - a sport, exercise, or game term.
+- Pitch (**n.**) - a sport, exercise, or game term.
+- Players (**n.**) - a sport, exercise, or game term.
+- Polo (**n.**) - a sport, exercise, or game term.
+- Press-up (**n. phrase**) - a sport, exercise, or game term.
+- Pull-up (**n. phrase**) - a sport, exercise, or game term.
+- Push-up (**n. phrase**) - a sport, exercise, or game term.
+- Recreation (**n.**) - a sport, exercise, or game term.
+- Refreshment (**adj.**) - light food/drink.
+- Rugby (**adj.**) - a sport, exercise, or game term.
+- Runnerup (**n.**) - a sport, exercise, or game term.
+- Show Jumping (**n. phrase**) - a sport, exercise, or game term.
+- Shuttle (**n.**) - a sport, exercise, or game term.
+- Skydiving (**n.**) - a sport, exercise, or game term.
+- Snooker (**n.**) - a sport, exercise, or game term.
+- Snowboarding (**n.**) - a sport, exercise, or game term.
+- Soccer (**n.**) - a sport, exercise, or game term.
+- Spirit (**n.**) - a sport, exercise, or game term.
+- Sportsmanship (**n.**) - a sport, exercise, or game term.
+- Squash (**n.**) - a sport, exercise, or game term.
+- Stadium (**n.**) - a sport, exercise, or game term.
+- Surfing (**n.**) - a sport, exercise, or game term.
+- Swimming (**n.**) - moving in water.
+- Team (**n.**) - a sport, exercise, or game term.
+- Tennis (**n.**) - racket sport.
+- Treadmill (**n.**) - a sport, exercise, or game term.
+- Walking (**n.**) - a sport, exercise, or game term.
+- Warm up (**n. phrase**) - a sport, exercise, or game term.
+- Weather (**n.**) - state of the air.
+- White-Water Rafting (**n. phrase**) - a sport, exercise, or game term.
+- Windsurfing (**n.**) - a sport, exercise, or game term.
+- Winner (**n.**) - a sport, exercise, or game term.
+
+## Adjectives
+
+- Affordable (**adj.**) - describes a quality or condition.
+- Ancient (**adj.**) - describes a quality or condition.
+- Boring (**adj.**) - describes a quality or condition.
+- Comfortable (**adj.**) - pleasant and easy.
+- Commitment (**adj.**) - describes a quality or condition.
+- Compulsory (**adj.**) - describes a quality or condition.
+- Conscious (**adj.**) - describes a quality or condition.
+- Convenient (**adj.**) - describes a quality or condition.
+- Decisive (**adj.**) - describes a quality or condition.
+- Dull (**adj.**) - describes a quality or condition.
+- Energetic (**adj.**) - describes a quality or condition.
+- Exciting (**adj.**) - describes a quality or condition.
+- Extinct (**adj.**) - describes a quality or condition.
+- Fabulous (**adj.**) - describes a quality or condition.
+- Fantastic (**adj.**) - describes a quality or condition.
+- Flexible (**adj.**) - able to change easily.
+- Immense (**adj.**) - describes a quality or condition.
+- Intact (**adj.**) - complete, not damaged.
+- Intensive (**adj.**) - strong/concentrated.
+- Knowledgeable (**adj.**) - describes a quality or condition.
+- Mandatory (**adj.**) - describes a quality or condition.
+- Modern (**adj.**) - new/current style.
+- Necessary (**adj.**) - describes a quality or condition.
+- Optimistic (**adj.**) - describes a quality or condition.
+- Permanent (**adj.**) - describes a quality or condition.
+- Pessimistic (**adj.**) - describes a quality or condition.
+- Practical (**adj.**) - useful/realistic.
+- Realistic (**adj.**) - describes a quality or condition.
+- Recessionary (**adj.**) - describes a quality or condition.
+- Salty (**adj.**) - describes a quality or condition.
+- Social (**adj.**) - related to society/people.
+- Spectacular (**adj.**) - describes a quality or condition.
+- Suitable (**adj.**) - describes a quality or condition.
+- Temporary (**adj.**) - for a short time.
+- Tranquil (**adj.**) - describes a quality or condition.
+- Various (**adj.**) - describes a quality or condition.
+- Vast (**adj.**) - describes a quality or condition.
+- Voluntary (**adj.**) - describes a quality or condition.
+- Vulnerable (**adj.**) - describes a quality or condition.
+- Western (**adj.**) - describes a quality or condition.
+
+## Verbs
+
+- Arrange (**v.**) - an action word.
+- Borrow (**v.**) - an action word.
+- Collect (**v.**) - an action word.
+- Compete (**v.**) - an action word.
+- Concentrate (**v.**) - an action word.
+- Develop (**v.**) - an action word.
+- Discuss (**v.**) - an action word.
+- Donate (**v.**) - an action word.
+- Edit (**v.**) - an action word.
+- Exercise (**v.**) - physical activity.
+- Exhibit (**v.**) - an action word.
+- Face IT (**v. phrase**) - an action word.
+- Fight (**v.**) - an action word.
+- Focus (**v.**) - an action word.
+- Hunt (**v.**) - an action word.
+- Immigrate (**v.**) - an action word.
+- Jump (**v.**) - an action word.
+- Learn (**v.**) - an action word.
+- Mark (**v.**) - an action word.
+- Perform (**v.**) - an action word.
+- Persuade (**v.**) - an action word.
+- Register (**v.**) - an action word.
+- Review (**v.**) - check or evaluation.
+- Revise (**v.**) - an action word.
+- Run (**v.**) - an action word.
+- Study (**v.**) - an action word.
+- Suggest (**v.**) - an action word.
+- Supervise (**v.**) - an action word.
+- Support (**v.**) - help/hold up.
+- Surpass (**v.**) - an action word.
+- Touch (**v.**) - an action word.
+- Walk (**v.**) - an action word.
+- Withstand (**v.**) - an action word.
+
+## Shapes
+
+- Altitude (**n.**) - a shape/measurement term.
+- Breadth (**n.**) - a shape/measurement term.
+- Circle (**n.**) - a shape/measurement term.
+- Circular (**n.**) - a shape/measurement term.
+- Curved (**adj.**) - bent, not straight.
+- Cylindrical (**adj.**) - a shape/measurement term.
+- Decoration (**n.**) - a shape/measurement term.
+- Depth (**n.**) - a shape/measurement term.
+- Height (**n.**) - a shape/measurement term.
+- High (**n.**) - a shape/measurement term.
+- High Frequency (**n. phrase**) - a shape/measurement term.
+- Imperial System (**n. phrase**) - a shape/measurement term.
+- Length (**n.**) - a shape/measurement term.
+- Mass (**n.**) - a shape/measurement term.
+- Measurement (**adj.**) - act/result of measuring.
+- Metric System (**n. phrase**) - a shape/measurement term.
+- Oval (**adj.**) - a shape/measurement term.
+- Parallelogram (**n.**) - a shape/measurement term.
+- Polygon (**n.**) - a shape/measurement term.
+- Rectangle (**n.**) - a shape/measurement term.
+- Rectangular (**n.**) - having rectangle shape.
+- Round (**n.**) - a shape/measurement term.
+- Shallow (**n.**) - a shape/measurement term.
+- Spherical (**adj.**) - a shape/measurement term.
+- Spiral (**adj.**) - a shape/measurement term.
+- Square (**n.**) - a shape/measurement term.
+- Three Dimensions (**n. phrase**) - a shape/measurement term.
+- Trapezium (**n.**) - a shape/measurement term.
+- Triangle (**n.**) - a shape/measurement term.
+- Triangular (**n.**) - a shape/measurement term.
+- Width (**n.**) - a shape/measurement term.
+
+## Weather
+
+- Anomaly (**adv.**) - a weather/climate term.
+- Antenna (**adj.**) - a weather/climate term.
+- Breeze (**adj.**) - a weather/climate term.
+- Breezy (**adj.**) - a weather/climate term.
+- Chill (**adj.**) - a weather/climate term.
+- Climate Trend (**adj. phrase**) - a weather/climate term.
+- Climate Warming (**adj. phrase**) - a weather/climate term.
+- Cloudy (**adj.**) - a weather/climate term.
+- Cold (**adj.**) - a weather/climate term.
+- Conservation Area (**adj. phrase**) - a weather/climate term.
+- Cool (**adj.**) - a weather/climate term.
+- Downpour (**adj.**) - a weather/climate term.
+- Dry (**adj.**) - not wet.
+- Dusty (**adj.**) - a weather/climate term.
+- Erosion (**adj.**) - wearing away of land/soil.
+- Feeling Under the Weather (**adj. phrase**) - a weather/climate term.
+- Forecast (**adj.**) - a weather/climate term.
+- Freezing (**adj.**) - a weather/climate term.
+- Gust (**adj.**) - a weather/climate term.
+- Heat Wave (**adj. phrase**) - a weather/climate term.
+- Hot (**adj.**) - a weather/climate term.
+- Humid (**adj.**) - hot and wet in air.
+- Mishap (**adj.**) - a weather/climate term.
+- Moist (**adj.**) - slightly wet.
+- Moisture (**adj.**) - a weather/climate term.
+- Overcast (**adj.**) - a weather/climate term.
+- Precipitation (**adj.**) - a weather/climate term.
+- Rainy (**adj.**) - a weather/climate term.
+- Recycled Water (**adj. phrase**) - a weather/climate term.
+- Renewable Energy (**adj. phrase**) - a weather/climate term.
+- Sensitive (**adj.**) - a weather/climate term.
+- Shower (**adj.**) - washing spray or short rain.
+- Sticky (**adj.**) - a weather/climate term.
+- Sunny (**adj.**) - a weather/climate term.
+- Sunrise (**adj.**) - a weather/climate term.
+- Sunset (**adj.**) - a weather/climate term.
+- Temperature (**adj.**) - measure of heat/cold.
+- Tornado (**adj.**) - a weather/climate term.
+- Variation (**adj.**) - a weather/climate term.
+- Warm (**adj.**) - fairly hot.
+- Watch (**adj.**) - a weather/climate term.
+- Weather Forecast (**adj. phrase**) - a weather/climate term.
+- Wet (**adj.**) - covered with water.
+- Winter (**adj.**) - a weather/climate term.
+
+## Equipment and Tools
+
+- Apparatus (**n.**) - a tool, device, or equipment term.
+- Appliance (**n.**) - a tool, device, or equipment term.
+- Backpack (**n.**) - a tool, device, or equipment term.
+- Brakes (**n.**) - a tool, device, or equipment term.
+- Cassette (**n.**) - a tool, device, or equipment term.
+- Computer (**n.**) - electronic data-processing machine.
+- Device (**n.**) - a tool, device, or equipment term.
+- Digital (**adj.**) - a tool, device, or equipment term.
+- Digital Monitor (**n. phrase**) - a tool, device, or equipment term.
+- Disk (**n.**) - a tool, device, or equipment term.
+- Electricity (**adj.**) - power/energy source.
+- Electronic Gadgets (**n. phrase**) - a tool, device, or equipment term.
+- Equipment (**adj.**) - tools needed for a job.
+- Gadget (**n.**) - a tool, device, or equipment term.
+- Gear (**n.**) - a tool, device, or equipment term.
+- Gizmo (**n.**) - a tool, device, or equipment term.
+- Hardware (**n.**) - a tool, device, or equipment term.
+- Helmet (**n.**) - protective head covering.
+- Instruction (**n.**) - a tool, device, or equipment term.
+- Light (**n.**) - a tool, device, or equipment term.
+- Machinery (**adj.**) - a tool, device, or equipment term.
+- Mechanic (**adj.**) - a tool, device, or equipment term.
+- Mechanical Pencil (**n. phrase**) - a tool, device, or equipment term.
+- Mechanism (**n.**) - a tool, device, or equipment term.
+- Monitor (**n.**) - a tool, device, or equipment term.
+- Musical Instrument (**n. phrase**) - a tool, device, or equipment term.
+- PC (**n.**) - a tool, device, or equipment term.
+- Safety (**adj.**) - being safe.
+- Screen (**adj.**) - display surface.
+- Screw (**n.**) - a tool, device, or equipment term.
+- Silicon Chip (**n. phrase**) - a tool, device, or equipment term.
+- Stuff (**n.**) - a tool, device, or equipment term.
+- Tablet (**n.**) - a tool, device, or equipment term.
+- Technician (**n.**) - a tool, device, or equipment term.
+- Utensils (**n.**) - a tool, device, or equipment term.
+- Wheels (**n.**) - round parts that turn.
+- Wiring (**n.**) - a tool, device, or equipment term.
+
+## Arts and Media
+
+- Announcement (**adj.**) - an art, media, or entertainment term.
+- Art Gallery (**n. phrase**) - an art, media, or entertainment term.
+- Artistry (**adj.**) - an art, media, or entertainment term.
+- Assignment (**adj.**) - an art, media, or entertainment term.
+- Audience (**n.**) - an art, media, or entertainment term.
+- Ballet (**n.**) - an art, media, or entertainment term.
+- Beverage (**n.**) - an art, media, or entertainment term.
+- Cable (**adj.**) - an art, media, or entertainment term.
+- Campaign (**n.**) - an art, media, or entertainment term.
+- Carnival (**adj.**) - an art, media, or entertainment term.
+- Cinemas (**n.**) - an art, media, or entertainment term.
+- Classical Music (**n. phrase**) - an art, media, or entertainment term.
+- Commercial Advertisement (**n. phrase**) - an art, media, or entertainment term.
+- Communication (**n.**) - an art, media, or entertainment term.
+- Concert (**n.**) - an art, media, or entertainment term.
+- Conductor (**n.**) - an art, media, or entertainment term.
+- Conflict (**n.**) - an art, media, or entertainment term.
+- Correspondence (**n.**) - an art, media, or entertainment term.
+- Craftsmanship (**n.**) - an art, media, or entertainment term.
+- Design (**n.**) - plan or style.
+- Dexterity (**adj.**) - an art, media, or entertainment term.
+- Documentary (**adj.**) - an art, media, or entertainment term.
+- Exhibition (**n.**) - public display.
+- Expertise (**n.**) - an art, media, or entertainment term.
+- Festival (**adj.**) - public celebration.
+- Film Business (**n. phrase**) - an art, media, or entertainment term.
+- Friendly Gesture (**n. phrase**) - an art, media, or entertainment term.
+- Gallery (**adj.**) - an art, media, or entertainment term.
+- Graphics (**n.**) - an art, media, or entertainment term.
+- Hardcover (**n.**) - an art, media, or entertainment term.
+- Horror Films (**n. phrase**) - an art, media, or entertainment term.
+- Museum (**n.**) - place showing objects/art.
+- Newspaper (**n.**) - an art, media, or entertainment term.
+- Entertainment industry (**n. phrase**) - an art, media, or entertainment term.
+- Opera (**n.**) - dramatic musical performance.
+- Orchestra (**n.**) - an art, media, or entertainment term.
+- Paperback (**n.**) - an art, media, or entertainment term.
+- Press (**n.**) - an art, media, or entertainment term.
+- Publication (**n.**) - an art, media, or entertainment term.
+- Publisher (**n.**) - an art, media, or entertainment term.
+- Publishing (**n.**) - an art, media, or entertainment term.
+- Radio (**n.**) - broadcast receiver.
+- Romantic Songs (**n. phrase**) - an art, media, or entertainment term.
+- Symphony (**adj.**) - an art, media, or entertainment term.
+- Television (**n.**) - an art, media, or entertainment term.
+- The Press (**n. phrase**) - an art, media, or entertainment term.
+- Theatre (**n.**) - place for plays/films.
+- TV Theatre (**n. phrase**) - an art, media, or entertainment term.
+- Violence Movie (**n. phrase**) - an art, media, or entertainment term.
+- Vocalist (**n.**) - an art, media, or entertainment term.
+
+## Expressions and Time
+
+- A Gap (**n. phrase**) - a time expression.
+- Century (**adj.**) - a time expression.
+- Days (**n.**) - a time expression.
+- Decade (**n.**) - ten years.
+- Fortnight (**n.**) - a time expression.
+- Full-Time (**n. phrase**) - a time expression.
+- Gap Year (**n. phrase**) - a time expression.
+- Indexing (**n.**) - a time expression.
+- Midday (**adj.**) - a time expression.
+- Midnight (**n.**) - a time expression.
+- Millennium (**n.**) - a time expression.
+- Once (**n.**) - a time expression.
+- Part-Time (**n. phrase**) - a time expression.
+- Per Week (**adv. phrase**) - a time expression.
+- Three Times (**n. phrase**) - on three occasions.
+- Three Times per Week (**n. phrase**) - a time expression.
+- Thrice (**n.**) - a time expression.
+- Twice (**n.**) - a time expression.
+
+## Materials
+
+- Aluminium (**n.**) - a material or substance.
+- Bone (**n.**) - a material or substance.
+- Cement (**adj.**) - a material or substance.
+- Ceramics (**n.**) - a material or substance.
+- Composite (**n.**) - a material or substance.
+- Concrete (**n.**) - hard building material.
+- Copper (**n.**) - a material or substance.
+- Cotton (**n.**) - a material or substance.
+- Fabric (**adj.**) - a material or substance.
+- Feather (**n.**) - bird covering.
+- Fibreglass (**n.**) - a material or substance.
+- Fur (**n.**) - a material or substance.
+- Glass (**n.**) - a material or substance.
+- Glue (**n.**) - a material or substance.
+- Leather (**n.**) - animal-hide material.
+- Lumber / Wood (**n. phrase**) - related spelling variants or connected forms.
+- Metal (**adj.**) - hard material like iron.
+- Paper (**n.**) - a material or substance.
+- Plastic (**adj.**) - a material or substance.
+- Platinum (**n.**) - a material or substance.
+- Raw Materials (**n. phrase**) - a material or substance.
+- Rubber (**n.**) - elastic material.
+- Silk (**n.**) - a material or substance.
+- Steel (**n.**) - a material or substance.
+- Stone (**n.**) - hard natural material.
+- Textile (**n.**) - woven/knitted fabric.
+- Titanium (**n.**) - a material or substance.
+- Wax (**n.**) - a material or substance.
+- Wood (**n.**) - a material or substance.
+- Wool (**n.**) - sheep hair material.
+
+## Shopping
+
+- Chain Store (**n. phrase**) - a shopping or store term.
+- Complaint (**n.**) - a shopping or store term.
+- Convenience Store (**n. phrase**) - a shopping or store term.
+- Customer (**n.**) - person who buys goods/services.
+- Deliver (**v.**) - a shopping or store term.
+- Department Store (**n. phrase**) - a shopping or store term.
+- Electric Cooker (**n. phrase**) - a shopping or store term.
+- Electronic Product (**n. phrase**) - a shopping or store term.
+- Family Size (**n. phrase**) - a shopping or store term.
+- Fix the Dinner (**v. phrase**) - a shopping or store term.
+- Grocery Store (**n. phrase**) - a shopping or store term.
+- Iron (**n.**) - a shopping or store term.
+- Mall (**n.**) - a shopping or store term.
+- On Sale (**n. phrase**) - a shopping or store term.
+- Outlet (**n.**) - a shopping or store term.
+- Past the Prime (**n. phrase**) - a shopping or store term.
+- Receipt (**n.**) - a shopping or store term.
+- Sell out (**v. phrase**) - a shopping or store term.
+- Stationery (**adj.**) - a shopping or store term.
+- Supermarket (**n.**) - a shopping or store term.
+- Video Camera (**n. phrase**) - a shopping or store term.
+
+## Countries
+
+- Argentina (**n.**) - a country/place name.
+- Brazil (**n.**) - a country/place name.
+- Canada (**n.**) - a country/place name.
+- China (**n.**) - a country/place name.
+- Denmark (**n.**) - a country/place name.
+- Dominican Republic (**n. phrase**) - a country/place name.
+- Dubai (**n.**) - a country/place name.
+- Egypt (**n.**) - a country/place name.
+- England (**n.**) - a country/place name.
+- France (**n.**) - a country/place name.
+- Germany (**adj.**) - a country/place name.
+- Greece (**n.**) - a country/place name.
+- India (**n.**) - a country/place name.
+- Indonesia (**n.**) - a country/place name.
+- Ireland (**n.**) - a country/place name.
+- Italy (**adj.**) - a country/place name.
+- Malaysia (**n.**) - a country/place name.
+- Mexico (**n.**) - a country/place name.
+- Netherlands (**n.**) - a country/place name.
+- New Zealand (**n. phrase**) - a country/place name.
+- Nigeria (**n.**) - a country/place name.
+- North Korea (**n. phrase**) - a country/place name.
+- Norway (**adj.**) - a country/place name.
+- Pakistan (**n.**) - a country/place name.
+- Philippines (**n.**) - a country/place name.
+- Portugal (**adj.**) - a country/place name.
+- Russia (**n.**) - a country/place name.
+- Scotland (**n.**) - a country/place name.
+- Singapore (**n.**) - a country/place name.
+- South Africa (**n. phrase**) - a country/place name.
+- Sweden (**adj.**) - a country/place name.
+- Switzerland (**n.**) - a country/place name.
+- Turkey (**adj.**) - a country/place name.
+- United Kingdom (**n. phrase**) - a country/place name.
+- United States of America (USA) (**n. phrase**) - a country/place name.
+- Zimbabwe (**n.**) - a country/place name.
+
+## Continents
+
+- Africa (**n.**) - a continent name.
+- Antarctica (**n.**) - a continent name.
+- Asia (**n.**) - a continent name.
+- Australia (**n.**) - a continent name.
+- Europe (**n.**) - continent name.
+- North America (**n. phrase**) - a continent name.
+- South America (**n. phrase**) - a continent name.
+
+## Languages
+
+- Bengali (**n.**) - a language name or language-related word.
+- Bilingual (**adj.**) - a language name or language-related word.
+- Chinese (**n.**) - a language name or language-related word.
+- English (**n.**) - a language name or language-related word.
+- Filipino (**n.**) - a language name or language-related word.
+- French (**n.**) - a language name or language-related word.
+- German (**n.**) - a language name or language-related word.
+- Greek (**n.**) - a language name or language-related word.
+- Hindi (**n.**) - a language name or language-related word.
+- Italian (**n.**) - a language name or language-related word.
+- Japanese (**n.**) - a language name or language-related word.
+- Linguistics (**n.**) - a language name or language-related word.
+- Malayalam (**n.**) - a language name or language-related word.
+- Mandarin (**n.**) - a language name or language-related word.
+- Marathi (**n.**) - a language name or language-related word.
+- Persian (**n.**) - a language name or language-related word.
+- Polyglot (**n.**) - a language name or language-related word.
+- Portuguese (**n.**) - a language name or language-related word.
+- Punjabi (**n.**) - a language name or language-related word.
+- Rajasthani (**n.**) - a language name or language-related word.
+- Russian (**n.**) - a language name or language-related word.
+- Spanish (**n.**) - a language name or language-related word.
+- Tamil (**n.**) - a language name or language-related word.
+- Telugu (**n.**) - a language name or language-related word.
+- Thai (**n.**) - a language name or language-related word.
+- Trilingual (**adj.**) - a language name or language-related word.
+
+## Others
+
+- Activity (**adj.**) - a general IELTS listening word.
+- Allergy (**adj.**) - a general IELTS listening word.
+- Alternatives (**n.**) - a general IELTS listening word.
+- Artificial Intelligence (**n. phrase**) - a general IELTS listening word.
+- Attitude (**n.**) - a general IELTS listening word.
+- Bird Flu (**n. phrase**) - a general IELTS listening word.
+- Biscuits (**n.**) - a general IELTS listening word.
+- Burger (**n.**) - a general IELTS listening word.
+- Calendar (**n.**) - a general IELTS listening word.
+- Carriage (**n.**) - a general IELTS listening word.
+- Chocolate (**n.**) - a general IELTS listening word.
+- Circuit (**n.**) - a general IELTS listening word.
+- Creation (**n.**) - act of making something.
+- Creativity (**adj.**) - ability to create new ideas.
+- Cure (**n.**) - a general IELTS listening word.
+- Daily Routine (**n. phrase**) - a general IELTS listening word.
+- Decision (**n.**) - a general IELTS listening word.
+- Decision-Making (**n. phrase**) - a general IELTS listening word.
+- Democrats (**n.**) - a general IELTS listening word.
+- Demonstration (**n.**) - a general IELTS listening word.
+- Dental Decay (**n. phrase**) - a general IELTS listening word.
+- Diabetes (**n.**) - a general IELTS listening word.
+- Dialect (**n.**) - a general IELTS listening word.
+- Dialogue (**n.**) - a general IELTS listening word.
+- Driving licence (**n. phrase**) - a general IELTS listening word.
+- Encouragement (**adj.**) - a general IELTS listening word.
+- Encyclopaedia (**n.**) - a general IELTS listening word.
+- Epidemic (**adj.**) - a general IELTS listening word.
+- Evolution (**n.**) - a general IELTS listening word.
+- Exams (**n.**) - a general IELTS listening word.
+- Farewell (**n.**) - a general IELTS listening word.
+- Foodie (**n.**) - a general IELTS listening word.
+- Fracture (**n.**) - a general IELTS listening word.
+- Frequency (**adj.**) - how often something happens.
+- Frequently Updated (**n. phrase**) - a general IELTS listening word.
+- Fulfilment (**adj.**) - a general IELTS listening word.
+- Fund-Raising Event (**n. phrase**) - a general IELTS listening word.
+- Gender (**n.**) - male/female/social category.
+- Government (**adj.**) - a general IELTS listening word.
+- Guarantee (**n.**) - a general IELTS listening word.
+- Have a Temperature Check (**v. phrase**) - a general IELTS listening word.
+- Illiteracy (**adj.**) - a general IELTS listening word.
+- Indigenous (**adj.**) - a general IELTS listening word.
+- Individual (**adj.**) - one person.
+- Infectious Illness (**n. phrase**) - a general IELTS listening word.
+- Junior (**n.**) - a general IELTS listening word.
+- Language Test (**n. phrase**) - a general IELTS listening word.
+- Liberal Democracy (**n. phrase**) - a general IELTS listening word.
+- Libertarian (**n.**) - a general IELTS listening word.
+- Liberty (**adj.**) - a general IELTS listening word.
+- Life Expectancy (**n. phrase**) - a general IELTS listening word.
+- Literary (**adj.**) - a general IELTS listening word.
+- Lunar Calendar (**n. phrase**) - a general IELTS listening word.
+- Magnet (**n.**) - a general IELTS listening word.
+- Man-Made (**n. phrase**) - a general IELTS listening word.
+- Narrative (**adj.**) - a general IELTS listening word.
+- Nature (**n.**) - natural world.
+- Nature Conservation (**n. phrase**) - a general IELTS listening word.
+- Observation (**n.**) - watching/noticing carefully.
+- Opportunity (**adj.**) - chance.
+- Original Inhabitant (**n. phrase**) - a general IELTS listening word.
+- Pandemic (**adj.**) - a general IELTS listening word.
+- Passport Photo (**n. phrase**) - a general IELTS listening word.
+- Pedestrian Safety (**n. phrase**) - a general IELTS listening word.
+- Personal Fulfillment (**n. phrase**) - a general IELTS listening word.
+- Private Sector (**n. phrase**) - a general IELTS listening word.
+- Prize (**n.**) - a general IELTS listening word.
+- Procedures (**n.**) - a general IELTS listening word.
+- Process (**n.**) - a general IELTS listening word.
+- Proficiency (**adj.**) - a general IELTS listening word.
+- Prototype (**n.**) - a general IELTS listening word.
+- Ramification (**n.**) - a general IELTS listening word.
+- Recipient (**adj.**) - a general IELTS listening word.
+- Recover (**v.**) - a general IELTS listening word.
+- Republic (**adj.**) - a general IELTS listening word.
+- Republicans (**n.**) - a general IELTS listening word.
+- Revolution (**n.**) - a general IELTS listening word.
+- Road safety (**n. phrase**) - a general IELTS listening word.
+- Robot (**n.**) - a general IELTS listening word.
+- Runny Nose (**n. phrase**) - a general IELTS listening word.
+- SARS (**n.**) - a general IELTS listening word.
+- Satellite (**n.**) - a general IELTS listening word.
+- Senior (**n.**) - a general IELTS listening word.
+- Sewer Systems (**n. phrase**) - a general IELTS listening word.
+- Sneeze (**n.**) - a general IELTS listening word.
+- Solar (**n.**) - related to the sun.
+- Sore Throat (**n. phrase**) - a general IELTS listening word.
+- Spelling (**n.**) - a general IELTS listening word.
+- State (**n.**) - a general IELTS listening word.
+- Straight (**n.**) - a general IELTS listening word.
+- Strike (**n.**) - a general IELTS listening word.
+- Sufficient (**adj.**) - a general IELTS listening word.
+- Tests (**n.**) - a general IELTS listening word.
+- Toothache (**n.**) - a general IELTS listening word.
+- Traffic Jams (**n. phrase**) - a general IELTS listening word.
+- Ultrasound (**n.**) - a general IELTS listening word.
+- Umbrella (**n.**) - a general IELTS listening word.
+- Variety (**adj.**) - different types.
+- Videos (**n.**) - a general IELTS listening word.
+- VISA Sponsorship (**n. phrase**) - a general IELTS listening word.
+- Waiting List (**n. phrase**) - list of people waiting.
+- Welfare (**n.**) - a general IELTS listening word.
+
+## Extra A-Z Spelling (A)
+
+- Absence (**n.**) - not being present.
+- Academic (**adj.**) - a descriptive IELTS spelling word.
+- Accept (**v.**) - an action word used in IELTS listening.
+- Acceptable (**adj.**) - a descriptive IELTS spelling word.
+- Activated (**adj.**) - a descriptive IELTS spelling word.
+- Activities (**n.**) - a common IELTS listening spelling word.
+- Adaptation (**n.**) - a common IELTS listening spelling word.
+- Advertising (**n.**) - a common IELTS listening spelling word.
+- Adviser (**n.**) - a common IELTS listening spelling word.
+- Afternoon (**n.**) - a common IELTS listening spelling word.
+- Ages (**n.**) - a common IELTS listening spelling word.
+- Alarm (**n.**) - warning sound.
+- Alone (**n.**) - a common IELTS listening spelling word.
+- Alternative (**adj.**) - another choice.
+- Analysis (**n.**) - careful study of something.
+- Annual (**adj.**) - a descriptive IELTS spelling word.
+- Answering (**n.**) - a common IELTS listening spelling word.
+- Anxiety (**adj.**) - worry or nervousness.
+- App (**n.**) - mobile/computer application.
+- Application (**n.**) - formal request or form.
+- Approach (**n.**) - method or way.
+- Aspiration (**n.**) - strong hope or goal.
+- Assessed (**adj.**) - a descriptive IELTS spelling word.
+- Assumption (**n.**) - something believed without proof.
+- Attention (**n.**) - careful listening or focus.
+- Aunt (**n.**) - parent’s sister.
+
+## Extra A-Z Spelling (B)
+
+- Babies (**n.**) - very young children.
+- Bag (**n.**) - container for carrying things.
+- Balance (**n.**) - stable/equal state.
+- Balcony/Balconies (**n. phrase**) - related spelling variants or connected forms.
+- Ball (**n.**) - round object used in games.
+- Banana (**n.**) - yellow fruit.
+- Band (**n.**) - music group or strip.
+- Bath (**n.**) - a common IELTS listening spelling word.
+- Bay (**adj.**) - part of sea/land curve.
+- Beach / Beaches (**n. phrase**) - sandy area by sea.
+- Bedsit (**n.**) - small room for living/sleeping.
+- Bee / Bees (**n. phrase**) - flying insect that makes honey.
+- Beginner (**n.**) - person starting to learn.
+- Behaviour (**n.**) - way someone acts.
+- Bike (**n.**) - bicycle or motorcycle.
+- Bill (**n.**) - money to pay.
+- Bitterness (**n.**) - bitter taste or feeling.
+- Blog (**n.**) - online writing page.
+- Blond (**n.**) - a common IELTS listening spelling word.
+- Blonde (**n.**) - a common IELTS listening spelling word.
+- Body Cells (**n. phrase**) - a common IELTS listening spelling word.
+- Bone / Bones (**n. phrase**) - related spelling variants or connected forms.
+- Boots (**n.**) - strong shoes.
+- Brain (**n.**) - organ for thinking.
+- Break (**n.**) - pause or damage.
+- Breathing (**n.**) - a common IELTS listening spelling word.
+- Build (**v.**) - an action word used in IELTS listening.
+- Built (**n.**) - a common IELTS listening spelling word.
+- Bullying (**n.**) - hurting/intimidating others.
+- Bunch (**n.**) - group of things.
+- Business (**n.**) - commercial activity.
+- Butterfly / Butterflies (**n. phrase**) - related spelling variants or connected forms.
+- Button (**n.**) - small fastener/control.
+
+## Extra A-Z Spelling (C)
+
+- Canal (**adj.**) - man-made waterway.
+- Card (**n.**) - small paper/plastic item.
+- Casual (**adj.**) - informal or relaxed.
+- Certain (**n.**) - sure or particular.
+- Checklist (**n.**) - list for checking tasks.
+- Chef (**n.**) - professional cook.
+- Chequebook (**n.**) - book of bank cheques.
+- Choose (**v.**) - an action word used in IELTS listening.
+- Cinema (**n.**) - movie theatre.
+- Classification (**n.**) - grouping by type.
+- Cleaner (**n.**) - person/product that cleans.
+- Cloth / Clothes / Clothing (**n. phrase**) - related spelling variants or connected forms.
+- Co-Operative (**n. phrase**) - working together.
+- Code (**n.**) - system of letters/numbers.
+- Combination (**n.**) - things joined together.
+- Completely / Complete (**n. phrase**) - related spelling variants or connected forms.
+- Complex (**n.**) - not simple.
+- Complicated (**adj.**) - difficult and detailed.
+- Conference (**n.**) - formal meeting.
+- Confusion (**n.**) - lack of clear understanding.
+- Conservation (**n.**) - protection of nature/resources.
+- Consumption (**n.**) - use of resources/food.
+- Conversation (**n.**) - talk between people.
+- Cooker (**n.**) - appliance for cooking.
+- Cooking (**n.**) - preparing food.
+- Cooperating (**n.**) - working with others.
+- Correction (**n.**) - fixing a mistake.
+- Cost (**n.**) - price or expense.
+- Craftsmen (**adj.**) - skilled workers.
+- Crime (**n.**) - illegal act.
+- Crisis (**n.**) - serious difficult situation.
+- Crying (**n.**) - shedding tears.
+- Crystal / Crystals (**n. phrase**) - clear mineral/glass piece.
+- Curry (**adj.**) - spiced dish.
+- Curtain (**n.**) - cloth covering a window.
+
+## Extra A-Z Spelling (D)
+
+- Damage (**n.**) - harm or injury.
+- Database (**n.**) - organized data store.
+- Decline (**v.**) - go down or refuse.
+- Decoration/Decorate (**n. phrase**) - related spelling variants or connected forms.
+- Delay (**adj.**) - late/postponement.
+- Deliveries / Delivery (**n. phrase**) - related spelling variants or connected forms.
+- Demand (**n.**) - need or request.
+- Democratic (**adj.**) - related to democracy.
+- Depression (**n.**) - sadness or economic decline.
+- Description (**n.**) - spoken/written details.
+- Desk (**n.**) - table for work/study.
+- Destruction (**n.**) - serious damage.
+- Detail (**n.**) - small piece of information.
+- Development (**adj.**) - growth or improvement.
+- Diameter (**n.**) - line across a circle.
+- Diary (**adj.**) - personal daily record.
+- Dictionary/Dictionaries (**n. phrase**) - book/app of word meanings.
+- Diet (**n.**) - food habit.
+- Direction / Directions (**n. phrase**) - way or instruction.
+- Disabled (**adj.**) - having a physical/mental limitation.
+- Discount (**n.**) - price reduction.
+- Discs (**n.**) - round flat objects.
+- Discussion (**n.**) - talk about a topic.
+- Distance (**n.**) - space between things.
+- Distraction (**n.**) - thing that takes attention away.
+- Disturbing (**n.**) - upsetting or interrupting.
+- Diversity (**adj.**) - variety/differences.
+- Doctor (**n.**) - medical professional.
+- Dog (**n.**) - common pet animal.
+- Door (**n.**) - entrance panel.
+- Drawing (**n.**) - picture made with lines.
+- Drone (**n.**) - unmanned flying device.
+- Drummer (**n.**) - person who plays drums.
+- Duck (**n.**) - water bird.
+- Dust (**n.**) - fine dry dirt.
+
+## Extra A-Z Spelling (E)
+
+- Ear (**n.**) - organ for hearing.
+- East (**n.**) - direction of sunrise.
+- Economics / Economic (**n. phrase**) - related spelling variants or connected forms.
+- Effectively (**adv.**) - in a successful way.
+- Egg / Eggs (**n. phrase**) - related spelling variants or connected forms.
+- Electricity / Electrician / Electronic (**n. phrase**) - related spelling variants or connected forms.
+- Emotion (**n.**) - feeling.
+- Endangered (**adj.**) - at risk of disappearing.
+- Energy (**adj.**) - power or strength.
+- Entry (**adj.**) - a descriptive IELTS spelling word.
+- Escape (**n.**) - get away.
+- Evaluate (**n.**) - judge or assess.
+- Evening (**n.**) - later part of the day.
+- Evidence (**n.**) - proof or sign.
+- Exchange (**n.**) - swap or trade.
+- Expansion (**n.**) - increase in size.
+- Expect / Expects (**v. phrase**) - related spelling variants or connected forms.
+- Experience / Experiment (**n. phrase**) - related spelling variants or connected forms.
+- Expert / Experts (**n. phrase**) - related spelling variants or connected forms.
+- Eyes (**n.**) - organs for seeing.
+
+## Extra A-Z Spelling (F)
+
+- Factory / Factories (**n. phrase**) - related spelling variants or connected forms.
+- Fairy (**adj.**) - imaginary magical being.
+- Family / Families (**n. phrase**) - related spelling variants or connected forms.
+- Farm (**n.**) - land for crops/animals.
+- Favourite (**n.**) - most liked.
+- Feeding (**n.**) - giving food.
+- Feet (**n.**) - plural of foot.
+- Fence / Fences (**n. phrase**) - related spelling variants or connected forms.
+- Festival / Festivals (**n. phrase**) - related spelling variants or connected forms.
+- Film (**n.**) - movie.
+- Finger (**n.**) - part of hand.
+- Fishing (**n.**) - catching fish.
+- Fit (**n.**) - healthy or suitable.
+- Flashing Light (**n. phrase**) - light turning on/off repeatedly.
+- Flooding (**n.**) - large amount of water covering land.
+- Floor (**n.**) - bottom surface of room.
+- Fluent (**adj.**) - able to speak smoothly.
+- Flute (**n.**) - musical instrument.
+- Fountain (**n.**) - water feature.
+- Frame (**n.**) - supporting border/structure.
+- Freedom (**n.**) - being free.
+- Frog (**n.**) - small jumping amphibian.
+- Fuel (**n.**) - substance burned for energy.
+- Furniture (**n.**) - movable home items.
+
+## Extra A-Z Spelling (G)
+
+- Garage (**n.**) - place for cars.
+- Garden / Gardening (**n. phrase**) - related spelling variants or connected forms.
+- Gate / Gates (**n. phrase**) - related spelling variants or connected forms.
+- Gene (**n.**) - unit of heredity.
+- General (**adj.**) - not specific.
+- Glass / Glasses (**n. phrase**) - related spelling variants or connected forms.
+- Global (**adj.**) - worldwide.
+- Gloves (**n.**) - hand coverings.
+- Grammar (**n.**) - language rules.
+- Grandparents / Grandmother (**n. phrase**) - related spelling variants or connected forms.
+- Grant (**adj.**) - money/support given.
+- Grass / Grasses (**n. phrase**) - related spelling variants or connected forms.
+- Growth (**n.**) - increase/development.
+- Guided Tour (**n. phrase**) - tour led by a guide.
+
+## Extra A-Z Spelling (H)
+
+- Hairdresser (**n.**) - person who cuts/styles hair.
+- Hall (**n.**) - large room or corridor.
+- Handbag (**n.**) - small bag carried by hand.
+- Harbour (**n.**) - safe place for ships.
+- Head (**n.**) - top body part.
+- Healthy (**adj.**) - in good health.
+- Hear / Hearing (**n. phrase**) - related spelling variants or connected forms.
+- Heavy (**adj.**) - large in weight.
+- Hillside / Hillsides (**n. phrase**) - related spelling variants or connected forms.
+- Holiday/Holidays (**n. phrase**) - related spelling variants or connected forms.
+- Homesick (**n.**) - sad from being away from home.
+- Horse/Horses (**n. phrase**) - related spelling variants or connected forms.
+- Hostel/Hotel (**n. phrase**) - related spelling variants or connected forms.
+- Housewife (**n.**) - woman managing home.
+- Hunting (**n.**) - searching/catching animals.
+
+## Extra A-Z Spelling (I)
+
+- Identification / Identify (**n. phrase**) - related spelling variants or connected forms.
+- Image (**n.**) - picture.
+- Inexpensive (**adj.**) - not expensive.
+- Innovation (**n.**) - new idea/method.
+- Insect / Insects (**n. phrase**) - related spelling variants or connected forms.
+- Insulation (**n.**) - material stopping heat/sound loss.
+- Investment (**adj.**) - money put in to gain profit.
+- Irrigation (**n.**) - water supply for crops.
+- Isolation (**n.**) - being alone/separate.
+- Issues (**n.**) - problems/topics.
+- Item (**n.**) - single thing.
+
+## Extra A-Z Spelling (J)
+
+- Jazz (**n.**) - music style.
+- Jeans (**n.**) - denim trousers.
+- Journalist (**n.**) - person reporting news.
+
+## Extra A-Z Spelling (K)
+
+- Knee (**n.**) - leg joint.
+- Knife (**n.**) - cutting tool.
+
+## Extra A-Z Spelling (L)
+
+- Label (**n.**) - tag/name attached to something.
+- Laboratory (**adj.**) - room for scientific work.
+- Lamb (**n.**) - young sheep/meat.
+- Lamp / Lamps (**n. phrase**) - related spelling variants or connected forms.
+- Language (**n.**) - system of communication.
+- Lap (**n.**) - upper legs when sitting.
+- Late (**n.**) - after expected time.
+- Launch (**n.**) - start or release.
+- Laundry (**adj.**) - washing clothes.
+- Leader / Leadership (**n. phrase**) - related spelling variants or connected forms.
+- Lecture / Lecturers (**n. phrase**) - related spelling variants or connected forms.
+- Leg (**n.**) - body part for walking.
+- Leisure Activities (**n. phrase**) - free-time activities.
+- Lentil (**n.**) - small edible pulse.
+- Lesson (**n.**) - teaching session.
+- Level (**n.**) - stage or height.
+- Lifting (**n.**) - raising something.
+- Lighting (**n.**) - lights/illumination.
+- Litre / Litres (**n. phrase**) - related spelling variants or connected forms.
+- Litter (**n.**) - rubbish left in public.
+- Lively (**adv.**) - full of energy.
+- Location (**n.**) - place/position.
+- Locker (**n.**) - small storage cupboard.
+- Logo (**n.**) - brand symbol.
+- Lunch (**n.**) - midday meal.
+
+## Extra A-Z Spelling (M)
+
+- Machines (**n.**) - devices doing work.
+- Magic (**adj.**) - supernatural tricks/power.
+- Market (**n.**) - place/system for buying/selling.
+- Material (**adj.**) - a descriptive IELTS spelling word.
+- Mature (**n.**) - fully grown/developed.
+- Meal Time (**n. phrase**) - time for eating.
+- Media (**n.**) - communication channels.
+- Medical (**adj.**) - related to medicine.
+- Medication (**n.**) - medicine/drug treatment.
+- Meditation (**n.**) - mental relaxation practice.
+- Melon (**n.**) - large sweet fruit.
+- Memory (**adj.**) - ability to remember.
+- Menu (**n.**) - list of food choices.
+- Message (**n.**) - written/spoken information.
+- Method / Methods (**n. phrase**) - related spelling variants or connected forms.
+- Microphone (**n.**) - device for recording voice.
+- Middle (**n.**) - central part.
+- Migration (**n.**) - movement to another place.
+- Military (**adj.**) - related to armed forces.
+- Mineral / Minerals (**n. phrase**) - related spelling variants or connected forms.
+- Minute / Minutes (**n. phrase**) - related spelling variants or connected forms.
+- Missed (**adj.**) - not caught/attended.
+- Monkey / Monkeys (**n. phrase**) - related spelling variants or connected forms.
+- Month (**n.**) - one of 12 year divisions.
+- Monument (**adj.**) - important statue/building.
+- Moon (**n.**) - earth’s natural satellite.
+- Motivation (**n.**) - reason/drive to act.
+- Movement (**adj.**) - motion/change of position.
+- Movie (**n.**) - film.
+- Mushroom / Mushrooms (**n. phrase**) - related spelling variants or connected forms.
+
+## Extra A-Z Spelling (N)
+
+- Neck (**n.**) - body part joining head/body.
+- Negative (**adj.**) - bad or opposite.
+- Nest (**n.**) - bird/animal home.
+- Network (**n.**) - connected system.
+- Noise (**n.**) - unwanted sound.
+- Noisy (**adj.**) - making much noise.
+- Northern (**adj.**) - in the north.
+- Note-Taking (**n. phrase**) - a common IELTS listening spelling word.
+- Notice Board (**n. phrase**) - board for announcements.
+- Nutrient (**adj.**) - substance needed for health.
+
+## Extra A-Z Spelling (O)
+
+- Obesity (**adj.**) - being very overweight.
+- Olympics (**n.**) - international sports event.
+- Opera House (**n. phrase**) - building for opera.
+- Ostrich (**n.**) - large flightless bird.
+- Outdoor (**n.**) - outside, not indoors.
+- Overlap (**n.**) - partly cover/share area.
+
+## Extra A-Z Spelling (P)
+
+- Paragraph (**n.**) - section of writing.
+- Parking (**n.**) - place/action of leaving vehicle.
+- Patience (**n.**) - ability to wait calmly.
+- Patient (**adj.**) - person receiving medical care.
+- Payment (**adj.**) - money paid.
+- Peak (**n.**) - highest point.
+- Pick (**n.**) - choose or take.
+- Plan / Planned (**n. phrase**) - related spelling variants or connected forms.
+- Plane (**n.**) - aircraft.
+- Plants (**n.**) - living things that grow in soil.
+- Plate / Plates (**n. phrase**) - related spelling variants or connected forms.
+- Play (**adj.**) - game/drama or act in a game.
+- Poison / Poisonous (**n. phrase**) - related spelling variants or connected forms.
+- Postbox (**n.**) - box for letters.
+- Practise (**v.**) - do repeatedly to improve.
+- Predator (**n.**) - animal that hunts others.
+- Pregnant (**adj.**) - carrying a baby.
+- Presentation (**n.**) - formal talk/display.
+- Priorities (**n.**) - most important things.
+- Procedure (**n.**) - set of steps.
+- Project (**n.**) - planned piece of work.
+
+## Extra A-Z Spelling (Q)
+
+- Quiz (**n.**) - short test.
+
+## Extra A-Z Spelling (R)
+
+- Race / Races (**n. phrase**) - related spelling variants or connected forms.
+- Rain (**n.**) - water falling from clouds.
+- Rat (**n.**) - small rodent.
+- Record / Records (**n. phrase**) - related spelling variants or connected forms.
+- Recovery (**adj.**) - getting better.
+- Regional (**adj.**) - related to a region.
+- Regulation (**n.**) - official rule.
+- Relative (**adj.**) - family member.
+- Repeated (**adj.**) - done again.
+- Reproduction (**n.**) - producing copies/offspring.
+- Reputation (**n.**) - public opinion about someone.
+- Reservation /Reserve (**n. phrase**) - related spelling variants or connected forms.
+- Resource / Resources (**n. phrase**) - related spelling variants or connected forms.
+- Respect (**n.**) - admiration or politeness.
+- Responsibility (**adj.**) - duty.
+- Restriction / Restrictions (**n. phrase**) - related spelling variants or connected forms.
+- Robber (**n.**) - person who steals.
+- Robbery /Robber (**n. phrase**) - related spelling variants or connected forms.
+- Rock (**n.**) - stone.
+- Roof (**n.**) - top covering of building.
+- Root (**n.**) - plant part underground.
+- Rose / Roses (**n. phrase**) - related spelling variants or connected forms.
+- Rough (**n.**) - not smooth.
+- Route (**n.**) - way/path.
+- Rules (**n.**) - instructions/laws.
+- Running (**n.**) - moving fast on foot.
+
+## Extra A-Z Spelling (S)
+
+- Salad (**n.**) - cold mixed food.
+- Sale / Sales (**n. phrase**) - related spelling variants or connected forms.
+- Salt (**n.**) - white seasoning mineral.
+- Scarf (**n.**) - cloth worn around neck.
+- Scientist (**n.**) - person doing science.
+- Scored (**adj.**) - got points/marks.
+- Seaweed (**adj.**) - plant/algae in sea.
+- Section (**n.**) - part of something.
+- Seed (**adj.**) - plant starting part.
+- Selection (**n.**) - choice/group chosen.
+- Self-Employed (**n. phrase**) - a common IELTS listening spelling word.
+- Settlement (**adj.**) - agreement or place people live.
+- Shelter (**n.**) - safe covered place.
+- Shoes (**n.**) - footwear.
+- Shopping (**n.**) - buying goods.
+- Shoulder (**n.**) - upper body joint.
+- Sign / Signed (**v. phrase**) - related spelling variants or connected forms.
+- Silent (**adj.**) - not making sound.
+- Similar (**n.**) - almost the same.
+- Simple (**n.**) - easy/not complex.
+- Situational (**adj.**) - related to a situation.
+- Skill (**n.**) - ability to do something.
+- Sky (**adj.**) - space above earth.
+- Slang (**n.**) - informal language.
+- Slaves (**n.**) - people forced to work.
+- Smartphone (**n.**) - mobile phone with apps.
+- Smell (**n.**) - sense/odour.
+- Smile (**n.**) - happy facial expression.
+- Snake / Snakes (**n. phrase**) - related spelling variants or connected forms.
+- Sock / Socks (**n. phrase**) - related spelling variants or connected forms.
+- Soft Water (**n. phrase**) - water with few minerals.
+- Speed (**adj.**) - rate of movement.
+- Spice (**n.**) - food flavouring.
+- Spoon (**n.**) - eating/cooking utensil.
+- Spotlight (**n.**) - strong focused light.
+- Spring (**n.**) - season or coil.
+- Squash Court / Courts (**n. phrase**) - related spelling variants or connected forms.
+- Stage (**n.**) - platform/phase.
+- Station (**n.**) - stop/place for transport.
+- Steam (**n.**) - hot water vapour.
+- Stranger (**n.**) - unknown person.
+- Strawberry (**adj.**) - red fruit.
+- Stream (**n.**) - small river/flow.
+- Structure (**n.**) - arrangement/building form.
+- Studio (**n.**) - room for recording/art.
+- Study / Studies (**v. phrase**) - related spelling variants or connected forms.
+- Style (**n.**) - manner/design.
+- Suit / Suits (**n. phrase**) - related spelling variants or connected forms.
+- Sunshade (**n.**) - thing giving shade from sun.
+- Superiority (**adj.**) - being better/higher.
+- Surface (**n.**) - outer/top layer.
+- Survival (**adj.**) - staying alive.
+
+## Extra A-Z Spelling (T)
+
+- Tail (**n.**) - animal rear part.
+- Tailor (**n.**) - person who makes clothes.
+- Taste (**n.**) - flavour/sense.
+- Taxicab (**n.**) - taxi.
+- Tea (**n.**) - hot drink/leaves.
+- Technique / Technical (**n. phrase**) - related spelling variants or connected forms.
+- Technology (**adj.**) - practical use of science.
+- Teddy Bear (**n. phrase**) - toy bear.
+- Teenager (**n.**) - person aged 13-19.
+- Telegraph (**n.**) - old long-distance message system.
+- Telephone (**n.**) - device for calls.
+- Tent (**adj.**) - portable shelter.
+- Term (**n.**) - word/period.
+- Tesla (**n.**) - electric-car brand or unit/name.
+- Test / Tests (**n. phrase**) - related spelling variants or connected forms.
+- Textbooks (**n.**) - course books.
+- Theme (**n.**) - main subject/idea.
+- Therapy (**adj.**) - treatment.
+- Thermometer (**n.**) - device measuring temperature.
+- Thick Etc (**n. phrase**) - a common IELTS listening spelling word.
+- Third (**n.**) - number after second.
+- Thursday / Tuesday (**n. phrase**) - related spelling variants or connected forms.
+- Tide (**n.**) - rise/fall of sea.
+- Tidy (**adj.**) - neat/orderly.
+- Timber (**n.**) - wood for building.
+- Timetable (**adj.**) - schedule.
+- Timing (**n.**) - choice/measurement of time.
+- Tool (**n.**) - instrument for work.
+- Toothpaste (**n.**) - substance for cleaning teeth.
+- Touching (**n.**) - moving emotionally or making contact.
+- Tough (**n.**) - difficult or strong.
+- Tourism (**n.**) - travel industry.
+- Tracking (**n.**) - following/monitoring.
+- Traditional (**adj.**) - following old customs.
+- Traffic (**adj.**) - vehicles on roads.
+- Transport (**n.**) - carry/move people or goods.
+- Travel (**n.**) - go from place to place.
+- Tree / Trees (**n. phrase**) - related spelling variants or connected forms.
+- Trouble (**n.**) - problem/difficulty.
+- Trousers (**n.**) - clothing for legs.
+- Twenties (**n.**) - numbers/years age 20-29.
+
+## Extra A-Z Spelling (U)
+
+- Undersea World (**n. phrase**) - world under the sea.
+- Uniform (**n.**) - special standard clothing.
+- Universities (**n.**) - a common IELTS listening spelling word.
+- Unnecessary (**adj.**) - not needed.
+
+## Extra A-Z Spelling (V)
+
+- Vacation (**n.**) - holiday.
+- Vegan (**n.**) - person avoiding animal products.
+- Vegetable / Vegetables (**n. phrase**) - related spelling variants or connected forms.
+- Venomous (**adj.**) - poisonous by bite/sting.
+- Viewing (**n.**) - watching or inspection.
+- Viewpoint (**n.**) - opinion or perspective.
+- Violin (**n.**) - string musical instrument.
+- Visible (**adj.**) - able to be seen.
+- Visitor / Visitors (**n. phrase**) - related spelling variants or connected forms.
+
+## Extra A-Z Spelling (W)
+
+- Waist (**n.**) - middle part of body.
+- Weak (**n.**) - not strong.
+- Week (**n.**) - seven-day period.
+- West / Waste (**n. phrase**) - related spelling variants or connected forms.
+- Windy (**adj.**) - with much wind.
+- Wine (**n.**) - alcoholic grape drink.
