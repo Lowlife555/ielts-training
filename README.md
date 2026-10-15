@@ -1,4 +1,579 @@
-# 📚 IELTS 6.5 智能备考训练网站
+# IELTS Training Platform (V7.4.3)
+
+> An IELTS exam-prep platform targeting an **overall score of 6.5**, built on **React + Express + SQLite**
+> Current version: **V7.4.3** · GitHub: `https://github.com/Lowlife555/ielts-training`
+
+---
+
+## Table of Contents
+
+1. [Project Overview](#project-overview)
+2. [Feature Overview](#feature-overview)
+3. [Daily Training Flow](#daily-training-flow)
+4. [Smart Answer Grading System](#smart-answer-grading-system)
+5. [Version History](#version-history)
+6. [Quick Start](#quick-start)
+7. [Project Structure](#project-structure)
+8. [API Reference](#api-reference)
+9. [Database Design](#database-design)
+10. [User Memory KV Storage System](#user-memory-kv-storage-system)
+11. [Keyboard Shortcuts](#keyboard-shortcuts)
+12. [Speech System (Multiple Sources)](#speech-system-multiple-sources)
+13. [Spaced Repetition Algorithm](#spaced-repetition-algorithm)
+14. [DeepSeek AI Grading](#deepseek-ai-grading)
+15. [Deployment](#deployment)
+16. [Data Scale and Tech Stack](#data-scale-and-tech-stack)
+17. [Version Naming Convention](#version-naming-convention)
+
+---
+
+## Project Overview
+
+A smart exam-prep platform aimed at **an IELTS target score of 6.5**, solving two core needs:
+
+- **Vocabulary memorisation**: a 4,237-word graded vocabulary (PET foundation 1,752 + IELTS advanced 2,318 + real-exam selection 282), supporting List-by-List memorisation, 3D card flipping, Chinese dictation, meaning judgement, spaced repetition (Ebbinghaus), spot checks, a debt incentive mechanism, and resume-from-breakpoint
+- **Writing practice**: 30 Cambridge past-paper questions, an editor that auto-saves drafts, and DeepSeek AI grading against the four IELTS criteria (falls back to heuristic scoring when no key is configured)
+
+Highlights: smart grading (spelling tolerance + synonym library), Pomodoro batched memorisation, multi-source speech (local / Youdao / Baidu), training summaries and a history calendar, dual touch-screen and desktop modes, dark mode, cloud KV storage for user data, multi-user data isolation, and Admin management.
+
+---
+
+## Feature Overview
+
+### 🗓️ Daily Training (Core Loop)
+| Stage | Description |
+|------|------|
+| Today's briefing | Target duration (60 + debt, capped at 120 min), reasons, today's Lists, spot-check tasks, warm-up word count; **shows a completion banner + the to-be-relearned list when done** |
+| Resume from breakpoint | Batch progress is preserved when exiting midway; the briefing offers "continue from breakpoint / re-learn this batch" |
+| PET warm-up | 10 words: first 5 Chinese→English + last 5 English→Chinese, system-graded, untimed and unscored |
+| Word list memorisation | Pomodoro batching (30/40/50/100 words per batch), 3D card flip: front = word + phonetic + full definition, click to flip and hide the definition, both sides can be read aloud, keys 1/2 mark known / unknown |
+| Chinese dictation | Read the English and write the Chinese; **both correct and incorrect answers stay on screen showing right/wrong plus the full definition, advance manually with "Next"**; lenient grading via keywords + synonyms; wrong answers are automatically retested, and words already passed are removed from the next round |
+| Spot check | **Read the English and type the Chinese, system-graded** (same format as dictation), pass at ≥80% accuracy, otherwise the List is marked for relearning |
+| Spelling spot check | 30 random words studied today (read Chinese, spell English), pass at ≥80% |
+| Acceptance test | Every remaining word must be spelled correctly to complete the day's task |
+| Training summary | After finishing training, **a modal shows word-level detail** (how many times each word was missed + time taken + accuracy per stage), and it can be reopened after closing |
+
+### 📖 Vocabulary Module
+| Feature | Description |
+|------|------|
+| List memorisation | 24 Lists (about 100 words per List), full definitions for the whole List, single-card flipping to hide the definition |
+| Chinese dictation test | Questions drawn by List, graded by keywords + synonyms, wrong words retested until all are correct |
+| Meaning judgement | Read the word and choose the definition (4 options, full multiple senses shown = lenient grading), supports a meaning/spelling mixed mode |
+| Spelling test | Read Chinese and spell English (spelling tolerance) |
+| Spaced repetition | SM-2 algorithm, automatic reminders when due |
+| Wrong-word book | Review every word answered incorrectly more than twice |
+| Topic browsing | 8 topic cards (the original 282 real-exam word system) |
+
+### ✍️ Writing Module
+- Past-paper list (Task 1/2 filter)
+- Editor: `Ctrl+S` saves a draft, `Tab` indents, auto-save every 30 seconds
+- After submission: DeepSeek grading against the four criteria + a radar chart
+
+### 👤 User System
+- Register / log in (bcrypt encryption + Bearer Token 30-day session)
+- Data isolation: every route is isolated per user
+- Admin panel: user list / statistics / password reset / disable
+- Test account `admin_test`: penalty-free mechanism + a test panel that can jump anywhere
+- The first registered user automatically inherits the original data and becomes an administrator
+
+### ⚙️ Settings (entered via the gear icon at the top)
+| Setting | Options |
+|--------|------|
+| Speech source | Local speech (offline) / Youdao Dictionary (US/UK pronunciation) / Baidu Translate |
+| Accent | US / UK |
+| Phonetic display | On / Off |
+| Pomodoro break length | 3 / 5 / 10 minutes |
+| Daily target duration | 30 / 45 / 60 / 90 / 120 minutes (linked to the debt system) |
+| Training history | **View each training summary in calendar style** (word-level detail) |
+| Data management | Clear cache / export settings / restore defaults |
+
+> All settings are stored in the server-side **user_kv** table, and sync as soon as you log in from any device.
+
+### 📱 Dual Mode and Appearance
+- Touch mode: bottom tab bar + swipe to flip cards + larger tap areas
+- Desktop mode: top navigation + keyboard shortcuts
+- Dark mode (sun/moon toggle), automatic interface-mode detection
+- Environment badge: local laptop (light yellow) / server (light grey)
+
+---
+
+## Daily Training Flow
+
+```
+Today's briefing (target duration = 60 + debt, capped at 120 min; includes a resume-from-breakpoint entry)
+  └─ PET warm-up (10 words: first 5 Chinese→English + last 5 English→Chinese, untimed and unscored)
+  └─ Word list memorisation (Pomodoro batches of 30/40/50/100 words, 3D card flip + known/unknown marking)
+  └─ Chinese dictation (keyword + synonym grading, right and wrong answers both stay on screen showing the full definition, manual advance, wrong words retested with passed words removed)
+  └─ Break (3/5/10 minutes, skippable, not counted towards duration)
+  └─ Spot check (read English and type Chinese, pass at ≥80%)
+  └─ Spelling spot check (30 random words studied today, pass at ≥80%)
+  └─ Acceptance test (all remaining words correct → the day is complete)
+  └─ Training summary (modal: word-level detail + time taken + accuracy)
+```
+
+### Debt Rules (Time Box)
+| Scenario | Penalty |
+|------|------|
+| No training on the day | Debt +30 minutes |
+| Training duration < target - 15 min and acceptance not passed | Debt +30 minutes |
+| Acceptance passed on the day | No extra penalty (old debt is retained) |
+| Practising a full 2 hours | Everything cleared, back to the baseline target the next day |
+| Test account | Always 60 minutes, never accrues debt |
+
+### Spot Checks and Pending Relearning
+- Lists completed for ≥3 days trigger a spot check (30 random words, pass at ≥80%)
+- Spot check / spelling below standard → the List is marked `pending_review`, and re-learning is scheduled first in the next day's briefing
+- Today's briefing lists **all Lists pending relearning** (`pendingReviewLists`)
+
+### Resume from Breakpoint (V7.3.1)
+- On an Esc exit midway, `completed_batches` is saved (completed batches)
+- The next briefing shows "Last progress: List X has completed N batches", and you can choose **continue from breakpoint** or **re-learn this batch**
+
+---
+
+## Smart Answer Grading System
+
+> Tools: `client/src/utils/answerCheck.js` (unified grading) + `server/scripts/enrichSynonyms.js` (synonym library)
+
+### English Spelling Grading `checkEnglishAnswer`
+| Level | Rule | Example |
+|------|------|------|
+| ① Exact match | Case-insensitive | `Silence` = `silence` ✓ |
+| ② Word-form normalisation | Plurals / past tense / progressive | `studies`→`study`, `studied`→`study` ✓ |
+| ③ Edit distance ≤1 | Insert / delete / substitute / transpose one character | `silense`→`silence` ✓ |
+| Safety guard | Edit distance is disabled when the input is a common standalone word | `quite` ≠ `quiet` ✗ |
+
+### Chinese Definition Grading `checkChineseAnswer`
+| Level | Rule |
+|------|------|
+| ① Lenient keyword grading | Particle stripping + bidirectional containment (e.g. "位于..." → "位于") |
+| ② Synonym library hit | `word_meanings.synonyms` (e.g. definition "寂静", answering "安静" is also accepted) |
+| Single-character handling | Single-character keywords/synonyms match exactly (`糖` only accepts `糖`, not "糖水") |
+
+### Grading by Scenario
+| Scenario | Word-form variation | Edit distance | Synonyms |
+|------|---------|---------|--------|
+| Learning (dictation / warm-up / ListDictation / spelling practice) | ✅ | ✅ | ✅ |
+| Assessment (acceptance test / spelling spot check) | ✅ | ❌ | ❌ |
+
+### Synonym Library Data
+- **IELTS words**: all 2,318 words expanded (batch-generated by DeepSeek, `enrichSynonyms.js`)
+- **PET words**: 1,720 words (keywords + synonyms + single-character core senses + fixes for empty definitions/dirty word names)
+- The generation script is idempotent + resumable (checkpoint), independent of the deployment flow
+
+---
+
+## Version History
+
+> Version numbers use **V major.minor.patch** (SemVer): major = significant rework, minor = new features, patch = fixes.
+> Every version corresponds to a git tag (V2.0.0 ~ V7.3.1) and can be rolled back at any time.
+
+| Version | Date | Development Agent | Core Content |
+|------|------|-----------|---------|
+| V1.0.0 | 2026-08-05 | Claude Code + DeepSeek V4 | Initial version: scaffold + database + 14 APIs + 282 real-exam words + 30 writing questions |
+| V2.0.0 | 2026-08-06 | Claude Code + DeepSeek V4 | Post-acceptance fixes: dynamic user_id, speech, empty catch swallowing errors, grading button colours |
+| V3.0.0 | 2026-08-06 | Claude Code + DeepSeek V4 | Daily word training system + 4,237-word vocabulary |
+| V3.0.1 | 2026-08-06 | Claude Code + DeepSeek V4 | Speech pronunciation fix: switched to local Microsoft offline speech |
+| V3.0.2 | 2026-08-06 | Claude Code + DeepSeek V4 | Pre-delivery fixes: vocabulary isolation, unified ports, feedback delay, auto-save, etc. |
+| V4.0.0 | 2026-08-07 | Claude Code + DeepSeek V4 | Vocabulary tidy-up: List 1-24 numbering, three-level definition completion, list_no/is_extra fields |
+| V4.1.0 | 2026-08-08 | opencode (deepseek-v4-flash-free) | Today's briefing + daily flow rework + time box and debt system |
+| V4.2.0 | 2026-08-08 | opencode (deepseek-v4-flash-free) | Spot-check mechanism: 30 random words 3-4 days after memorising, pass at ≥80% |
+| V4.3.0 | 2026-08-08 | opencode (deepseek-v4-flash-free) | Definition depth expansion: DeepSeek batch of 756 words, all IELTS words with 2+ senses |
+| V5.0.0 | 2026-08-08 | opencode (deepseek-v4-flash-free) | User system: register/login/data isolation/Admin management/environment badge |
+| V5.1.0 | 2026-08-08 | opencode (deepseek-v4-flash-free) | Test account admin_test + dark mode |
+| V5.2.0 | 2026-08-08 | opencode (deepseek-v4-flash-free) | Study mode selection: sequential/custom List (queue-jumping without losing progress) |
+| V5.3.0 | 2026-08-08 | opencode (deepseek-v4-flash-free) | Touch adaptation: swipe card flipping/bottom tab bar/My page |
+| V5.3.1 | 2026-08-08 | opencode (deepseek-v4-flash-free) | Touch interaction fixes + front-end directory reorganised by functional domain |
+| V5.4.0 | 2026-08-08 | opencode (deepseek-v4-flash-free) | Touch-to-desktop switch entry + new-version announcement system |
+| V6.0.0 | 2026-08-08 | opencode (deepseek-v4-flash-free) | Meaning judgement test (lenient grading) + meaning/spelling mixed mode + full Youdao definition crawl (2,318 words) |
+| V7.0.0 | 2026-08-08 | opencode (deepseek-v4-flash-free) | List memorisation (full List definitions + show/hide toggle) + Chinese dictation test, removed the old word-card entry |
+| V7.1.0 | 2026-08-08 | opencode (deepseek-v4-flash-free) | Pomodoro batched memorisation + spelling spot check (30 random words ≥80%) + on-the-spot word-count selection |
+| V7.2.0 | 2026-08-08 | opencode (deepseek-v4-flash-free) | 3D card-flip memorisation + warm-up input grading + multi-source speech + settings page + lenient grading + retests removing words already passed |
+| V7.2.1 | 2026-08-08 | opencode (deepseek-v4-flash-free) | Warm-up fix: automatic word skipping/could not enter the next stage |
+| V7.2.2 | 2026-08-12 | opencode (deepseek-v4-flash-free) | Fixed warm-up feedback dwell/single-card flip + settings gear entry + KV user memory storage system |
+| V7.2.3 | 2026-08-12 | opencode (deepseek-v4-flash-free) | Fixed card-back scrollbar + reading aloud on both card faces + version naming convention established |
+| V7.2.4 | 2026-08-12 | opencode (deepseek-v4-flash-free) | Grading optimisation: spelling tolerance (word form + edit distance ≤1) + synonym library (IELTS 2,318/PET 1,720 full) + PET vocabulary fixes + grading by scenario |
+| V7.3.1 | 2026-08-14 | opencode (deepseek-v4-flash-free) | Dictation manual advance on right/wrong + full definition on correct answers + spot check changed to input grading + fixed the acceptance page crash (spelling could not be submitted) + training summary modal/history calendar page + resume from breakpoint + briefing completion state/pending relearning list |
+| V7.4.0 | 2026-08-18 | DeepSeek Harness | Study logging + study report (study_events table) + card-flip interaction improvement (clicking "unknown" flips back to the definition side) + self-test in the memorisation screen (test unknown words/wrong-word loop/can go back) |
+| V7.4.1 | 2026-08-18 | DeepSeek Harness | Spelling self-memorisation + self-test (known/unknown marking across the whole List flip cards) + all test stages changed to manual advance + Apple-style page polish + fixed the spelling spot check hanging |
+| V7.4.2 | 2026-08-19 | DeepSeek Harness | Memory progress system: word-level progress snapshot dual-write (localStorage + server DB), coverage of every stage, precise resume after interruption/manual exit returns to the stage start |
+| V7.4.3 | 2026-08-19 | opencode (deepseek-v4-flash-free) | Fixed the spot check jumping to the next word on Enter + the double-Enter hazard in the warm-up + independent spelling/meaning judgement changed to manual advance (the answer is shown even when correct) |
+
+---
+
+## Quick Start
+
+### Prerequisites
+- Node.js ≥ 18 (v26.5.0 used in development)
+- npm
+
+### Install and Run
+
+```bash
+# 1. Install dependencies
+cd client && npm install
+cd ../server && npm install
+
+# 2. Initialise the database (create tables + import 4,237 words + 30 writing questions + all migrations)
+cd server && npm run setup
+
+# 3. Start the backend (port 3001)
+cd server && npm run dev
+
+# 4. Start the frontend (port 5174)
+cd client && npm run dev
+```
+
+Open `http://localhost:5174` in your browser.
+
+> For production deployment, see the [Deployment](#deployment) section.
+
+### Database Scripts
+| Command | Description |
+|------|------|
+| `npm run setup` | Full initialisation (create tables + seeds + all migrations) |
+| `npm run migrate:all` | Run all migrations only (idempotent, repeatable) |
+| `npm run migrate` | Basic table creation |
+| `npm run seed` | Seed data (vocabulary + writing questions) |
+
+---
+
+## Project Structure
+
+```
+ielts-training/
+├── client/                          # React frontend (Vite + Tailwind CSS 4)
+│   └── src/
+│       ├── App.jsx                  # Routing + Provider hierarchy
+│       ├── index.css                # Tailwind + card-flip 3D animation
+│       ├── components/
+│       │   ├── layout/              # Navbar / MobileTabBar / FloatingActions
+│       │   ├── training/            # TrainingTimer / FirstVisitHint / SummaryModal (summary modal)
+│       │   └── ui/                  # FlipCard (3D flip) / Toast / KeyboardHelp / VersionNotice / Loading / ErrorBoundary
+│       ├── context/                 # Auth / Settings / Theme / Touch / App / UserKV (memory storage)
+│       ├── hooks/                   # useKeyboard / useSwipe / useTimer
+│       ├── pages/
+│       │   ├── daily/               # TodayBriefing / PetWarmup / MainStudy / SpotCheck / SpellingPractice / SpellCheck / AcceptanceTest / DailyReport
+│       │   ├── words/               # Lists / ListStudy / ListDictation / MeaningTest / SpellingTest / ReviewWords / WrongWords / Topics / WordList / WordStudy
+│       │   ├── writing/             # WritingQuestions / WritingEditor / WritingResult / History
+│       │   ├── user/                # Login / Register / Admin / Me / Settings
+│       │   └── misc/                # Home / SpeechDiagnostic / TrainingHistory (history calendar)
+│       └── utils/                   # api / speech (multi-source) / answerCheck (smart grading) / checkAnswer
+│
+├── server/                          # Express backend
+│   ├── index.js                     # Entry point (route mounting)
+│   ├── auth.js                      # Auth middleware (requireAuth / requireAdmin)
+│   ├── routes/                      # 20 route files (see the API docs)
+│   ├── db/
+│   │   ├── database.js              # SQLite connection (better-sqlite3)
+│   │   ├── migrate.js               # Basic table creation
+│   │   ├── migrate_v4..v19.js       # Versioned migrations (idempotent)
+│   │   ├── seed.js                  # Seed data
+│   │   ├── word_bank.json           # Full definitions for 2,319 IELTS words
+│   │   └── v6_meanings.json         # Full Youdao definitions for 2,318 words
+│   ├── scripts/                     # enrichSynonyms (synonym library) / fixPetDefs / fixSingleCharDefs / DeepSeek expansion, etc.
+│   └── .env                         # DEEPSEEK_API_KEY
+│
+├── deploy.ps1                       # One-click deployment script (Tencent Cloud)
+├── start.bat                        # One-click local start
+├── RELEASE-REPORT.md                # Full release report
+├── KV-STORAGE.md                    # KV storage system design document
+└── AGENTS.md / CLAUDE.md            # AI collaboration conventions
+```
+
+---
+
+## API Reference
+
+> Authentication: everything except `/api/auth/*` requires `Authorization: Bearer <token>` (returned at login).
+
+### Auth and Users
+| Method | Path | Description |
+|------|------|------|
+| POST | `/api/auth/register` | Register (the first user automatically becomes an administrator and inherits the old data) |
+| POST | `/api/auth/login` | Log in (returns token + user info) |
+| POST | `/api/auth/logout` | Log out (invalidates the token) |
+| GET | `/api/auth/me` | Current user info |
+
+### Administration
+| Method | Path | Description |
+|------|------|------|
+| GET | `/api/admin/users` | User list + per-user statistics (Admin required) |
+| POST | `/api/admin/users/:id/reset-password` | Reset password (kicks out all sessions) |
+| POST | `/api/admin/users/:id/toggle-status` | Enable/disable an account |
+
+### Vocabulary and Learning
+| Method | Path | Description |
+|------|------|------|
+| GET | `/api/topics` | Topic list and statistics |
+| GET | `/api/words?topic=&page=&limit=&search=` | Paginated/searchable words |
+| GET | `/api/words/:id` | Word details |
+| GET | `/api/lists` | 24 List metadata entries + mastery progress |
+| GET | `/api/lists/:listNo/words` | All words in a List (with definitions + keywords + synonyms + mastery status) |
+| POST | `/api/lists/:listNo/dictation` | Submit dictation results |
+| GET | `/api/spelling-test?topic=&count=` | Generate spelling test questions |
+| POST | `/api/spelling-test` | Submit spelling results |
+| GET | `/api/meaning-test?mode=meaning\|mixed&count=` | Generate meaning judgement questions (lenient grading) |
+| POST | `/api/meaning-test` | Submit meaning judgement results |
+| GET | `/api/review-words` | Words due for review today (SM-2) |
+| POST | `/api/review-result` | Submit review results |
+| GET | `/api/wrong-words` | Wrong-word book |
+
+### Daily Training
+| Method | Path | Description |
+|------|------|------|
+| GET | `/api/daily-plan` | Today's briefing (target duration/debt/reasons/today's List/spot-check tasks/warm-up words/**full pending-relearning list/today's completion state**) |
+| GET | `/api/daily-plan/status` | Today's training status (remaining duration) |
+| GET | `/api/daily-plan/resume` | **Resume-from-breakpoint info (most recent unfinished session + batch progress)** |
+| POST | `/api/daily-plan/settings` | Switch study mode (sequential/custom List) |
+| POST | `/api/daily-plan/spot-check` | Submit spot-check results (pass at ≥80%) |
+| GET | `/api/daily-plan/test-spot-check` | Simulated spot check for the test account |
+| POST | `/api/daily-plan/complete` | Mark the day as complete |
+| POST | `/api/training/start` | Start a training session (returns the word list/spelling words/batches) |
+| POST | `/api/training/spell-check` | Submit the spelling spot check (≥80% passes / otherwise pending relearning) |
+| POST | `/api/training/complete` | Complete training (records duration + accuracy + **writes the training summary**) |
+| POST | `/api/training/abandon` | Wrap up (saves progress + **completed batches**, debt is still calculated normally) |
+
+### Training Summaries (V7.3.1)
+| Method | Path | Description |
+|------|------|------|
+| GET | `/api/training/summaries?limit=` | Training summary list (word-level detail + duration + accuracy) |
+| GET | `/api/training/summaries/:id` | Single summary details |
+
+### Writing
+| Method | Path | Description |
+|------|------|------|
+| GET | `/api/writing-questions?task_type=` | Writing question list |
+| GET | `/api/writing-questions/:id` | Single question details |
+| POST | `/api/essays/submit` | Submit an essay + AI grading |
+| GET | `/api/essays/:id/result` | Grading result (four criteria) |
+| GET | `/api/essays/history` | History |
+| GET | `/api/stats/overview` | Study overview statistics |
+
+### Settings and KV Storage
+| Method | Path | Description |
+|------|------|------|
+| GET | `/api/settings` | Read settings (with fallback to the legacy table) |
+| PUT | `/api/settings` | Update settings (written to KV as well) |
+| GET | `/api/user-kv?keys=k1,k2` | Read user KV (filterable) |
+| GET | `/api/user-kv/:key` | Read a single key |
+| PUT | `/api/user-kv` | Batch write KV (body: `{key: value}`) |
+| DELETE | `/api/user-kv/:key` | Delete a key (idempotent) |
+
+### Announcements
+| Method | Path | Description |
+|------|------|------|
+| GET | `/api/announcements` | Unread announcement list |
+| POST | `/api/announcements/:id/seen` | Mark as read |
+
+### Other
+| Method | Path | Description |
+|------|------|------|
+| GET | `/api/health` | Health check |
+
+---
+
+## Database Design
+
+> SQLite (better-sqlite3), migration scripts are idempotent and repeatable (migrate_v4 ~ v19).
+
+| Table | Purpose | Key Fields |
+|----|------|----------|
+| `users` | Users | username/password_hash/is_admin/status/is_test/study_mode/custom_list_no |
+| `sessions` | Login sessions | token/expires_at |
+| `words` | Vocabulary (4,237 words) | word/phonetic/chinese_definition/list_no/level/is_extra/topic/source |
+| `word_meanings` | Full multiple-sense definitions | meanings(JSON)/keywords(JSON)/**synonyms(JSON synonyms)**/source |
+| `user_word_progress` | Study progress (per word per user) | ease_factor/interval_days/repetitions/mastered/review dates |
+| `list_completion` | List completion status | first_completed_date/spot_check_date/pending_review/reback_completed_date |
+| `daily_sessions` | Daily training sessions | list_no/batch_size/**completed_batches (resume from breakpoint)**/duration_seconds/completed |
+| `daily_session_words` | Per-word detail within a session | main_correct/spelling_correct/acceptance_correct |
+| `training_summaries` | **Training summaries (V7.3.1)** | list_no/duration_seconds/accuracy per stage/**word_stats (word-level right/wrong JSON)** |
+| `writing_questions` | Writing past papers | task_type/chart_type/model_essay |
+| `essay_submissions` | Essay submissions | scores_json/feedback_json |
+| `user_kv` | **KV user memory storage** | key/value(JSON)/updated_at |
+| `user_settings` | Legacy settings table (kept for compatibility) | voice_source/rest_minutes etc. |
+| `announcements` | Version announcements | version(unique)/title/content |
+| `user_announcements` | Announcement read records | user_id+announcement_id |
+
+---
+
+## User Memory KV Storage System
+
+> Design document: `KV-STORAGE.md`. Goal: **from now on, adding any new user data field no longer requires writing a database migration.**
+
+### Architecture
+```
+Frontend useUserKV() hook
+  ├── In-memory cache (React state, O(1) reads and writes)
+  ├── localStorage cache (speeds up startup across sessions)
+  └── Server-side user_kv table (persistence)
+       ├── PUT /api/user-kv   → batch upsert
+       ├── GET /api/user-kv   → read (supports keys filtering)
+       └── DELETE /api/user-kv/:key → delete
+```
+
+### Key Naming Convention
+`namespace.camelCaseKey`, e.g. `settings.voiceSource`, `training.pomodoro`, `ui.theme`
+
+### Usage Example
+```js
+const { get, set, remove } = useUserKV();
+set('settings.voiceSource', 'youdao');   // automatic optimistic update + server sync
+get('settings.voiceSource');              // synchronous read from cache
+remove('ui.legacyKey');                   // delete
+```
+
+### Design Principles
+- Optimistic updates: write to the cache first for immediate effect, sync to the server asynchronously, roll back automatically on failure
+- High-frequency structured data (study progress, SM-2, etc.) stays in relational tables; KV carries settings/preferences/metadata
+- The legacy `user_settings` table is kept read-only for compatibility; all settings reads and writes have migrated to KV
+
+---
+
+## Keyboard Shortcuts
+
+### Global
+| Key | Behaviour |
+|------|------|
+| `?` | Show/hide the shortcut help panel |
+| `/` | Focus the top search box |
+| `Esc` | Close the modal / go back one level |
+
+### Memorisation and Tests
+| Key | Scenario | Behaviour |
+|------|------|------|
+| `Enter` | Word list/dictation/spelling | Submit the answer / next |
+| `Space` | Word-related | Read the current word aloud |
+| `← →` | Card flip/wrong-word book | Previous/next |
+| `1` / `2` | Word list | Mark known / unknown |
+| `1-6` | Spaced repetition | Quickly select the recall level |
+| `1-4` | Meaning judgement | Select a definition option |
+
+### Writing
+| Key | Behaviour |
+|------|------|
+| `Ctrl+Enter` | Submit the essay (with confirmation) |
+| `Tab` | Insert a 2-space indent |
+| `Ctrl+S` | Save the draft |
+
+---
+
+## Speech System (Multiple Sources)
+
+> Tool: `client/src/utils/speech.js`; the source can be switched on the settings page.
+
+| Source | Characteristics | Dependency |
+|------|------|------|
+| Local speech | Web Speech API, works offline, most reliable | An English voice installed on the system |
+| Youdao Dictionary | Real human pronunciation, US/UK selectable | Internet (no key required) |
+| Baidu Translate | Clear and natural | Internet (no key required) |
+
+- Network sources fall back to local speech automatically on failure
+- Local speech must be called synchronously (a Chrome restriction); network sources play through `<audio>`
+- Both card faces have a read-aloud button; the `Space` shortcut works globally
+
+---
+
+## Spaced Repetition Algorithm
+
+A simplified SM-2 algorithm (`user_word_progress` table):
+- Each review adjusts the interval based on the rating (0-5)
+- `quality ≥ 3` (remembered): `interval = interval × ease_factor`
+- `quality < 3` (not remembered): reset to 1 day
+- Ease factor range: 1.3 - 2.5+
+- 3 correct answers in a row → marked "mastered" (mastered=1)
+
+---
+
+## DeepSeek AI Grading
+
+Writing grading is based on the **DeepSeek API**, scoring against the four IELTS criteria:
+1. Task Achievement / Task Response
+2. Coherence and Cohesion
+3. Lexical Resource
+4. Grammatical Range and Accuracy
+
+```bash
+# Edit server/.env
+DEEPSEEK_API_KEY=sk-your-api-key-here
+```
+
+> 💡 When no API key is configured, local heuristic scoring is used (word count/complexity/structure) so the feature stays usable.
+
+---
+
+## Deployment
+
+### One-Click Local Start
+```bash
+start.bat
+```
+
+### Tencent Cloud Deployment (deploy.ps1)
+```powershell
+# Prerequisite: passwordless ssh root@<your-server-ip> is configured
+powershell -File deploy.ps1
+```
+
+Deployment flow (6 steps):
+1. Local `git push` (including the deploy checkpoint empty commit)
+2. Server `git pull --ff-only`
+3. Server installs dependencies (server `--omit=dev` + client)
+4. Server runs `npm run migrate:all`
+5. Server builds the frontend (`npm run build`)
+6. `pm2 restart ielts-server` + health check (API /api/health + frontend 200)
+
+> Server environment: Ubuntu 24.04 · pm2 daemon · nginx reverse proxy (`/api/` → :3001, static → client/dist)
+>
+> Note: DeepSeek-expanded data such as the synonym library is generated independently on the server with `node scripts/enrichSynonyms.js` (and `--pet`), outside the deployment flow.
+
+---
+
+## Data Scale and Tech Stack
+
+### Data Scale
+| Item | Count |
+|----|------|
+| Vocabulary | 4,237 words (PET 1,752 + IELTS 2,318 + real-exam selection 282) |
+| IELTS Lists | 24 (about 100 words per List, all with 2+ deep definitions + synonyms) |
+| PET words | 1,752 words (all with keywords + synonyms + single-character core-sense fixes) |
+| Writing questions | 30 Cambridge past papers (Task 1 × 15 + Task 2 × 15) |
+
+### Tech Stack
+| Layer | Technology |
+|----|------|
+| Frontend | React 18 · Vite 8 · Tailwind CSS 4 · React Router · Lucide React · Recharts |
+| Backend | Node.js · Express 5 |
+| Database | SQLite (better-sqlite3, WAL mode) |
+| Authentication | bcryptjs + Bearer Token (30-day session) |
+| AI | DeepSeek API (deepseek-chat) — writing grading + synonym library generation |
+| Deployment | Tencent Cloud Lighthouse · pm2 · nginx |
+
+---
+
+## Version Naming Convention
+
+Enforced uniformly since V7.2.3:
+
+| Digit | Meaning | Trigger Condition |
+|----|------|----------|
+| Major | Significant rework/architectural refactor | Flow rework, data system rebuild, new core module |
+| Minor | New features | New page, new interaction, new module |
+| Patch | Bug fixes | Defect fixes, experience improvements, copy adjustments |
+
+**Convention**:
+1. Commit messages start with `V X.X.X:`
+2. On every version update: update this README's version history + `RELEASE-REPORT.md` + create a version announcement (migrate_vN.js)
+3. Tag the git release: `git tag V7.3.1`
+4. All new user data goes through KV (`useUserKV().set()`), with no database migration needed
+
+---
+
+*Documentation maintained: updated continuously with each version · Last updated 2026-08-19 (V7.4.3)*
+
+---
+
+# 📚 IELTS 6.5 智能备考训练网站（V7.4.3）
 
 > 基于 **React + Express + SQLite** 的雅思（IELTS）6.5 分目标备考平台
 > 当前版本：**V7.4.3** · GitHub：`https://github.com/Lowlife555/ielts-training`
@@ -511,7 +1086,7 @@ start.bat
 
 ### 腾讯云部署（deploy.ps1）
 ```powershell
-# 前提：已配置 ssh root@43.135.22.140 免密
+# 前提：已配置 ssh root@<your-server-ip> 免密
 powershell -File deploy.ps1
 ```
 
